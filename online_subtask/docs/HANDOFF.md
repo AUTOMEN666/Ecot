@@ -1,7 +1,7 @@
 # Steady Subtask implementation handoff
 
-Work is confined to `ecot_online_generation_subtask_steady`, based on original
-`ecot_online_generation_subtask` at `8e4f340940c56fbbe5c30e0ee578d6e5b8678321`.
+Work is confined to `ecot_online_generation_subtask_steady_classify_objects`, based on original
+`ecot_online_generation_subtask_classify_objects` at `8e4f340940c56fbbe5c30e0ee578d6e5b8678321`.
 Do not edit or force-update the original branch. No training, GPU process, real
 API request or simulator episode was started for this implementation/review.
 

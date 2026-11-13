@@ -1,7 +1,7 @@
 # Steady Subtask: runtime constraints for Follow ECoT tests
 
-Branch: `ecot_online_generation_subtask_steady`, based on
-`ecot_online_generation_subtask` commit `8e4f340940c56fbbe5c30e0ee578d6e5b8678321`.
+Branch: `ecot_online_generation_subtask_steady_classify_objects`, based on
+`ecot_online_generation_subtask_classify_objects` commit `8e4f340940c56fbbe5c30e0ee578d6e5b8678321`.
 The source branch and its deployment/results are unchanged. This version is a
 new protocol, `mainhist93_tok65536_steady_v1`, with its own output namespace.
 

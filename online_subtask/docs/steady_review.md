@@ -3,7 +3,7 @@
 Initially reviewed candidate: `8b82a0a2859534a00003146bd5e430a46b48ab26`.
 The first review reproduced three behavioral defects in that initial steady commit
 and a missing error-evidence artifact.
-The original `ecot_online_generation_subtask` branch is unchanged.
+The original `ecot_online_generation_subtask_classify_objects` branch is unchanged.
 
 | Finding | Reproduced behavior before correction | Correction |
 | --- | --- | --- |

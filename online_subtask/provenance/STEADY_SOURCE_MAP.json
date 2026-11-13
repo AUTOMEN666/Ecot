@@ -1,8 +1,8 @@
 {
   "schema": "ecot.online_subtask.steady.source_map.v1",
-  "base_branch": "ecot_online_generation_subtask",
+  "base_branch": "ecot_online_generation_subtask_classify_objects",
   "base_commit": "8e4f340940c56fbbe5c30e0ee578d6e5b8678321",
-  "branch": "ecot_online_generation_subtask_steady",
+  "branch": "ecot_online_generation_subtask_steady_classify_objects",
   "protocol_config_id": "mainhist93_tok65536_steady_v1",
   "scope": "Current branch adaptations; historical SOURCE_MAP.json and deployment receipts remain unchanged. No real API/GPU/native rollout is asserted.",
   "manifest_excludes_itself_to_avoid_self_reference": true,
@@ -14,7 +14,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "e472d6bc517c3ee5d3b23d146a83ba9c488f66e7d19e0e1db0fe6c89a752f111",
+      "sha256": "500af808b55e86d28d4ca86d5930ad7d8afeb4ac64d45381b7fef5f0ba99b451",
       "base_sha256": "d7cb92c5ed4a07e21a7071a4c33684b1a124b14cefdcfee6ba71b3f7ea6ce0f4"
     },
     {
@@ -39,7 +39,7 @@
     },
     {
       "path": "online_subtask/docs/HANDOFF.md",
-      "sha256": "e5c3e7c9a69dc83534e8ed92f40127a0ac9edf7b5a3f98e294e8cb71175fb709",
+      "sha256": "e08d547ce76dc64f4ca43e35d55f250fefd84980124148298e56015cfe4e3913",
       "base_sha256": null
     },
     {
@@ -59,12 +59,12 @@
     },
     {
       "path": "online_subtask/docs/steady.md",
-      "sha256": "ade5b56c512bca68d819e0ce5a8f8e7222df8b5301e5c6765488f97fdea5c5f3",
+      "sha256": "b51c5724c1684a0f1487b7f6adda354fa7f9036f84083d94fc7c79dcfaa4741e",
       "base_sha256": null
     },
     {
       "path": "online_subtask/docs/steady_review.md",
-      "sha256": "873e05e97abebcc22c887f14238db4c5538ce1f50c4ae40fcef66cc45691e5c2",
+      "sha256": "0eac0e6f87cf6bd32e28128ef2aa171db81dee678045b424fb4b87d918079849",
       "base_sha256": null
     },
     {
@@ -441,6 +441,20 @@
       "path": "tools/verify_steady.py",
       "sha256": "0dd154fc8659f59dd3bf2e658877d6f37ecab815d5f52a18bb07881b62a0fde3",
       "base_sha256": null
+    },
+    {
+      "path": "online_subtask/docs/branches.md",
+      "sha256": "04029185eb1a0f6859196f378819dcaabf2e1c854c276376d12b326d12ce4b19",
+      "base_sha256": null
     }
-  ]
+  ],
+  "task_name": "classify_objects",
+  "branch_naming_migration": {
+    "base_task_branch": "ecot_online_generation_subtask_classify_objects",
+    "steady_task_branch": "ecot_online_generation_subtask_steady_classify_objects",
+    "SSR_preparation_branch": "ecot_online_generation_subtask_reasoning_and_action_summary_classify_objects",
+    "derived_from_commit": "19046d3b9c0dea754c1f3937cc6d4ca698e9d0ea",
+    "runtime_and_scientific_settings_changed": false,
+    "historical_base_commit_preserved": "8e4f340940c56fbbe5c30e0ee578d6e5b8678321"
+  }
 }
