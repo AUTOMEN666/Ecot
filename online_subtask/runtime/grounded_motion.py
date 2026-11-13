@@ -106,7 +106,7 @@ def action_envelopes(evidence,target,*,contact_transition=None):
         'known_contact_transition':deepcopy(contact_transition)}
 
 def mentioned_arms(text):
-    refs=set(re.findall(r'\b(left|right|both)(?:-hand)?\s+(?:(?:open|closed|empty|free|robot)\s+){0,3}(?:arm|arms|gripper|grippers|hand|hands|fingers)\b',text,re.I))
+    refs=set(re.findall(r'\b(left|right|both)(?:-hand)?\s+(?:(?:open|closed|empty|free|robot)\s+){0,3}(?:arm|arms|gripper|grippers|hand|hands|fingers|grasp|grasps)\b',text,re.I))
     refs={x.lower()for x in refs}
     if'both'in refs:refs.discard('both');refs.update({'left','right'})
     return refs
@@ -121,7 +121,7 @@ def explicit_action_actors(text):
         'release':'release','releases':'release','releasing':'release','retract':'retract','retracts':'retract',
         'retracting':'retract'}
     verbs='(?:'+'|'.join(sorted(forms,key=len,reverse=True))+')'
-    actor=r'(left|right|both)(?:-hand)?\s+(?:(?:open|closed|empty|free|robot)\s+){0,3}(?:arm|arms|gripper|grippers|hand|hands|fingers)'
+    actor=r'(left|right|both)(?:-hand)?\s+(?:(?:open|closed|empty|free|robot)\s+){0,3}(?:arm|arms|gripper|grippers|hand|hands|fingers|grasp|grasps)'
     patterns=[(re.compile(r'\b('+verbs+r')\b[^.;]{0,130}?\bwith\s+(?:the\s+)?'+actor,re.I),False),
         (re.compile(r'\b'+actor+r'\s+(?:(?:should|will|can|must|to|gently|slightly|continues|continue|starts|start)\s+){0,4}('+verbs+r')\b',re.I),True),
         (re.compile(r'\b('+verbs+r')\s+(?:(?:the|your|empty|open|closed)\s+){0,2}'+actor,re.I),False)]

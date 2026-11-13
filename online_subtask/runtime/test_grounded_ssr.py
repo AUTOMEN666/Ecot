@@ -72,6 +72,17 @@ def grounded_runtime(tmp,transport=wire):
         yield model,policy,p,spec
 
 class GroundedSSRTests(unittest.TestCase):
+    def test_actual_frame88_left_grasp_identifies_actor_without_rewriting_or_promoting_support(self):
+        context={'subtask':'unused','reasoning':'The left gripper currently encloses the secured black and gold pen; keep that grasp and continue carrying it toward the visible white basket. Release readiness is not yet observed.',
+            'action':{'summary':'Carry the secured black and gold pen toward the white basket while keeping the left grasp.'}}
+        evidence=facts('lift');target=dict(instance_id='O1',basket_color='white',category='pen')
+        result=validate_plan(context,action_envelopes(evidence,target))
+        self.assertEqual(result['acting_arms'],['left'])
+        self.assertEqual(context['action']['summary'],'Carry the secured black and gold pen toward the white basket while keeping the left grasp.')
+        with self.assertRaises(SubtaskConstraintError):validate_plan(context,action_envelopes(facts(),target))
+        direction_only=deepcopy(context);direction_only['action']['summary']='Carry the black and gold pen leftward toward the white basket.'
+        with self.assertRaisesRegex(SubtaskConstraintError,'identify its acting'):validate_plan(direction_only,action_envelopes(evidence,target))
+
     def test_known_enclosed_closing_target_preserves_unknown_grasp_and_only_close_hold(self):
         seen=[]
         def transport(request,proof):

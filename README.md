@@ -2,7 +2,7 @@
 
 This branch implements causal online generation of three public ECoT fields and
 conditions the existing noDropout SSR π0.5 checkpoint **EMA19566** on those fields.
-The active experimental protocol is `mainhist93_tok65536_grounded_strict_ssr_v3`.
+The active experimental protocol is `mainhist93_tok65536_grounded_strict_ssr_v4`.
 Start with the [grounded SSR guide](online_subtask/docs/grounded_ssr.md).
 Whole-trajectory annotation quality and genuine H20 GPU/native acceptance are
 still being evaluated. Neither code tests nor a rendered source video establish
@@ -23,10 +23,14 @@ that the annotations are reliable or that task success improves.
 4. Execute up to8 actions from the50-step prediction. Only verified actual
    injection/action/clock ACKs commit a real online Subtask-history record.
 
-Strict JSON Schema constrains both API responses to the existing field/enumeration
-contracts. Its factory is byte-identical to the real current3 compatibility probe.
-The v2 JSON-object protocol remains explicit; v3 never falls back to it. Schema
-validity does not establish visual facts or future-action accuracy.
+V4 requests strict JSON Schema with a finite semantic category vocabulary plus
+null. Categories are visually chosen, never inferred by the host from descriptor
+IDs or SDK labels. The selector schema remains byte-for-byte equivalent to the
+v3 selector factory. Earlier current3 probes showed limited format compatibility,
+but later v3 responses violated a category string pattern; strict mode is not a
+guarantee. Both output format and visual/action constraints remain checked, with
+errors preserved and no JSON-object fallback. Full v4 API and trajectory quality
+acceptance remain pending.
 
 Reasoning explains the current constraint and a useful next adjustment. Summary
 specifies a feasible immediate action over about8–16 control steps. Training
@@ -60,7 +64,7 @@ correction. Another similar object in a basket does not complete this instance.
 ## Native adapter and evaluation
 
 Use `pi05_ssr_policy`, `PI05_SSR_CHECKPOINT_STEP=19566` and
-`PI05_SSR_PROTOCOL_ID=mainhist93_tok65536_grounded_ssr_v2`. The preparer requires
+`PI05_SSR_PROTOCOL_ID=mainhist93_tok65536_grounded_strict_ssr_v4`. The preparer requires
 a genuine original weights/normalization/tokenizer binding. The original seven
 `pi05_policy` camera/action/clock files remain unchanged; the SSR adapter's
 execution loop remains equivalent to that original loop. H20 renderer/device and

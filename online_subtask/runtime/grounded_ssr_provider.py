@@ -20,6 +20,7 @@ HERE=Path(__file__).resolve().parent
 
 class GroundedSSRProvider(SSRSteadyProvider):
     protocol_config_id=CONFIG_ID
+    observer_prompt_path=HERE/'grounded_ssr_observer_prompt.md'
     history_mode='actual_execution'
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
@@ -33,6 +34,11 @@ class GroundedSSRProvider(SSRSteadyProvider):
 
     def selector_response_format(self,allowed_ids):
         return {'type':'json_object'}
+
+    def validate_observation_format(self,evidence):
+        # Versioned providers can add stricter format admission, without
+        # rewriting model observations or changing the visual scene guard.
+        pass
 
     def history_metadata(self,request,proof):
         request=deepcopy(request);proof=deepcopy(proof)
@@ -55,7 +61,7 @@ class GroundedSSRProvider(SSRSteadyProvider):
         self._ssr_authorization=None;self._motion_envelopes={};self._candidate_scene_sha=None
         request,proof=self.history_metadata(request,proof)
         scene_before=self.guard.snapshot();state_sha=digest(scene_before)
-        observer=deepcopy(request);observer_prompt=(HERE/'grounded_ssr_observer_prompt.md').read_text()
+        observer=deepcopy(request);observer_prompt=self.observer_prompt_path.read_text()
         observer['messages'][0]['content']=observer_prompt
         descriptors={c['descriptor_id']:c['object_phrase']for c in self.catalog['candidates']}
         observer['messages'][1]['content'][0]['text']=canonical({'descriptors':[
@@ -80,7 +86,8 @@ class GroundedSSRProvider(SSRSteadyProvider):
             response_format_sha256=digest(observer['response_format']))
         evidence,receipt=SteadySubtaskProvider.observer_query(self,observer,observer_proof,
             started=started,unchanged=observer_unchanged)
-        observer_unchanged();validate_arms(evidence['arms'],evidence['objects'])
+        observer_unchanged();self.validate_observation_format(evidence)
+        validate_arms(evidence['arms'],evidence['objects'])
         self.observer_receipt=receipt
         decision=self.guard.observe(evidence,episode_id=proof['episode_id'],frame=proof['current_frame'],
             available_frames=[x['frame']for x in proof['observations']],

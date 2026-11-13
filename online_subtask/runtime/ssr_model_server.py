@@ -14,9 +14,14 @@ from ssr_provider import SSRSteadyProvider
 def create_model(spec,policy=None,jax_module=None,provider=None):
     from grounded_ssr_protocol import CONFIG_ID as GROUNDED_ID
     from strict_grounded_ssr_protocol import CONFIG_ID as STRICT_ID
+    from enum_grounded_ssr_protocol import CONFIG_ID as ENUM_ID
+    enumerated=spec.get('config_id')==ENUM_ID
     strict=spec.get('config_id')==STRICT_ID
-    grounded=spec.get('config_id')in(GROUNDED_ID,STRICT_ID)
-    if strict:
+    grounded=spec.get('config_id')in(GROUNDED_ID,STRICT_ID,ENUM_ID)
+    if enumerated:
+        from enum_grounded_ssr_protocol import validate_spec as validate_enum_spec
+        validate_enum_spec(spec)
+    elif strict:
         from strict_grounded_ssr_protocol import validate_spec as validate_strict_spec
         validate_strict_spec(spec)
     elif grounded:
@@ -33,7 +38,10 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
     # Fail before loading/sampling a policy if the real external formatter differs.
     actual_training_prompt(INSTRUCTION,load_reference()['examples'][0]['context'])
     if provider is None:
-        if strict:
+        if enumerated:
+            from enum_grounded_ssr_provider import EnumGroundedSSRProvider
+            provider_class=EnumGroundedSSRProvider
+        elif strict:
             from strict_grounded_ssr_provider import StrictGroundedSSRProvider
             provider_class=StrictGroundedSSRProvider
         elif grounded:

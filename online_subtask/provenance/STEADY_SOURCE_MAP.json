@@ -3,7 +3,7 @@
   "base_branch": "ecot_online_generation_subtask_classify_objects",
   "base_commit": "8e4f340940c56fbbe5c30e0ee578d6e5b8678321",
   "branch": "ecot_online_generation_subtask_reasoning_and_action_summary_classify_objects",
-  "protocol_config_id": "mainhist93_tok65536_grounded_strict_ssr_v3",
+  "protocol_config_id": "mainhist93_tok65536_grounded_strict_ssr_v4",
   "scope": "Current branch adaptations; historical SOURCE_MAP.json and deployment receipts remain unchanged. No real API/GPU/native rollout is asserted.",
   "manifest_excludes_itself_to_avoid_self_reference": true,
   "files": [
@@ -14,7 +14,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "6b321d3d4529877c645b5deb44f46a99465c8cdb77244e3820b8b429f3eead23",
+      "sha256": "b3f915825da51c0912b9faa312b1f4bff7cf1c8efb7ff630aa05ef1f7c477bd3",
       "base_sha256": "d7cb92c5ed4a07e21a7071a4c33684b1a124b14cefdcfee6ba71b3f7ea6ce0f4"
     },
     {
@@ -36,6 +36,11 @@
       "path": "online_subtask/configs/mainhist93_tok65536_grounded_strict_ssr_v3.json",
       "base_sha256": null,
       "sha256": "86bb62a88a7470c220b507ef4ca9fa624e051ab2beb5e61c99d3d9ad72c12cb5"
+    },
+    {
+      "path": "online_subtask/configs/mainhist93_tok65536_grounded_strict_ssr_v4.json",
+      "base_sha256": null,
+      "sha256": "c3f1e53855d79181dd2bac2a0fb40836d8ec314789bbec6916297b2bcf90b863"
     },
     {
       "path": "online_subtask/configs/mainhist93_tok65536_steady_ssr_v1.json",
@@ -65,7 +70,7 @@
     {
       "path": "online_subtask/docs/grounded_ssr.md",
       "base_sha256": null,
-      "sha256": "4cb9c60cc2669c3fa1858edfccb54f6ae01f4525a45bc5a00660ce9309b3b352"
+      "sha256": "a2266c5e4f71d6d2c04aed78a78e2e0e92073c753fff18322edd2ad145e595fc"
     },
     {
       "path": "online_subtask/docs/integration.md",
@@ -220,7 +225,7 @@
     {
       "path": "online_subtask/provenance/ssr_cpu_validation.json",
       "base_sha256": null,
-      "sha256": "343b8e5696a860f7429f04e079d55388ab2724d6b8f4b258a5305c792dec4cc2"
+      "sha256": "38a093eadeb76472dc237cb2d01c51febe0cf4fab352c373546e8da165565206"
     },
     {
       "path": "online_subtask/provenance/steady_cpu_validation.json",
@@ -253,6 +258,16 @@
       "base_sha256": "9ee6c45125999fe9a82ffd3c82b1818b2ee3f0c99eb50df674598aec6ae4a567"
     },
     {
+      "path": "online_subtask/runtime/enum_grounded_ssr_protocol.py",
+      "base_sha256": null,
+      "sha256": "4fb1cf2aa7cfc4d3c5ec52306a04643e28a1a7c2a0e94ac2f8d3f8a358c43a62"
+    },
+    {
+      "path": "online_subtask/runtime/enum_grounded_ssr_provider.py",
+      "base_sha256": null,
+      "sha256": "4dba4e16a2cff3e12f307f76182ee943310065747f529aca224c7b39b611e0ab"
+    },
+    {
       "path": "online_subtask/runtime/executed_history.py",
       "sha256": "24933812374e226e0490883720dd3ae599e5303a2410bf554cd4ea29699e6224",
       "base_sha256": "bdc03c43903b05eb2bb595d26bdbe71fb24a504a3b6b7c882d39637e157a3fac"
@@ -265,12 +280,17 @@
     {
       "path": "online_subtask/runtime/grounded_motion.py",
       "base_sha256": null,
-      "sha256": "36c6f049e379792bf8763e1ed5b47d2500f4cc8cf1aff78005894848d709d9cd"
+      "sha256": "d0feb30eb8ca2baae3bcb84df300ef47cffcf9452f11212d9fd35a9ff9295f84"
     },
     {
       "path": "online_subtask/runtime/grounded_response_schema.py",
       "base_sha256": null,
       "sha256": "0504bf0830ec16f220eb0e1fb46fd5f56e9f7593c23f433ed6d778562d31c94b"
+    },
+    {
+      "path": "online_subtask/runtime/grounded_response_schema_v2.py",
+      "base_sha256": null,
+      "sha256": "b66d2d5d89bf6d0ef88d93636d1464c1f11ac0534d54f912dc0a06dee47f4d37"
     },
     {
       "path": "online_subtask/runtime/grounded_scene_guard.py",
@@ -283,6 +303,11 @@
       "sha256": "16f34eb42e3344d8d0ee4d73f57021e4b117b50270af4893b730e16195a1078f"
     },
     {
+      "path": "online_subtask/runtime/grounded_ssr_observer_prompt_v4.md",
+      "base_sha256": null,
+      "sha256": "fe443e8e166594f9ac35160e5d1f5742f93e77f83e3b88352700fe5ea7694f5d"
+    },
+    {
       "path": "online_subtask/runtime/grounded_ssr_protocol.py",
       "base_sha256": null,
       "sha256": "2bed69c168c3004c14fdadd7a3d1a9ebebbdd6d2b791684b109995cb8158476e"
@@ -290,7 +315,7 @@
     {
       "path": "online_subtask/runtime/grounded_ssr_provider.py",
       "base_sha256": null,
-      "sha256": "fc93a4be0d164724e3af661a00c70f199d70d1c15fbacf5fd1699c6c58b28913"
+      "sha256": "ca6ab27c4026a04c7365a517ed22b5aa79d383856a062f60c72f6e39dbf1bb45"
     },
     {
       "path": "online_subtask/runtime/grounded_ssr_selector_prompt.md",
@@ -314,7 +339,7 @@
     },
     {
       "path": "online_subtask/runtime/model_server.py",
-      "sha256": "82351321b9fe78fedf9d9151181f44146611053272964e306b1325ba9d398a16",
+      "sha256": "762520b066edecb0bd07e5219fa46b616a05a9202160227445efb8b66faa1177",
       "base_sha256": "ac89372dfc41ffccf27e3ae23828837cb45232ecc435dce7841488a42400d224"
     },
     {
@@ -380,7 +405,7 @@
     {
       "path": "online_subtask/runtime/pi05_ssr_policy/deploy.py",
       "base_sha256": null,
-      "sha256": "406516e868893f3f16eb9ecd99c82550b48793667214dc91cd16958dc13fedce"
+      "sha256": "9246ec62ee02d842f15b945f3c81d19a2f3d768ebb94c78e0ba4591c29e5df4c"
     },
     {
       "path": "online_subtask/runtime/prepare_native_sim.py",
@@ -395,12 +420,12 @@
     {
       "path": "online_subtask/runtime/prepare_ssr_native.py",
       "base_sha256": null,
-      "sha256": "8f043228aaacf75b8e7e74c604f4f37a0cfa079f79ee73a8dc5312c43e3648be"
+      "sha256": "39af801b1f3bc102b6807a589c1365674dd3d902c21f7af76ecced8213184f25"
     },
     {
       "path": "online_subtask/runtime/prepare_ssr_spec.py",
       "base_sha256": null,
-      "sha256": "1f3766216519c79bbdcd176106d8d00f9fff83606bf65280cb4f5a653bdb83cf"
+      "sha256": "bff9e88db68c0474e48ec36fd8d9a0977938bb6e4c195b8ac52107e4ffb66fab"
     },
     {
       "path": "online_subtask/runtime/prepare_steady_spec.py",
@@ -440,7 +465,7 @@
     {
       "path": "online_subtask/runtime/ssr_model_server.py",
       "base_sha256": null,
-      "sha256": "72632e2977c02c750a0b41c27bb785d3b76dc34215ad6be81906cc73b61e0e7a"
+      "sha256": "508da1233c16134ef4c0757aeafe44f0ceb7cf95e86fbd9622b64801d2f79ef8"
     },
     {
       "path": "online_subtask/runtime/ssr_protocol.py",
@@ -493,6 +518,11 @@
       "base_sha256": null
     },
     {
+      "path": "online_subtask/runtime/test_enum_grounded_ssr.py",
+      "base_sha256": null,
+      "sha256": "00c78e9f29655c1b1d7f3f93d9f4a1c118d2aa6099b938bde0607330dff083bc"
+    },
+    {
       "path": "online_subtask/runtime/test_executed_history.py",
       "sha256": "c534a2cd2f15e90ef279591ad467ce83031b8f5bc5b9b041f8ee7ef05e817a84",
       "base_sha256": "c534a2cd2f15e90ef279591ad467ce83031b8f5bc5b9b041f8ee7ef05e817a84"
@@ -510,7 +540,7 @@
     {
       "path": "online_subtask/runtime/test_grounded_ssr.py",
       "base_sha256": null,
-      "sha256": "ea12ea3c073ef3c0001ce71f29e433c31123f5105422b6f975538b877c546ecc"
+      "sha256": "e3f7886b7af53f01c72e8402e99173c0b6402b035c71a01b7c76cbc40cca17b0"
     },
     {
       "path": "online_subtask/runtime/test_history96.py",
@@ -605,7 +635,7 @@
     {
       "path": "tools/verify_ssr.py",
       "base_sha256": null,
-      "sha256": "d29d8b92866f515ed7d442cd4d5e53455acab006ebde6619f5795120cea41ae4"
+      "sha256": "64511c2b880091ffda0627f4ad01f51f1308fd96155b0fafdc076c694fd62e84"
     },
     {
       "path": "tools/verify_steady.py",
