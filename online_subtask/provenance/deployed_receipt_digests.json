@@ -1,0 +1,21 @@
+{
+  "schema": "ecot.source_receipt_references.v1",
+  "receipts": [
+    {
+      "source_receipt_basename": "ACTUAL_LIVE_INTEGRATION_ACCEPTANCE.json",
+      "source_receipt_sha256": "b2bf9b00c2fe146de18f277f491a127489584187ff0aa2851d61f3c59de3f861",
+      "included_raw_receipt": false
+    },
+    {
+      "source_receipt_basename": "ACTUAL_FULL96_ACCEPTANCE_42132.json",
+      "source_receipt_sha256": "eb2eb862644fef2025dbacfcb990d0c56ba4f613f9258a25f481c17ed7724c84",
+      "included_raw_receipt": false
+    },
+    {
+      "source_receipt_basename": "ACTUAL_FULL96_ACCEPTANCE_43585.json",
+      "source_receipt_sha256": "a5a20be70741c862f8105c02eae2a79d2d29a2fe3463b6959174ab45a1c300b7",
+      "included_raw_receipt": false
+    }
+  ],
+  "claim_scope": "Existing source receipt references only; raw response payloads and infrastructure details are excluded."
+}

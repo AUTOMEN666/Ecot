@@ -1,0 +1,534 @@
+{
+  "schema": "ecot.online_subtask.archive.file_map.v1",
+  "configuration_id": "mainhist93_tok65536_v1",
+  "original_core_file_count": 35,
+  "original_parent_static_file_count": 11,
+  "original_fixture_file_count": 1,
+  "source_manifest_sha256": "cd11ef5d728a194a94408259f95a6fff6a3513e86c09c2ce1723293b20596780",
+  "core42132_manifest_sha256": "d8a23fa56d5bbef3a8cc8b03305e47e56ec6dc0e3ecfe08ca2193ea127309dfa",
+  "independent_inventory_sha256": "24222cb22f278fed3f7d41983ee8e0b1a68118b01d94a1e67305d215b0aeb772",
+  "mapped_files": [
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/ACTIVE_EXPANDED_CATALOG.json",
+      "source_sha256": "97734cb3db4e92fcf62beec96d635896d09d8f23c99c646170bf7736f8b48600",
+      "destination": "online_subtask/runtime/ACTIVE_EXPANDED_CATALOG.json",
+      "destination_sha256": "97734cb3db4e92fcf62beec96d635896d09d8f23c99c646170bf7736f8b48600",
+      "source_bytes": 581451,
+      "destination_bytes": 581451,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/NATIVE_COPY_BASELINE.json",
+      "source_sha256": "95fc6a94ce249a7f78395d1406666e949558e2b0b5a61e7322ec6c25d2f99253",
+      "destination": "online_subtask/runtime/NATIVE_COPY_BASELINE.json",
+      "destination_sha256": "95fc6a94ce249a7f78395d1406666e949558e2b0b5a61e7322ec6c25d2f99253",
+      "source_bytes": 1358,
+      "destination_bytes": 1358,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/ONLINE8_REMOTE_INVOCATION_REFERENCE.md",
+      "source_sha256": "5da12dbd88641f08796cf8b30557679abe5f47e2ae0c7cb3352bfcdcd3f921e1",
+      "destination": "online_subtask/runtime/ONLINE8_REMOTE_INVOCATION_REFERENCE.md",
+      "destination_sha256": "5da12dbd88641f08796cf8b30557679abe5f47e2ae0c7cb3352bfcdcd3f921e1",
+      "source_bytes": 8549,
+      "destination_bytes": 8549,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/ONLINE8_SOURCE_BASELINE.json",
+      "source_sha256": "5a03391b75e8bebbeb7befb1a2f3e47edee5362e17bd8c760d0cec4ce999ae0c",
+      "destination": "online_subtask/runtime/ONLINE8_SOURCE_BASELINE.json",
+      "destination_sha256": "5a03391b75e8bebbeb7befb1a2f3e47edee5362e17bd8c760d0cec4ce999ae0c",
+      "source_bytes": 2397,
+      "destination_bytes": 2397,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/REMOTE_INVOCATION.md",
+      "source_sha256": "9ee6c45125999fe9a82ffd3c82b1818b2ee3f0c99eb50df674598aec6ae4a567",
+      "destination": "online_subtask/runtime/REMOTE_INVOCATION.md",
+      "destination_sha256": "9ee6c45125999fe9a82ffd3c82b1818b2ee3f0c99eb50df674598aec6ae4a567",
+      "source_bytes": 3979,
+      "destination_bytes": 3979,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/executed_history.py",
+      "source_sha256": "bdc03c43903b05eb2bb595d26bdbe71fb24a504a3b6b7c882d39637e157a3fac",
+      "destination": "online_subtask/runtime/executed_history.py",
+      "destination_sha256": "bdc03c43903b05eb2bb595d26bdbe71fb24a504a3b6b7c882d39637e157a3fac",
+      "source_bytes": 6784,
+      "destination_bytes": 6784,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/export_binding.py",
+      "source_sha256": "597ae11efd67960b4898f52cf973905ab01fec157fc077d6560ea8e04a35d65b",
+      "destination": "online_subtask/runtime/export_binding.py",
+      "destination_sha256": "597ae11efd67960b4898f52cf973905ab01fec157fc077d6560ea8e04a35d65b",
+      "source_bytes": 15817,
+      "destination_bytes": 15817,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/history_client.py",
+      "source_sha256": "d6afca8d16e91e452719d790be3849007084c3879032ed03f723568f96322b08",
+      "destination": "online_subtask/runtime/history_client.py",
+      "destination_sha256": "d6afca8d16e91e452719d790be3849007084c3879032ed03f723568f96322b08",
+      "source_bytes": 25413,
+      "destination_bytes": 25413,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/http_transport.py",
+      "source_sha256": "3dae444076c323fb0074811a823f7a03342481dc5ae364e48d3e2ef279e32232",
+      "destination": "online_subtask/runtime/http_transport.py",
+      "destination_sha256": "3dae444076c323fb0074811a823f7a03342481dc5ae364e48d3e2ef279e32232",
+      "source_bytes": 5322,
+      "destination_bytes": 5322,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/layout_manifest.py",
+      "source_sha256": "e52ff36815cdd94a5f15ec80cd92256efad6535beecd022de2e99eee16fcfe97",
+      "destination": "online_subtask/runtime/layout_manifest.py",
+      "destination_sha256": "e52ff36815cdd94a5f15ec80cd92256efad6535beecd022de2e99eee16fcfe97",
+      "source_bytes": 2121,
+      "destination_bytes": 2121,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/model_server.py",
+      "source_sha256": "ac89372dfc41ffccf27e3ae23828837cb45232ecc435dce7841488a42400d224",
+      "destination": "online_subtask/runtime/model_server.py",
+      "destination_sha256": "ac89372dfc41ffccf27e3ae23828837cb45232ecc435dce7841488a42400d224",
+      "source_bytes": 16454,
+      "destination_bytes": 16454,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/multiview_protocol.py",
+      "source_sha256": "681c3a8aaf87de1c54bc1d7011cf7916ddbdc60e6c1aa5bfbeabe60e0b15c259",
+      "destination": "online_subtask/runtime/multiview_protocol.py",
+      "destination_sha256": "681c3a8aaf87de1c54bc1d7011cf7916ddbdc60e6c1aa5bfbeabe60e0b15c259",
+      "source_bytes": 9749,
+      "destination_bytes": 9749,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/multiview_provider.py",
+      "source_sha256": "0c120dcdbed1fafd7824cee7b32b8c141818b362dc85ac3669d57f91224cfd1c",
+      "destination": "online_subtask/runtime/multiview_provider.py",
+      "destination_sha256": "0c120dcdbed1fafd7824cee7b32b8c141818b362dc85ac3669d57f91224cfd1c",
+      "source_bytes": 15825,
+      "destination_bytes": 15825,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/namespace_fiveseed.py",
+      "source_sha256": "4c8c51e137007e0b01e31ec2eb999dcae705ed404fe3dc83c786e6a78e6eae99",
+      "destination": "online_subtask/runtime/namespace_fiveseed.py",
+      "destination_sha256": "4c8c51e137007e0b01e31ec2eb999dcae705ed404fe3dc83c786e6a78e6eae99",
+      "source_bytes": 6798,
+      "destination_bytes": 6798,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/native_cpu_smoke.py",
+      "source_sha256": "ff4160aaedfb7f3bd11918bc44bdf7d046ca15345026b91311d51b857a0f6db8",
+      "destination": "online_subtask/runtime/native_cpu_smoke.py",
+      "destination_sha256": "ff4160aaedfb7f3bd11918bc44bdf7d046ca15345026b91311d51b857a0f6db8",
+      "source_bytes": 5054,
+      "destination_bytes": 5054,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/pi05_policy/__init__.py",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "destination": "online_subtask/runtime/pi05_policy/__init__.py",
+      "destination_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_bytes": 0,
+      "destination_bytes": 0,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/pi05_policy/deploy.py",
+      "source_sha256": "d257f974c6d64018f735fc294ccfbebf0ee435c29d9ad1c28d1159b56e530bd2",
+      "destination": "online_subtask/runtime/pi05_policy/deploy.py",
+      "destination_sha256": "d257f974c6d64018f735fc294ccfbebf0ee435c29d9ad1c28d1159b56e530bd2",
+      "source_bytes": 10154,
+      "destination_bytes": 10154,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/pi05_policy/freeze.py",
+      "source_sha256": "d1928595f5a4bf3cb99a6f64e5975159e5567c1367e62d1ca6b32db300687305",
+      "destination": "online_subtask/runtime/pi05_policy/freeze.py",
+      "destination_sha256": "d1928595f5a4bf3cb99a6f64e5975159e5567c1367e62d1ca6b32db300687305",
+      "source_bytes": 7241,
+      "destination_bytes": 7241,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/pi05_policy/main_camera_action25hz.py",
+      "source_sha256": "ddd18fe53ee8317188c7ae194e7ec02bae18becf86a5b8c16958eb1e54707af8",
+      "destination": "online_subtask/runtime/pi05_policy/main_camera_action25hz.py",
+      "destination_sha256": "ddd18fe53ee8317188c7ae194e7ec02bae18becf86a5b8c16958eb1e54707af8",
+      "source_bytes": 9204,
+      "destination_bytes": 9204,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/pi05_policy/native_model.py",
+      "source_sha256": "4819795629a5dcd517b6ad62d5d5e808414a0a897bd094f67489776f8acf3e10",
+      "destination": "online_subtask/runtime/pi05_policy/native_model.py",
+      "destination_sha256": "4819795629a5dcd517b6ad62d5d5e808414a0a897bd094f67489776f8acf3e10",
+      "source_bytes": 10550,
+      "destination_bytes": 10550,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/pi05_policy/physics_clock.py",
+      "source_sha256": "3a1b84a4b800247c733ebfeb8f093e39f539a73b23a4cbc991464b27289e2fe7",
+      "destination": "online_subtask/runtime/pi05_policy/physics_clock.py",
+      "destination_sha256": "3a1b84a4b800247c733ebfeb8f093e39f539a73b23a4cbc991464b27289e2fe7",
+      "source_bytes": 5774,
+      "destination_bytes": 5774,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/pi05_policy/probe_readback.py",
+      "source_sha256": "79a98fb9dcbf025fdfa757efb792e28104b456d135fe984d1320ccf88007427e",
+      "destination": "online_subtask/runtime/pi05_policy/probe_readback.py",
+      "destination_sha256": "79a98fb9dcbf025fdfa757efb792e28104b456d135fe984d1320ccf88007427e",
+      "source_bytes": 3490,
+      "destination_bytes": 3490,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/prepare_native_sim.py",
+      "source_sha256": "692ba9739efd71d2924d55496f6956ff0bee82ec5d6b3b1a3d773ff8ea520901",
+      "destination": "online_subtask/runtime/prepare_native_sim.py",
+      "destination_sha256": "692ba9739efd71d2924d55496f6956ff0bee82ec5d6b3b1a3d773ff8ea520901",
+      "source_bytes": 3723,
+      "destination_bytes": 3723,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/prepare_policy.py",
+      "source_sha256": "825b528f8d7094d29ab6df02592098923219c73fecc46128ee47301bf250ed52",
+      "destination": "online_subtask/runtime/prepare_policy.py",
+      "destination_sha256": "825b528f8d7094d29ab6df02592098923219c73fecc46128ee47301bf250ed52",
+      "source_bytes": 4291,
+      "destination_bytes": 4291,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/rpc_contract.py",
+      "source_sha256": "2e140fea1a701f0fad4052a68c485150a18c9eaf2cc4ec545f51ed9d9122233b",
+      "destination": "online_subtask/runtime/rpc_contract.py",
+      "destination_sha256": "2e140fea1a701f0fad4052a68c485150a18c9eaf2cc4ec545f51ed9d9122233b",
+      "source_bytes": 5624,
+      "destination_bytes": 5624,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/seed_namespace_validation.py",
+      "source_sha256": "0580d9833ab35cde001ae683696150d05684b5683e3fac9c917bad8be5b01ec6",
+      "destination": "online_subtask/runtime/seed_namespace_validation.py",
+      "destination_sha256": "0580d9833ab35cde001ae683696150d05684b5683e3fac9c917bad8be5b01ec6",
+      "source_bytes": 1838,
+      "destination_bytes": 1838,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/selector_prompt.md",
+      "source_sha256": "f18ee5fa2310d8aba963171c8d8846a6d92e7f05841fd75bcc9782c33a8e0561",
+      "destination": "online_subtask/runtime/selector_prompt.md",
+      "destination_sha256": "f18ee5fa2310d8aba963171c8d8846a6d92e7f05841fd75bcc9782c33a8e0561",
+      "source_bytes": 4171,
+      "destination_bytes": 4171,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/subtask_client.py",
+      "source_sha256": "433d49e709317b1d43005ccdf5c77232822b4738213c83c6cd355d0b0cd7a5fb",
+      "destination": "online_subtask/runtime/subtask_client.py",
+      "destination_sha256": "433d49e709317b1d43005ccdf5c77232822b4738213c83c6cd355d0b0cd7a5fb",
+      "source_bytes": 7140,
+      "destination_bytes": 7140,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/test_executed_history.py",
+      "source_sha256": "c534a2cd2f15e90ef279591ad467ce83031b8f5bc5b9b041f8ee7ef05e817a84",
+      "destination": "online_subtask/runtime/test_executed_history.py",
+      "destination_sha256": "c534a2cd2f15e90ef279591ad467ce83031b8f5bc5b9b041f8ee7ef05e817a84",
+      "source_bytes": 6813,
+      "destination_bytes": 6813,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/test_executed_history_integration.py",
+      "source_sha256": "14880f916837f852b24ced9d03b6e1d5426b9cd35084b91fe1db20b3cbedd5cc",
+      "destination": "online_subtask/runtime/test_executed_history_integration.py",
+      "destination_sha256": "14880f916837f852b24ced9d03b6e1d5426b9cd35084b91fe1db20b3cbedd5cc",
+      "source_bytes": 8259,
+      "destination_bytes": 8259,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/test_history96.py",
+      "source_sha256": "d9680fcfbe17a738c049737ed86938915b497b0c1d47e399f80bea99bd78d92f",
+      "destination": "online_subtask/runtime/test_history96.py",
+      "destination_sha256": "d9680fcfbe17a738c049737ed86938915b497b0c1d47e399f80bea99bd78d92f",
+      "source_bytes": 6613,
+      "destination_bytes": 6613,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/test_http_transport.py",
+      "source_sha256": "610e0bd0b3cf4a3ffd27dd42983da569b771dc95ae5b0ebae963d7652eef6586",
+      "destination": "online_subtask/runtime/test_http_transport.py",
+      "destination_sha256": "610e0bd0b3cf4a3ffd27dd42983da569b771dc95ae5b0ebae963d7652eef6586",
+      "source_bytes": 3760,
+      "destination_bytes": 3760,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/test_json_object_prompt_compatibility.py",
+      "source_sha256": "8caee13e0eb97b3e650e60589fc1b987d156a7694dd3bc88fcd76bd14d7cd55b",
+      "destination": "online_subtask/runtime/test_json_object_prompt_compatibility.py",
+      "destination_sha256": "8caee13e0eb97b3e650e60589fc1b987d156a7694dd3bc88fcd76bd14d7cd55b",
+      "source_bytes": 4135,
+      "destination_bytes": 4135,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/test_mainhistory93_65536.py",
+      "source_sha256": "1a74c95ef4d08bf0d0182e22820f8106f3ad89536b3eee2b109ae6d5094dd925",
+      "destination": "online_subtask/runtime/test_mainhistory93_65536.py",
+      "destination_sha256": "688160ef969951866208b1c2a621cb3f37f100683822826cc6a6f6de6ef59f58",
+      "source_bytes": 11198,
+      "destination_bytes": 11152,
+      "byte_identical": false,
+      "modification_reason": "Only adapt historical31-image Prompt fixture lookup to the package-local tests/fixtures path; all assertions and scientific runtime bytes unchanged."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core42132/test_runtime_executed_history.py",
+      "source_sha256": "e3b1488cf2189c5d08a4186fe1088dedca0140cde8fe23b39d5ac3d9603dc9e2",
+      "destination": "online_subtask/runtime/test_runtime_executed_history.py",
+      "destination_sha256": "e3b1488cf2189c5d08a4186fe1088dedca0140cde8fe23b39d5ac3d9603dc9e2",
+      "source_bytes": 6051,
+      "destination_bytes": 6051,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte preservation of the deployed core42132 frozen source, including import layout and historical provenance."
+    },
+    {
+      "source": "pi05_classify_objects100_subtask_natural_dropout05_fullparam_20261111/experiments_20261112/A_subtask_online/src/strict_prompt.py",
+      "source_sha256": "f13aa23c024c9241ea0c5a181f947772a558743444a0fb66179de00c6e6e28ea",
+      "destination": "online_subtask/integration/experiment_contract/src/strict_prompt.py",
+      "destination_sha256": "f13aa23c024c9241ea0c5a181f947772a558743444a0fb66179de00c6e6e28ea",
+      "source_bytes": 3668,
+      "destination_bytes": 3668,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte static local parent contract closure; retain validation and src/evaluation_native/support import layout. Third-party assets/environment and verified binding remain external."
+    },
+    {
+      "source": "pi05_classify_objects100_subtask_natural_dropout05_fullparam_20261111/experiments_20261112/A_subtask_online/src/subtask_data.py",
+      "source_sha256": "807bd5169cd9e111bff6acb395dfaf8fde81f7e32372cbccc58b86e4bd3c84ba",
+      "destination": "online_subtask/integration/experiment_contract/src/subtask_data.py",
+      "destination_sha256": "807bd5169cd9e111bff6acb395dfaf8fde81f7e32372cbccc58b86e4bd3c84ba",
+      "source_bytes": 7745,
+      "destination_bytes": 7745,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte static local parent contract closure; retain validation and src/evaluation_native/support import layout. Third-party assets/environment and verified binding remain external."
+    },
+    {
+      "source": "pi05_classify_objects100_subtask_natural_dropout05_fullparam_20261111/experiments_20261112/A_subtask_online/src/experiment_settings.py",
+      "source_sha256": "a18c22fd25c0d551ca9b5fa0ab1cc12d0c1d8673b2fccaca6b61adc7394229a1",
+      "destination": "online_subtask/integration/experiment_contract/src/experiment_settings.py",
+      "destination_sha256": "a18c22fd25c0d551ca9b5fa0ab1cc12d0c1d8673b2fccaca6b61adc7394229a1",
+      "source_bytes": 527,
+      "destination_bytes": 527,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte static local parent contract closure; retain validation and src/evaluation_native/support import layout. Third-party assets/environment and verified binding remain external."
+    },
+    {
+      "source": "pi05_classify_objects100_subtask_natural_dropout05_fullparam_20261111/experiments_20261112/A_subtask_online/src/cover_dataset.py",
+      "source_sha256": "0930560b85fa18f9290e7c6b9f515effb07b7387bda43eb9464c6dd8b7eeecc7",
+      "destination": "online_subtask/integration/experiment_contract/src/cover_dataset.py",
+      "destination_sha256": "0930560b85fa18f9290e7c6b9f515effb07b7387bda43eb9464c6dd8b7eeecc7",
+      "source_bytes": 7682,
+      "destination_bytes": 7682,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte static local parent contract closure; retain validation and src/evaluation_native/support import layout. Third-party assets/environment and verified binding remain external."
+    },
+    {
+      "source": "pi05_classify_objects100_subtask_natural_dropout05_fullparam_20261111/experiments_20261112/A_subtask_online/src/ablation_training_contract.py",
+      "source_sha256": "af37e9492a79db712a98e483b04c64079a84f67478eb9381a4701a6955e07021",
+      "destination": "online_subtask/integration/experiment_contract/src/ablation_training_contract.py",
+      "destination_sha256": "af37e9492a79db712a98e483b04c64079a84f67478eb9381a4701a6955e07021",
+      "source_bytes": 16901,
+      "destination_bytes": 16901,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte static local parent contract closure; retain validation and src/evaluation_native/support import layout. Third-party assets/environment and verified binding remain external."
+    },
+    {
+      "source": "pi05_classify_objects100_subtask_natural_dropout05_fullparam_20261111/experiments_20261112/A_subtask_online/src/fullparam_contract.py",
+      "source_sha256": "fc1c2a50a93351c4d765f6de447c4957d5a3714ca403b7f364017a5a68583072",
+      "destination": "online_subtask/integration/experiment_contract/src/fullparam_contract.py",
+      "destination_sha256": "fc1c2a50a93351c4d765f6de447c4957d5a3714ca403b7f364017a5a68583072",
+      "source_bytes": 13723,
+      "destination_bytes": 13723,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte static local parent contract closure; retain validation and src/evaluation_native/support import layout. Third-party assets/environment and verified binding remain external."
+    },
+    {
+      "source": "pi05_classify_objects100_subtask_natural_dropout05_fullparam_20261111/experiments_20261112/A_subtask_online/src/train.py",
+      "source_sha256": "e35959aefa498a885797c38091f9a1f3839638023e6a8593d288639250db3e10",
+      "destination": "online_subtask/integration/experiment_contract/src/train.py",
+      "destination_sha256": "e35959aefa498a885797c38091f9a1f3839638023e6a8593d288639250db3e10",
+      "source_bytes": 10557,
+      "destination_bytes": 10557,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte static local parent contract closure; retain validation and src/evaluation_native/support import layout. Third-party assets/environment and verified binding remain external."
+    },
+    {
+      "source": "pi05_classify_objects100_subtask_natural_dropout05_fullparam_20261111/experiments_20261112/A_subtask_online/src/masked_pi05.py",
+      "source_sha256": "7be92494d1709b9e62bbf7405b4211f496c7c31071d61efa026e709f8dfbac2b",
+      "destination": "online_subtask/integration/experiment_contract/src/masked_pi05.py",
+      "destination_sha256": "7be92494d1709b9e62bbf7405b4211f496c7c31071d61efa026e709f8dfbac2b",
+      "source_bytes": 2668,
+      "destination_bytes": 2668,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte static local parent contract closure; retain validation and src/evaluation_native/support import layout. Third-party assets/environment and verified binding remain external."
+    },
+    {
+      "source": "pi05_classify_objects100_subtask_natural_dropout05_fullparam_20261111/experiments_20261112/A_subtask_online/src/checkpoint_recovery.py",
+      "source_sha256": "3aff16e55d43ec18aeb57d0261912da130eb150342be4c27010f33c5e3bf63d6",
+      "destination": "online_subtask/integration/experiment_contract/src/checkpoint_recovery.py",
+      "destination_sha256": "3aff16e55d43ec18aeb57d0261912da130eb150342be4c27010f33c5e3bf63d6",
+      "source_bytes": 2886,
+      "destination_bytes": 2886,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte static local parent contract closure; retain validation and src/evaluation_native/support import layout. Third-party assets/environment and verified binding remain external."
+    },
+    {
+      "source": "pi05_classify_objects100_subtask_natural_dropout05_fullparam_20261111/experiments_20261112/A_subtask_online/evaluation_native/support/task_contract.py",
+      "source_sha256": "505b218e198892015d7394794eb3c0d2fa1ec8a0f1aab764b95c511c7928589d",
+      "destination": "online_subtask/integration/experiment_contract/evaluation_native/support/task_contract.py",
+      "destination_sha256": "505b218e198892015d7394794eb3c0d2fa1ec8a0f1aab764b95c511c7928589d",
+      "source_bytes": 3847,
+      "destination_bytes": 3847,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte static local parent contract closure; retain validation and src/evaluation_native/support import layout. Third-party assets/environment and verified binding remain external."
+    },
+    {
+      "source": "pi05_classify_objects100_subtask_natural_dropout05_fullparam_20261111/experiments_20261112/A_subtask_online/evaluation_native/support/weights_contract.py",
+      "source_sha256": "19ff077143fd8834491934511e3c8e9d05d8e6e566dd9060df421f687913542e",
+      "destination": "online_subtask/integration/experiment_contract/evaluation_native/support/weights_contract.py",
+      "destination_sha256": "19ff077143fd8834491934511e3c8e9d05d8e6e566dd9060df421f687913542e",
+      "source_bytes": 18803,
+      "destination_bytes": 18803,
+      "byte_identical": true,
+      "modification_reason": "Byte-for-byte static local parent contract closure; retain validation and src/evaluation_native/support import layout. Third-party assets/environment and verified binding remain external."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory31_65536_20261113/code/core42132/selector_prompt.md",
+      "source_sha256": "971417b2eac74372c1411cd4e6d8828dc5bb7a07debbda84e34cf022ab633226",
+      "destination": "online_subtask/tests/fixtures/mainhistory31_selector_prompt.md",
+      "destination_sha256": "971417b2eac74372c1411cd4e6d8828dc5bb7a07debbda84e34cf022ab633226",
+      "source_bytes": 4171,
+      "destination_bytes": 4171,
+      "byte_identical": true,
+      "modification_reason": "Minimal historical test fixture: exact old Prompt bytes only, used to verify the93-image Prompt differs solely in capacity wording. Not a runtime entry or selected configuration."
+    },
+    {
+      "source": "reports/deepseek_seed1_mainhistory93_65536_20261113/code/core43585/export_binding.py",
+      "source_sha256": "0366cb02f94dcfb4e34ccbd7908bbc82b4d6595da58fe93ed5133caab3b356cd",
+      "destination": "online_subtask/provenance/deployed_host_variants/host43585/export_binding.py",
+      "destination_sha256": "0366cb02f94dcfb4e34ccbd7908bbc82b4d6595da58fe93ed5133caab3b356cd",
+      "source_bytes": 26622,
+      "destination_bytes": 26622,
+      "byte_identical": true,
+      "modification_reason": "Preserve the single host-specific original-byte/stat attestation variant separately; not the default runtime and not portable identity evidence."
+    }
+  ],
+  "generated_files": [
+    {
+      "source": null,
+      "source_sha256": null,
+      "destination": "online_subtask/configs/mainhist93_tok65536_v1.json",
+      "destination_sha256": "6bc3afa6d02599256c935cd3612e5ba65c22d499891239f81a5f446734f27d92",
+      "destination_bytes": 4200,
+      "modification_reason": "New declarative scientific configuration snapshot, not a runtime loader; no preserved runtime parameters changed."
+    },
+    {
+      "source": null,
+      "source_sha256": null,
+      "destination": "online_subtask/configs/external_paths.example.json",
+      "destination_sha256": "33d72abc9c785dce72b27094fcdb3b1d1c4c993475221278fbdb75e7f06a9c8e",
+      "destination_bytes": 2462,
+      "modification_reason": "New placeholders and external dependency/identity constraints; no assets, credentials or binding evidence invented."
+    },
+    {
+      "source": null,
+      "source_sha256": null,
+      "destination": "online_subtask/tests/run_cpu_tests.py",
+      "destination_sha256": "74e857860185669f64c67c139987921c58e05cd06edf0a558a3fa4341dca26b1",
+      "destination_bytes": 2459,
+      "modification_reason": "New isolated CPU suite runner for the original7 modules, with explicit optional exclusion of3 loopback HTTP tests."
+    },
+    {
+      "destination": "tools/verify_archive.py",
+      "destination_sha256": "0c3a5baeac4daf7ae036c28bcbcfbe41885eafc39e1096b9d69b41baf8ff664a",
+      "destination_bytes": 2879,
+      "modification_reason": "New local source verification or deterministic source packaging utility; no policy/runtime change."
+    },
+    {
+      "destination": "tools/build_source_archive.py",
+      "destination_sha256": "63092da535d8de414bffb74962e58efa9661a99f69f20c5660f376349814ce26",
+      "destination_bytes": 3039,
+      "modification_reason": "New local source verification or deterministic source packaging utility; no policy/runtime change."
+    }
+  ],
+  "modifications_to_original_running_sources": false,
+  "network_credentials_git_remote_GPU_accessed": false,
+  "scope_note": "One original35-file core42132 set retained; only one test fixture path changed. Core43585 export_binding variant is assigned to Root provenance. No machine queue/ops, outputs, raw requests/responses, credentials, videos, weights or third-party SDK are copied.",
+  "public_archive_claim": "Preserved deployed source with one test fixture path adaptation; no new API/GPU/native acceptance is implied."
+}
