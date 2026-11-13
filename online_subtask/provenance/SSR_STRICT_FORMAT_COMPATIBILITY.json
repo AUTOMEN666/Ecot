@@ -1,0 +1,46 @@
+{
+  "schema": "ecot.full_current3_schema.actual_independent_validation.v1",
+  "validator": "jsonschema.Draft202012Validator",
+  "factory_sha256": "0504bf0830ec16f220eb0e1fb46fd5f56e9f7593c23f433ed6d778562d31c94b",
+  "actual_roles": [
+    {
+      "role": "observer",
+      "actual_model": "deepseek-v4-1-flash-261017",
+      "finish_reason": "stop",
+      "response_format_sha256": "256c2548ea4d251182b647171b5c3f9bed1e281ef08c81e8f767a564ec8b76d4",
+      "standard_schema_valid": true,
+      "response_sha256": "92aa7dd1e6a1bb806bc01189904686981a647cd0c5626251bd177b2f4cd8b25b",
+      "messages_unchanged": true,
+      "current_image_count": 3,
+      "past_image_count": 0
+    },
+    {
+      "role": "selector",
+      "actual_model": "deepseek-v4-1-flash-261017",
+      "finish_reason": "stop",
+      "response_format_sha256": "4e917fa38c45057185cca43fe2b340cdcac92ff288b28438188d28df078570c2",
+      "standard_schema_valid": true,
+      "response_sha256": "5b0597858a779b3b378cbfa5d2e71fb5a3074628a13da6ff2f649cba44877ddb",
+      "messages_unchanged": true,
+      "current_image_count": 3,
+      "past_image_count": 0
+    }
+  ],
+  "format_compatibility_observed": true,
+  "full96_image_API_verified": false,
+  "whole_pipeline_or_language_quality_claimed": false,
+  "GPU_policy_ACK_called": false,
+  "model": "deepseek-v4-1-flash-261017",
+  "temperature": 0,
+  "max_tokens": 65536,
+  "thinking": {
+    "type": "enabled"
+  },
+  "reasoning_effort": "high",
+  "two_independent_format_probes_not_closed_loop": true,
+  "selector_used_original_observer_facts": true,
+  "test_source_episode": 201,
+  "source_frame": 0,
+  "no_GT_future_actions_or_images": true,
+  "format_fallback_or_semantic_redraw": false
+}

@@ -1,40 +1,83 @@
 # Online Subtask, Reasoning and Action Summary for classify_objects
 
-This branch implements causal generation of all three public ECoT fields and
-actual three-field pi0.5 conditioning. Start with the [SSR protocol and integration
-guide](online_subtask/docs/ssr_branch.md). Active ID: `mainhist93_tok65536_steady_ssr_v1`.
+This branch implements causal online generation of three public ECoT fields and
+conditions the existing noDropout SSR π0.5 checkpoint **EMA19566** on those fields.
+The active experimental protocol is `mainhist93_tok65536_grounded_strict_ssr_v3`.
+Start with the [grounded SSR guide](online_subtask/docs/grounded_ssr.md).
+Whole-trajectory annotation quality and genuine H20 GPU/native acceptance are
+still being evaluated. Neither code tests nor a rendered source video establish
+that the annotations are reliable or that task success improves.
 
-The inherited visual observer/steady guard is followed by one joint selector
-returning `subtask_id`, `reasoning` and `action.summary`. The host looks up exact
-Subtask text from the original288 candidates. Seven source-bound real training
-examples constrain action-stage language. Reasoning/Summary describe a grounded
-next action over a short16-step window, separating observed facts from intended
-outcomes. Current-test future images, expert actions and GT labels are excluded.
+## Generation and execution order
 
-The API input remains current3RGB + State14 + instruction, up to93 strictly past
-MAIN images uniformly sampled over the whole episode prefix (96total), and
-verified actual-execution Subtask history. Both calls use temperature0, thinking
-enabled/high and65536 output tokens, with one shared1850s budget,600s HTTP/max3
-identical attempts, and2100s policy RPC. No semantic repair/redraw or fallback.
+1. Observe the current MAIN, left-wrist and right-wrist RGB images, synchronized
+   State14, instruction and causal history. The first DeepSeek call reports
+   current objects, basket contents and arm/grasp facts with local uncertainty.
+2. Preserve physical-instance/goal continuity and admit actions supported by
+   those fallible visual facts. The second call returns exactly `subtask_id`,
+   public `reasoning` and `action.summary`. Copy Subtask text byte-for-byte from
+   the original288 candidates; preserve generated Reasoning/Summary verbatim.
+3. Validate all three fields **before** π0.5 inference. Compose the prompt using
+   the exact original noDropout training serializer. π0.5 receives current3RGB,
+   State14, instruction and the three public fields.
+4. Execute up to8 actions from the50-step prediction. Only verified actual
+   injection/action/clock ACKs commit a real online Subtask-history record.
 
-The runtime generates and validates all three fields BEFORE policy inference,
-compares the prompt byte-for-byte with the actual original noDropout training
-serializer, then gives pi0.5 only current3RGB, State14 and Instruction/SSR. It
-retains predict50/execute8/flow10/noise42/25Hz/native1100 and the original SDK
-freeze/action/termination rules. Only a real action/injection/clock ACK commits
-history; complete actual SSR text stays in the execution audit.
+Strict JSON Schema constrains both API responses to the existing field/enumeration
+contracts. Its factory is byte-identical to the real current3 compatibility probe.
+The v2 JSON-object protocol remains explicit; v3 never falls back to it. Schema
+validity does not establish visual facts or future-action accuracy.
 
-A genuine existing **noDropout three-field SSR EMA checkpoint** and original
-weights/normalization/tokenizer binding are required. The checkpoint step is
-explicit; current inventory found noDropout EMA17392 and EMA19566. The preparer
-validates a selected genuine binding without starting API/model/GPU. The server
-requires SSR by default; --allow-legacy-replay explicitly opts into inherited
-Subtask-only behavior.
+Reasoning explains the current constraint and a useful next adjustment. Summary
+specifies a feasible immediate action over about8–16 control steps. Training
+examples guide the language, never supply current test truth. Close requires an
+aligned object between the fingers; lift requires a supported grasp; release
+requires the correct basket and placement readiness. These conservative checks
+are not a perception or English-semantic accuracy oracle. No output rewriting,
+semantic redraw, replacement ID or fallback is used.
 
-Native execution uses the new `pi05_ssr_policy` SDK adapter and explicit
-`PI05_SSR_CHECKPOINT_STEP`; the inherited Subtask-only adapter is incompatible.
-The guide includes a private seed1/native128 engineering preparer. GPU/native
-acceptance and a formal evaluation remain separate from these code/CPU checks.
+## Fixed settings
+
+| Item | Setting |
+| --- | --- |
+| Current input | Three RGB views + synchronized State14 + full instruction |
+| Visual history | Up to93 strictly past MAIN images, uniform across the entire approximately10Hz episode prefix, keeping earliest/latest past timestamps |
+| Maximum image count |93 history +3 current =96 per call |
+| Real online text history | Up to137 actual executed Subtasks: exact ID/text, observation frame and executed action range; reset per episode |
+| Generator | Existing DeepSeek model, temperature0, thinking enabled/high, max_tokens65536, JSON output |
+| Calls per replan | Current visual observer, then joint three-field selector |
+| Timeouts/retries | HTTP600s, shared generation1850s, policy RPC2100s; max3 identical transport/empty-length attempts |
+| Policy | Genuine noDropout SSR EMA19566; no retraining or weight substitution |
+| Actions | Predict50, execute8, flow10, noise42,25Hz, native limit1100 |
+| Simulation | Frozen during API/policy waits; original SDK termination/success rules |
+
+Historical images and the visual observer's internal JSON are not π0.5 inputs.
+Failed requests, unexecuted proposals and retries do not extend real history.
+The same physical object and destination retain an ID through approach, grasp,
+transport and placement; clear visual contradictions permit an explicit
+correction. Another similar object in a basket does not complete this instance.
+
+## Native adapter and evaluation
+
+Use `pi05_ssr_policy`, `PI05_SSR_CHECKPOINT_STEP=19566` and
+`PI05_SSR_PROTOCOL_ID=mainhist93_tok65536_grounded_ssr_v2`. The preparer requires
+a genuine original weights/normalization/tokenizer binding. The original seven
+`pi05_policy` camera/action/clock files remain unchanged; the SSR adapter's
+execution loop remains equivalent to that original loop. H20 renderer/device and
+resource admission require separate verification; the A800 launcher alone does
+not establish H20 compatibility.
+
+Causal expert replay is a separate evaluation mode. Its recorded expert actions
+were not conditioned on generated annotations, so exposure of those transitions
+is never described as actual policy injection or ACK. Test GT, future images,
+expert actions and segment labels are excluded from generator requests. A
+separate renderer/evaluator can inspect same-frame GT and the following16-frame
+window. Legal alternative object order is not automatically an error, and GT
+text agreement is not measured semantic accuracy. Preserve complete source
+videos, missing annotations, stop reasons and all failed versions.
+
+The previous [steady SSR guide](online_subtask/docs/ssr_branch.md), protocol
+`mainhist93_tok65536_steady_ssr_v1`, and historical receipts remain available.
 
 ## Task-scoped branches
 
@@ -42,18 +85,8 @@ acceptance and a formal evaluation remain separate from these code/CPU checks.
 - [Steady Subtask](https://github.com/AUTOMEN666/Ecot/tree/ecot_online_generation_subtask_steady_classify_objects)
 - [Subtask + Reasoning + Action Summary](https://github.com/AUTOMEN666/Ecot/tree/ecot_online_generation_subtask_reasoning_and_action_summary_classify_objects)
 
-Instruction,288 candidates and category/basket constraints target classify_objects.
-Other tasks need their own catalogue and integration. Historical protocol IDs,
-archive names and source receipts retain their identities. Inherited steady.md
-records the old Subtask-only path; use ssr_branch.md for this branch's active path.
-
-## Verification boundaries
-
-See provenance/ssr_cpu_validation.json for the actual CPU receipt and
-SSR_TRAINING_FORMAT_REFERENCE.json for seven original-training prompt comparisons.
-Tests cover generation-before-inference, all three policy fields, actual ACK
-methods/next history,96-image capacity, error/mutation/retry/concurrency gates,
-private-thinking separation and original weight identity checks.
+Instruction, catalogue and category/basket constraints are specific to
+`classify_objects`. Other tasks require their own catalogue and integration.
 
 ```sh
 python3 -E -B online_subtask/tests/run_cpu_tests.py
@@ -61,7 +94,8 @@ python3 -E -B tools/verify_archive.py
 python3 -E -B tools/verify_ssr.py
 ```
 
-Code/CPU checks do not establish semantic accuracy, real API/GPU compatibility
-or task-success improvement. Those empirical checks remain pending an explicit
-checkpoint and an isolated online run. No new training or50-case scheduler is
-claimed.
+The CPU suite covers generation-before-inference, exact three-field prompting,
+ACK/history methods,96-image capacity, retries/timeouts, mutation/concurrency
+failures, current-fact/phase counterexamples and original weight contracts.
+Actual API compatibility, whole-trajectory language quality, GPU/native
+execution and SDK outcomes must each be reported from their own evidence.

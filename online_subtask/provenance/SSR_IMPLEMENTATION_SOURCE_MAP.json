@@ -1,11 +1,21 @@
 {
-  "schema": "ecot.classify_objects.SSR_implementation_source_map.v1",
+  "schema": "ecot.classify_objects.grounded_SSR_implementation_source_map.v2",
   "base_commit": "3e8f27e9b89f48d3e6cca665c8fd8bb6736f6274",
   "files": [
     {
       "path": "README.md",
-      "sha256": "20418675df0062f01b9bea2e1c5557429a65022ca677209c62d50d1020cc488f",
+      "sha256": "6b321d3d4529877c645b5deb44f46a99465c8cdb77244e3820b8b429f3eead23",
       "base_sha256": "1c356784af79c203d96154359c1a63f7b2757cf2e1b148dfbf5a2a968f45d664"
+    },
+    {
+      "path": "online_subtask/configs/mainhist93_tok65536_grounded_ssr_v2.json",
+      "sha256": "d6e57a1007b5000c9a2ea90658e3c49b183f634a71eaf6092ae889669d95b8c1",
+      "base_sha256": null
+    },
+    {
+      "path": "online_subtask/configs/mainhist93_tok65536_grounded_strict_ssr_v3.json",
+      "sha256": "86bb62a88a7470c220b507ef4ca9fa624e051ab2beb5e61c99d3d9ad72c12cb5",
+      "base_sha256": null
     },
     {
       "path": "online_subtask/configs/mainhist93_tok65536_steady_ssr_v1.json",
@@ -23,9 +33,19 @@
       "base_sha256": "04029185eb1a0f6859196f378819dcaabf2e1c854c276376d12b326d12ce4b19"
     },
     {
+      "path": "online_subtask/docs/grounded_ssr.md",
+      "sha256": "4cb9c60cc2669c3fa1858edfccb54f6ae01f4525a45bc5a00660ce9309b3b352",
+      "base_sha256": null
+    },
+    {
       "path": "online_subtask/docs/ssr_branch.md",
       "sha256": "c02ead7a7dc7413c628a14c8be902b7c698b2ea1a230ecf48ae6296fc8e8f9d1",
       "base_sha256": "df1521b5e691554cb6e8c60f553c68790ab3dd886cdbf8ba7a95f9d2d2568219"
+    },
+    {
+      "path": "online_subtask/provenance/SSR_STRICT_FORMAT_COMPATIBILITY.json",
+      "sha256": "d0eb5f3fd25a1cb9f18c5e2c97d7af97d6a9702ccf9a7007e8cf76e9e4d274b1",
+      "base_sha256": null
     },
     {
       "path": "online_subtask/provenance/SSR_TRAINING_FORMAT_REFERENCE.json",
@@ -34,7 +54,7 @@
     },
     {
       "path": "online_subtask/provenance/ssr_cpu_validation.json",
-      "sha256": "5d1b6d9a85a92a89e36a70c929105249d37a95f8970363ffbdab286245ea6c35",
+      "sha256": "343b8e5696a860f7429f04e079d55388ab2724d6b8f4b258a5305c792dec4cc2",
       "base_sha256": null
     },
     {
@@ -43,8 +63,43 @@
       "base_sha256": "bdc03c43903b05eb2bb595d26bdbe71fb24a504a3b6b7c882d39637e157a3fac"
     },
     {
+      "path": "online_subtask/runtime/grounded_motion.py",
+      "sha256": "36c6f049e379792bf8763e1ed5b47d2500f4cc8cf1aff78005894848d709d9cd",
+      "base_sha256": null
+    },
+    {
+      "path": "online_subtask/runtime/grounded_response_schema.py",
+      "sha256": "0504bf0830ec16f220eb0e1fb46fd5f56e9f7593c23f433ed6d778562d31c94b",
+      "base_sha256": null
+    },
+    {
+      "path": "online_subtask/runtime/grounded_scene_guard.py",
+      "sha256": "2b1e59307b1615249a1fc5ed226fedd8ed47ea3dd487db974bae4162e914533c",
+      "base_sha256": null
+    },
+    {
+      "path": "online_subtask/runtime/grounded_ssr_observer_prompt.md",
+      "sha256": "16f34eb42e3344d8d0ee4d73f57021e4b117b50270af4893b730e16195a1078f",
+      "base_sha256": null
+    },
+    {
+      "path": "online_subtask/runtime/grounded_ssr_protocol.py",
+      "sha256": "2bed69c168c3004c14fdadd7a3d1a9ebebbdd6d2b791684b109995cb8158476e",
+      "base_sha256": null
+    },
+    {
+      "path": "online_subtask/runtime/grounded_ssr_provider.py",
+      "sha256": "fc93a4be0d164724e3af661a00c70f199d70d1c15fbacf5fd1699c6c58b28913",
+      "base_sha256": null
+    },
+    {
+      "path": "online_subtask/runtime/grounded_ssr_selector_prompt.md",
+      "sha256": "6af96af181a4cc49b6075e64febb0236926fe25e5dcd89ebeb4cca6c1e14936d",
+      "base_sha256": null
+    },
+    {
       "path": "online_subtask/runtime/model_server.py",
-      "sha256": "0d529a25de308348b32425fc3bef6d72b1fc4f5b71bc703b2b5be0c46344c688",
+      "sha256": "82351321b9fe78fedf9d9151181f44146611053272964e306b1325ba9d398a16",
       "base_sha256": "b5fefaf9df8ccea532580fef70629d1cdd6a1d563e7765c50a8b462bbf300088"
     },
     {
@@ -59,17 +114,17 @@
     },
     {
       "path": "online_subtask/runtime/pi05_ssr_policy/deploy.py",
-      "sha256": "e96b38419626045145cd73e2d25df20e5570bb48185bf6769ad5e5b4affa8572",
+      "sha256": "406516e868893f3f16eb9ecd99c82550b48793667214dc91cd16958dc13fedce",
       "base_sha256": null
     },
     {
       "path": "online_subtask/runtime/prepare_ssr_native.py",
-      "sha256": "4aa0b162b45dc924e86f52f42b247098e984e3a8ab304d7be966d82f781e5d5d",
+      "sha256": "8f043228aaacf75b8e7e74c604f4f37a0cfa079f79ee73a8dc5312c43e3648be",
       "base_sha256": null
     },
     {
       "path": "online_subtask/runtime/prepare_ssr_spec.py",
-      "sha256": "3d34036d52596ea4df36847c9ad02f14f2db7c6d15c5553efb6b38d811450c3a",
+      "sha256": "1f3766216519c79bbdcd176106d8d00f9fff83606bf65280cb4f5a653bdb83cf",
       "base_sha256": null
     },
     {
@@ -79,17 +134,17 @@
     },
     {
       "path": "online_subtask/runtime/ssr_model_server.py",
-      "sha256": "a5de9f00d679fe56594e8e1b998e6b8f1d3e11725d4e64fcb559545256446a40",
+      "sha256": "72632e2977c02c750a0b41c27bb785d3b76dc34215ad6be81906cc73b61e0e7a",
       "base_sha256": null
     },
     {
       "path": "online_subtask/runtime/ssr_protocol.py",
-      "sha256": "51c113822a845575ec08e90bb0ba3fd1f8841e44cce0858bf495db5f52a6c85e",
+      "sha256": "be44f1ec7c320781974ad45c09877f6da532558e536fb619f642c69c3b594455",
       "base_sha256": null
     },
     {
       "path": "online_subtask/runtime/ssr_provider.py",
-      "sha256": "e4f89e764a970fcfafe930b7d99b6d95b0df6218a797ea5b4262ee11c6af350f",
+      "sha256": "8c0575f7f040da49de2d2091b4686a6d539431a8240d314830a3e6af01fff65b",
       "base_sha256": null
     },
     {
@@ -108,6 +163,26 @@
       "base_sha256": "30420bb51e3bf6653a77e1ee84689b9d0066421e7e9d21079052ee08be4acc25"
     },
     {
+      "path": "online_subtask/runtime/strict_grounded_ssr_protocol.py",
+      "sha256": "1509ff6e1f3265024af9d3b7b131d6f0ef74749753df68e61421a8182e80abeb",
+      "base_sha256": null
+    },
+    {
+      "path": "online_subtask/runtime/strict_grounded_ssr_provider.py",
+      "sha256": "053604e292c115e2ecf887f162fec746c9da18a3ff51121eec6eaa4ccbadc3ae",
+      "base_sha256": null
+    },
+    {
+      "path": "online_subtask/runtime/test_grounded_scene_guard.py",
+      "sha256": "54c4649c07f8b8b96cfea8024572a6dd9ded5f4417064bf1f82759c848940304",
+      "base_sha256": null
+    },
+    {
+      "path": "online_subtask/runtime/test_grounded_ssr.py",
+      "sha256": "ea12ea3c073ef3c0001ce71f29e433c31123f5105422b6f975538b877c546ecc",
+      "base_sha256": null
+    },
+    {
       "path": "online_subtask/runtime/test_ssr.py",
       "sha256": "028764e53dbdd10cedc6cbfc188571fa140d1853ff11115f7093120dcfaf720a",
       "base_sha256": null
@@ -118,8 +193,13 @@
       "base_sha256": null
     },
     {
+      "path": "online_subtask/runtime/test_strict_grounded_ssr.py",
+      "sha256": "6bcf5232c9422aff1529229202217e4cbeec9142ce55dcd38765fc0b52ae3de2",
+      "base_sha256": null
+    },
+    {
       "path": "tools/verify_ssr.py",
-      "sha256": "ff7931f8a3ba73a2a87f40a5f2aef5d5178b0dda6a8b34df64ca357c6f5b0028",
+      "sha256": "d29d8b92866f515ed7d442cd4d5e53455acab006ebde6619f5795120cea41ae4",
       "base_sha256": null
     }
   ],
@@ -157,6 +237,7 @@
     "online_subtask/provenance/SSR_IMPLEMENTATION_SOURCE_MAP.json",
     "online_subtask/provenance/STEADY_SOURCE_MAP.json"
   ],
-  "current_protocol": "mainhist93_tok65536_steady_ssr_v1",
-  "API_GPU_native_acceptance_claimed": false
+  "current_protocol": "mainhist93_tok65536_grounded_strict_ssr_v3",
+  "API_GPU_native_acceptance_claimed": false,
+  "whole_trajectory_semantic_quality_claimed": false
 }

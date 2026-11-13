@@ -21,6 +21,14 @@ def initialize_paths(parent):
 def validate_protocol_spec(spec):
     """Validate the actual prepared model configuration before model loading."""
     from ssr_protocol import CONFIG_ID as SSR_CONFIG_ID
+    from grounded_ssr_protocol import CONFIG_ID as GROUNDED_CONFIG_ID
+    from strict_grounded_ssr_protocol import CONFIG_ID as STRICT_CONFIG_ID
+    if spec.get('config_id')==STRICT_CONFIG_ID:
+        from strict_grounded_ssr_protocol import validate_spec
+        return validate_spec(spec)
+    if spec.get('config_id')==GROUNDED_CONFIG_ID:
+        from grounded_ssr_protocol import validate_spec
+        return validate_spec(spec)
     if spec.get('config_id')==SSR_CONFIG_ID:
         from ssr_protocol import validate_spec
         return validate_spec(spec)
@@ -52,7 +60,9 @@ def validate_protocol_spec(spec):
 
 def create_model(spec,policy=None,jax_module=None,provider=None):
     from ssr_protocol import CONFIG_ID as SSR_CONFIG_ID
-    if spec.get('config_id')==SSR_CONFIG_ID:
+    from grounded_ssr_protocol import CONFIG_ID as GROUNDED_CONFIG_ID
+    from strict_grounded_ssr_protocol import CONFIG_ID as STRICT_CONFIG_ID
+    if spec.get('config_id')in(SSR_CONFIG_ID,GROUNDED_CONFIG_ID,STRICT_CONFIG_ID):
         from ssr_model_server import create_model as create_ssr_model
         return create_ssr_model(spec,policy=policy,jax_module=jax_module,provider=provider)
     initialize_paths(spec['parent_root'])
@@ -253,7 +263,9 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
 
 def validate_entry_mode(spec,allow_legacy_replay=False):
     from ssr_protocol import CONFIG_ID as SSR_CONFIG_ID
-    if not allow_legacy_replay and (spec.get('config_id')!=SSR_CONFIG_ID or spec.get('ssr_enabled')is not True):
+    from grounded_ssr_protocol import CONFIG_ID as GROUNDED_CONFIG_ID
+    from strict_grounded_ssr_protocol import CONFIG_ID as STRICT_CONFIG_ID
+    if not allow_legacy_replay and (spec.get('config_id')not in(SSR_CONFIG_ID,GROUNDED_CONFIG_ID,STRICT_CONFIG_ID)or spec.get('ssr_enabled')is not True):
         raise ValueError('This SSR branch requires an explicit SSR spec by default; use prepare_ssr_spec.py. Inherited Subtask-only replay requires --allow-legacy-replay.')
     return validate_protocol_spec(spec)
 

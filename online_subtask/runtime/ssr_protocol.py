@@ -63,8 +63,8 @@ def load_reference():
         validate_context(item['context'])
     return data
 
-def validate_spec(spec):
-    required={'config_id':CONFIG_ID,'protocol_config_id':CONFIG_ID,'generator_protocol':CONFIG_ID,
+def validate_spec(spec,*,config_id=CONFIG_ID,namespace=NAMESPACE):
+    required={'config_id':config_id,'protocol_config_id':config_id,'generator_protocol':config_id,
         'steady_subtask_enabled':True,'ssr_enabled':True,'provider':'deepseek',
         'condition':'online_ssr','effective_eval_ecot':True,'task':'classify_objects','instruction':INSTRUCTION,
         'protocol_mode':'expanded_catalog_id_with_ssr','isolated_multiview_probe':True,
@@ -81,10 +81,10 @@ def validate_spec(spec):
     if type(spec.get('ecot_dropout_probability'))not in (int,float):raise ValueError('Numeric dropout probability required')
     from multiview_protocol import CATALOG_SHA
     if spec.get('catalog_sha256')!=CATALOG_SHA:raise ValueError('Exact288 catalogue binding required')
-    if NAMESPACE not in Path(spec.get('audit_path','')).parts:raise ValueError('New SSR run namespace required')
+    if namespace not in Path(spec.get('audit_path','')).parts:raise ValueError('New SSR run namespace required')
     if type(spec.get('step'))is not int or spec['step']<=0:raise ValueError('Explicit genuine EMA checkpoint step required')
     if not isinstance(spec.get('weights_binding_file'),str)or not spec['weights_binding_file']:
         raise ValueError('Genuine noDropout SSR weights binding file required')
     load_reference()
-    return {'config_id':CONFIG_ID,'ssr_enabled':True,'steady_subtask_enabled':True,
+    return {'config_id':config_id,'ssr_enabled':True,'steady_subtask_enabled':True,
             'maximum_past_timepoints':93,'maximum_total_images':96}

@@ -10,12 +10,19 @@ from ssr_protocol import CONFIG_ID,NAMESPACE,validate_spec
 HERE=Path(__file__).resolve().parent
 
 def prepare(a):
-    spec=read(a.model_config);validate_spec(spec)
+    spec=read(a.model_config)
+    from grounded_ssr_protocol import CONFIG_ID as GROUNDED_ID,NAMESPACE as GROUNDED_NAMESPACE,validate_spec as validate_grounded
+    from strict_grounded_ssr_protocol import CONFIG_ID as STRICT_ID,NAMESPACE as STRICT_NAMESPACE,validate_spec as validate_strict
+    grounded=spec.get('config_id')==GROUNDED_ID
+    strict=spec.get('config_id')==STRICT_ID
+    if strict:validate_strict(spec);protocol_namespace=STRICT_NAMESPACE
+    elif grounded:validate_grounded(spec);protocol_namespace=GROUNDED_NAMESPACE
+    else:validate_spec(spec);protocol_namespace=NAMESPACE
     manifest=validate_manifest(a.layout_manifest)
     if not a.sim_python.is_file()or not a.sim_gpu_uuid.startswith('GPU-'):
         raise ValueError('Existing native interpreter and explicit physical GPU UUID required')
     out=a.output.resolve()
-    if NAMESPACE not in out.parts:raise ValueError('Isolated SSR native namespace required')
+    if protocol_namespace not in out.parts:raise ValueError('Isolated SSR native namespace required')
     if a.command_limit!=128:raise ValueError('This engineering preparer permits exactly128 commands')
     out.mkdir(parents=True,exist_ok=False)
     alias='Pi05SSR_'+hashlib.sha256(str(out).encode()).hexdigest()[:16]
@@ -24,13 +31,14 @@ def prepare(a):
     sdk=Path(namespace['private_source'])
     env={'PI05_ONLINE_LANE_OUTPUT':str(out),'PI05_ENGINEERING_COMMAND_LIMIT':'128',
         'PI05_SSR_CHECKPOINT_STEP':str(spec['step']),'EVAL_NUM':'1',
+        'PI05_SSR_PROTOCOL_ID':spec['config_id'],
         'ROBODOJO_SAVE_EVAL_VIDEOS':'true','ROBODOJO_SAVE_EVAL_VIDEOS_MAX_LAYOUTS':'1',
         'ROBODOJO_RUN_ID':out.name,'PYTHONDONTWRITEBYTECODE':'1','CUDA_VISIBLE_DEVICES':a.sim_gpu_uuid}
     argv=[str(a.sim_python),str(sdk/'src/eval_client/main.py'),'--task_name','classify_objects',
         '--num_envs','1','--env_cfg_type','arx_x5','--policy_name',alias,'--port',str(a.port),
         '--host','127.0.0.1','--seed','1','--additional_info',out.name,'--headless','--enable_cameras','--device_id','0']
     if a.experience:argv+=['--experience',str(a.experience)]
-    plan={'schema':'ecot.classify_objects.SSR.native_engineering_preparation.v1','config_id':CONFIG_ID,
+    plan={'schema':'ecot.classify_objects.SSR.native_engineering_preparation.v1','config_id':spec['config_id'],
         'argv':argv,'cwd':str(sdk),'required_environment_overrides':env,'namespace':namespace,
         'model_config':str(a.model_config.resolve()),'model_config_sha256':sha(a.model_config),
         'layout_manifest':str(a.layout_manifest.resolve()),'layout_manifest_sha256':sha(a.layout_manifest),

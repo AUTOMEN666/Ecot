@@ -92,8 +92,7 @@ class SSRSteadyProvider(SteadySubtaskProvider):
               'context_sha256':digest(context),'reference_sha256':REFERENCE_SHA}
         self._ssr_authorization=deepcopy(auth);proof['SSR_authorization']=auth
 
-    @exclusive_rpc
-    def validate_injection(self,context,lineage,*,episode_id,frame):
+    def _validate_injection_unlocked(self,context,lineage,*,episode_id,frame):
         validate_context(context)
         auth=self._ssr_authorization
         if (self.stopped is not None or auth is None or auth!=lineage.get('SSR_authorization')
@@ -101,3 +100,7 @@ class SSRSteadyProvider(SteadySubtaskProvider):
                 or auth['context_sha256']!=digest(context)or lineage.get('context_sha256')!=digest(context)):
             raise SubtaskConstraintError('SSR text/episode/frame changed after generation authorization')
         self.guard.validate_injection({'subtask':context['subtask']},lineage,episode_id=episode_id,frame=frame)
+
+    @exclusive_rpc
+    def validate_injection(self,context,lineage,*,episode_id,frame):
+        return self._validate_injection_unlocked(context,lineage,episode_id=episode_id,frame=frame)

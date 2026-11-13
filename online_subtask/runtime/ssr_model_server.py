@@ -12,7 +12,18 @@ from ssr_protocol import CONFIG_ID,CONTEXT_FIELDS,REFERENCE_SHA,validate_context
 from ssr_provider import SSRSteadyProvider
 
 def create_model(spec,policy=None,jax_module=None,provider=None):
-    validate_spec(spec)
+    from grounded_ssr_protocol import CONFIG_ID as GROUNDED_ID
+    from strict_grounded_ssr_protocol import CONFIG_ID as STRICT_ID
+    strict=spec.get('config_id')==STRICT_ID
+    grounded=spec.get('config_id')in(GROUNDED_ID,STRICT_ID)
+    if strict:
+        from strict_grounded_ssr_protocol import validate_spec as validate_strict_spec
+        validate_strict_spec(spec)
+    elif grounded:
+        from grounded_ssr_protocol import validate_spec as validate_grounded_spec
+        validate_grounded_spec(spec)
+    else:validate_spec(spec)
+    protocol_id=spec['config_id']
     parent=Path(spec['parent_root'])
     sys.path[:0]=[str(Path(__file__).resolve().parent),str(parent/'src'),str(parent/'evaluation')]
     from ssr_binding import actual_training_prompt,load_weights
@@ -22,10 +33,19 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
     # Fail before loading/sampling a policy if the real external formatter differs.
     actual_training_prompt(INSTRUCTION,load_reference()['examples'][0]['context'])
     if provider is None:
-        provider=SSRSteadyProvider(Path(spec['audit_path']).parent/'ssr_requests',selector_kind='deepseek',
+        if strict:
+            from strict_grounded_ssr_provider import StrictGroundedSSRProvider
+            provider_class=StrictGroundedSSRProvider
+        elif grounded:
+            from grounded_ssr_provider import GroundedSSRProvider
+            provider_class=GroundedSSRProvider
+        else:provider_class=SSRSteadyProvider
+        provider=provider_class(Path(spec['audit_path']).parent/'ssr_requests',selector_kind='deepseek',
             timeout_seconds=spec['selector_timeout_seconds'],checkpoint_step=binding['step'])
     if not isinstance(provider,SSRSteadyProvider)or provider.executed_history.checkpoint_step!=binding['step']:
         raise ValueError('Actual SSR provider/checkpoint step binding required')
+    if getattr(provider,'protocol_config_id',None)!=protocol_id:
+        raise ValueError('Actual generation provider differs from the declared SSR revision')
 
     class RuntimeModel(NativeModel):
         def __init__(self):
@@ -37,7 +57,7 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
             self.latest_injection=None;self.latest_commands=None
             self.metadata={'schema':'ecot.classify_objects.steady_SSR_runtime.v1',
                            'source_weights_binding':deepcopy(binding)}
-            self.metadata.update(protocol_config_id=CONFIG_ID,steady_subtask_enabled=True,ssr_enabled=True,
+            self.metadata.update(protocol_config_id=protocol_id,steady_subtask_enabled=True,ssr_enabled=True,
                 context_fields=CONTEXT_FIELDS,task='classify_objects',step=binding['step'],inference_params='EMA',
                 source_weights_identity_sha256=binding['weights_identity_sha256'],
                 source_checkpoint=binding['checkpoint'],source_training_eval_ecot=False,effective_eval_ecot=True,
@@ -102,7 +122,7 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
                 'context':deepcopy(context),'context_json':canonical(context),'prompt':prompt,
                 'prompt_sha256':hashlib.sha256(prompt.encode()).hexdigest(),'lineage':deepcopy(lineage),
                 'actual_injected':True,'checkpoint_step':binding['step'],'training_composition_byte_equal':True,
-                'context_protocol':CONFIG_ID}
+                'context_protocol':protocol_id}
             self.audit({'event':'inference','episode_id':self.episode_id,'executed_action_step':self.frame_index,
                 'binding':self.metadata,'raw_current_state':self.current['state'].tolist(),'raw_instruction':INSTRUCTION,
                 'prompt':prompt,'context':context,'lineage':lineage,'context_source_frame':self.frame_index,
