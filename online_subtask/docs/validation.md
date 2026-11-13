@@ -14,8 +14,8 @@ path. This is separate from the observed deployed policy environment
 | Preserved-source map verification |48 mapped sources passed;47 retain original bytes, one test-only fixture path adaptation |
 | CPU behavior suite, including3 loopback HTTP checks |31 passed;0 failures/errors/skips in the separate copied checkout |
 | No implicit original workspace/history dependency | Original workspace absent from the successful test import path; old prompt is an explicit package fixture |
-| Final public file list and secret/data exclusions | Pending final review |
-| Complete file inventory / clean committed clone / extracted ZIP checks | Pending final release-owner receipts |
+| Public file list and secret/data exclusions | Independently reviewed; no blocking findings, credential literals or excluded data found by the documented scan |
+| Complete file inventory / clean committed clone / extracted ZIP checks | Passed on the preserved source candidate; every tracked file matched, and the extracted ZIP passed all31 CPU tests |
 | External software/version provenance | Observed versions and selected source hashes recorded; unknown upstream commits remain unpinned |
 | New API/GPU/native execution from this archive | Not performed by the documentation/packaging checks |
 
@@ -26,8 +26,13 @@ hash and the sole test adaptation. Recheck it with:
 python -B tools/verify_archive.py
 ```
 
-The final release owner must attach actual clone/ZIP receipts before claiming
-those pending checks passed. The copied-checkout CPU result does not fill them.
+The [delivery validation](../provenance/delivery_validation.json) identifies the
+candidate commit used for the clean-clone, extracted-ZIP and deterministic
+rebuild checks. Runtime, tests, configurations and archive utilities remain the
+same bytes as that tested candidate; the later changes finalize documentation
+and evidence only. Final delivery commit/ZIP identities are recorded separately
+in the PR and the ZIP's adjacent checksum/manifest, avoiding a self-referential
+archive checksum. The copied-checkout result and delivery checks are distinct.
 
 ## CPU commands and meaning
 
