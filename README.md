@@ -1,4 +1,6 @@
-# Steady online Subtask for classify_objects
+# Prospective Subtask, Reasoning and Action Summary for classify_objects
+
+**Branch preparation:** created from [`ecot_online_generation_subtask_steady_classify_objects`](https://github.com/AUTOMEN666/Ecot/tree/ecot_online_generation_subtask_steady_classify_objects) at `28fc9730adf5222382f4aa177916217062a1e7d5`. The implementation currently remains steady Subtask-only. The intended SSR contract and checkpoint requirement are in [ssr_branch.md](online_subtask/docs/ssr_branch.md).
 
 ## Task scope and branches
 
@@ -18,6 +20,10 @@ inherits the steady Subtask-only runtime; its name does not claim that SSR
 generation, SSR policy injection or a new online evaluation has been completed.
 Historical protocol IDs, archived ZIP names, source commits and validation
 receipts keep their original identities.
+
+## Inherited steady implementation
+
+
 
 This branch adds executable goal continuity and category/basket admission to the
 original online Subtask implementation. An unfinished physical-instance goal is

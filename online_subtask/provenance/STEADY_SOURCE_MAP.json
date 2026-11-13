@@ -2,7 +2,7 @@
   "schema": "ecot.online_subtask.steady.source_map.v1",
   "base_branch": "ecot_online_generation_subtask_classify_objects",
   "base_commit": "8e4f340940c56fbbe5c30e0ee578d6e5b8678321",
-  "branch": "ecot_online_generation_subtask_steady_classify_objects",
+  "branch": "ecot_online_generation_subtask_reasoning_and_action_summary_classify_objects",
   "protocol_config_id": "mainhist93_tok65536_steady_v1",
   "scope": "Current branch adaptations; historical SOURCE_MAP.json and deployment receipts remain unchanged. No real API/GPU/native rollout is asserted.",
   "manifest_excludes_itself_to_avoid_self_reference": true,
@@ -14,7 +14,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "500af808b55e86d28d4ca86d5930ad7d8afeb4ac64d45381b7fef5f0ba99b451",
+      "sha256": "1c356784af79c203d96154359c1a63f7b2757cf2e1b148dfbf5a2a968f45d664",
       "base_sha256": "d7cb92c5ed4a07e21a7071a4c33684b1a124b14cefdcfee6ba71b3f7ea6ce0f4"
     },
     {
@@ -446,6 +446,11 @@
       "path": "online_subtask/docs/branches.md",
       "sha256": "04029185eb1a0f6859196f378819dcaabf2e1c854c276376d12b326d12ce4b19",
       "base_sha256": null
+    },
+    {
+      "path": "online_subtask/docs/ssr_branch.md",
+      "sha256": "df1521b5e691554cb6e8c60f553c68790ab3dd886cdbf8ba7a95f9d2d2568219",
+      "base_sha256": null
     }
   ],
   "task_name": "classify_objects",
@@ -453,7 +458,7 @@
     "base_task_branch": "ecot_online_generation_subtask_classify_objects",
     "steady_task_branch": "ecot_online_generation_subtask_steady_classify_objects",
     "SSR_preparation_branch": "ecot_online_generation_subtask_reasoning_and_action_summary_classify_objects",
-    "derived_from_commit": "19046d3b9c0dea754c1f3937cc6d4ca698e9d0ea",
+    "derived_from_commit": "28fc9730adf5222382f4aa177916217062a1e7d5",
     "runtime_and_scientific_settings_changed": false,
     "historical_base_commit_preserved": "8e4f340940c56fbbe5c30e0ee578d6e5b8678321"
   }
