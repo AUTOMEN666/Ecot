@@ -86,9 +86,31 @@ python3 -B online_subtask/runtime/model_server.py \
 
 The preparer validates existing external weights but starts no API/model/GPU.
 This branch's server defaults to SSR. Inherited Subtask-only replay requires
-explicit --allow-legacy-replay; it is not an SSR test. A compatible SDK runner,
-real external assets, resource ownership and an authorized API key are still
-needed. No new50-case scheduler or native rollout is supplied by the archive.
+explicit --allow-legacy-replay; it is not an SSR test.
+
+The native SDK must use `runtime/pi05_ssr_policy`, with
+`PI05_SSR_CHECKPOINT_STEP` set to the genuine selected step (19566 for the current
+operator choice). The inherited `pi05_policy` adapter accepts only Subtask and
+legacy checkpoint milestones; it cannot run this three-field model. The SSR
+adapter retains the original action loop/camera/clock implementations, validates
+all three fields and the full training prompt before executing any command, and
+uses the original RPC `obs` keyword for execution ACKs and terminal reports.
+
+```sh
+python3 -B online_subtask/runtime/prepare_ssr_native.py \
+  --model-config /new/run/ssr_model.json \
+  --layout-manifest /path/to/verified_original_C5000_seed1_native50_manifest.json \
+  --sim-python /path/to/existing/native/python --sim-gpu-uuid GPU-REPLACE \
+  --port 30111 --layout 0 --command-limit 128 \
+  --output /new/run/seed1_native50_steady_ssr_mainhist93_65536_20261113_v1/engineering_case
+```
+
+This produces a private namespace and `sim_launch.json`, without starting a job.
+The128-command stop is an engineering diagnostic, never an SDK failure or formal
+episode. Real external assets, exclusive resources, platform renderer/device
+acceptance and an authorized API key are still required. In particular an A800
+plan does not establish H20 renderer compatibility. No new50-case scheduler or
+native rollout result is supplied by the archive.
 
 ## Verification scope
 
@@ -102,7 +124,9 @@ The fixtures verify generation-before-inference, three actual policy prompt
 fields, original-training golden bytes, full8-action ACK and next history,
 96-image/29-ACK prefixes, absence of phantom history, partial termination,
 mutation rejection, same-request retries, concurrency, public/private reasoning
-separation, and rejection of incompatible policy conditioning.
+separation, and rejection of incompatible policy conditioning. A direct SDK
+adapter-to-model RPC fixture also checks history replies, actual `obs` keyword
+ACKs, full8/partial terminal execution and source equality of the action loop.
 See provenance/ssr_cpu_validation.json for the actual CPU result. Historical
 steady receipts remain historical. CPU fixtures are not real API/GPU/native
 acceptance. Semantic quality and task-success improvement remain unmeasured.

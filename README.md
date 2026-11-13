@@ -31,6 +31,11 @@ validates a selected genuine binding without starting API/model/GPU. The server
 requires SSR by default; --allow-legacy-replay explicitly opts into inherited
 Subtask-only behavior.
 
+Native execution uses the new `pi05_ssr_policy` SDK adapter and explicit
+`PI05_SSR_CHECKPOINT_STEP`; the inherited Subtask-only adapter is incompatible.
+The guide includes a private seed1/native128 engineering preparer. GPU/native
+acceptance and a formal evaluation remain separate from these code/CPU checks.
+
 ## Task-scoped branches
 
 - [Original Subtask](https://github.com/AUTOMEN666/Ecot/tree/ecot_online_generation_subtask_classify_objects)

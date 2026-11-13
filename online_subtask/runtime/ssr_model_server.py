@@ -74,7 +74,9 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
                 raise RuntimeError('SSR history capture altered policy frame/RNG')
             self.audit({'event':'actual_history_capture','episode_id':self.episode_id,'history_frame':obs['frame_index'],
                         'physics_clock':obs.get('physics_clock'),'policy_called':False,'RNG_advanced':False})
-            return result
+            return {'history_frame':obs['frame_index'],'episode_id':self.episode_id,'policy_called':False,
+                    'RNG_advanced':False,'capture_count':result['history_source_index']+1,
+                    'current_views':result['current_views']}
 
         @exclusive_rpc
         def get_action(self):
@@ -118,7 +120,8 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
             return deepcopy(self.latest_injection)
 
         @exclusive_rpc
-        def acknowledge_executed_subtask(self,ack):
+        def acknowledge_executed_subtask(self,obs):
+            ack=obs
             if self.latest_injection is None or self.latest_commands is None:raise ValueError('No actual SSR injection/actions to acknowledge')
             before=(self.frame_index,self.predicted_at,self.current);rng=self.rng_snapshot()
             receipt=provider.acknowledge_executed_subtask(ack,expected_injection=self.latest_injection,
@@ -130,6 +133,6 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
             return receipt
 
         @exclusive_rpc
-        def record_terminal_observation(self,payload):return super().record_terminal_observation(payload)
+        def record_terminal_observation(self,obs):return super().record_terminal_observation(obs)
 
     return RuntimeModel()
