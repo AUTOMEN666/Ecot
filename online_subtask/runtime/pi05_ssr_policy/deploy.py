@@ -53,8 +53,10 @@ def replan(env,client,n):
         from grounded_ssr_protocol import CONFIG_ID as GROUNDED_ID
         from strict_grounded_ssr_protocol import CONFIG_ID as STRICT_ID
         from enum_grounded_ssr_protocol import CONFIG_ID as ENUM_ID
+        from phase_grounded_ssr_protocol import CONFIG_ID as PHASE_ID
+        from release_grounded_ssr_protocol import CONFIG_ID as RELEASE_ID
         expected_protocol=os.environ.get('PI05_SSR_PROTOCOL_ID',CONFIG_ID)
-        if expected_protocol not in(CONFIG_ID,GROUNDED_ID,STRICT_ID,ENUM_ID):raise ValueError('Unknown explicit SSR SDK protocol')
+        if expected_protocol not in(CONFIG_ID,GROUNDED_ID,STRICT_ID,ENUM_ID,PHASE_ID,RELEASE_ID):raise ValueError('Unknown explicit SSR SDK protocol')
         if (expected_step<=0 or injection['execution_frame']!=n or injection['actual_injected'] is not True
                 or injection['checkpoint_step']!=expected_step or injection['training_composition_byte_equal'] is not True
                 or injection.get('context_protocol')!=expected_protocol

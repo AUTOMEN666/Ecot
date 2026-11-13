@@ -2,7 +2,7 @@
 
 This branch implements causal online generation of three public ECoT fields and
 conditions the existing noDropout SSR π0.5 checkpoint **EMA19566** on those fields.
-The active experimental protocol is `mainhist93_tok65536_grounded_strict_ssr_v4`.
+The active experimental protocol is `mainhist93_tok65536_grounded_strict_ssr_v6`.
 Start with the [grounded SSR guide](online_subtask/docs/grounded_ssr.md).
 Whole-trajectory annotation quality and genuine H20 GPU/native acceptance are
 still being evaluated. Neither code tests nor a rendered source video establish
@@ -23,14 +23,34 @@ that the annotations are reliable or that task success improves.
 4. Execute up to8 actions from the50-step prediction. Only verified actual
    injection/action/clock ACKs commit a real online Subtask-history record.
 
-V4 requests strict JSON Schema with a finite semantic category vocabulary plus
+V6 retains v4 strict JSON Schema with a finite semantic category vocabulary plus
 null. Categories are visually chosen, never inferred by the host from descriptor
 IDs or SDK labels. The selector schema remains byte-for-byte equivalent to the
 v3 selector factory. Earlier current3 probes showed limited format compatibility,
 but later v3 responses violated a category string pattern; strict mode is not a
 guarantee. Both output format and visual/action constraints remain checked, with
-errors preserved and no JSON-object fallback. Full v4 API and trajectory quality
-acceptance remain pending.
+errors preserved and no JSON-object fallback. Real v6 API regression runs have
+already exposed both an observer grasp contradiction and a false rejection of a
+completed-release clause. No v6 whole trajectory has passed quality acceptance.
+These failures are preserved while the implementation is revised; a strict
+schema does not certify the facts.
+
+V5 also admits opening as the physical implementation of an already admitted
+release. A Summary may omit an actor only for Lift/Carry/Lower/Release when the
+Reasoning names one hand and current facts establish exactly one clear, closed,
+secure holder of that exact target. The source text is never rewritten. Unknown
+support, another holder or an ambiguous hand still stops. Explicit Summary chains
+such as “then” are rejected; this does not establish general language accuracy.
+
+V6 adds two scoped corrections. A direct constraint such as “without releasing
+it” is not an instruction to release. During opening, continued release requires
+the previous real adjacent observation to show the same closed, securely held
+target ready over the same basket, with current supported opening and the other
+hand clear/empty. At most two additional8-step windows permit Open/Release/Hold;
+no facts are rewritten and no lift/carry is admitted. Earlier readiness must
+already be confirmed: a current-ready report after a prior-not-ready report still
+stops. Release-budget recovery after a dropped/regrasped same goal is not yet
+implemented. These limitations remain visible in evaluation.
 
 Reasoning explains the current constraint and a useful next adjustment. Summary
 specifies a feasible immediate action over about8–16 control steps. Training
@@ -61,10 +81,15 @@ The same physical object and destination retain an ID through approach, grasp,
 transport and placement; clear visual contradictions permit an explicit
 correction. Another similar object in a basket does not complete this instance.
 
+A real H20 numerical probe loaded the genuine EMA19566 with actual v4 generated
+three-field/current-frame input. Two fresh seed42 predictions were byte-identical.
+That establishes a narrow loader/numerical/input result; v6 live generation,
+executed8-action ACKs and SDK task outcomes remain separate pending checks.
+
 ## Native adapter and evaluation
 
 Use `pi05_ssr_policy`, `PI05_SSR_CHECKPOINT_STEP=19566` and
-`PI05_SSR_PROTOCOL_ID=mainhist93_tok65536_grounded_strict_ssr_v4`. The preparer requires
+`PI05_SSR_PROTOCOL_ID=mainhist93_tok65536_grounded_strict_ssr_v6`. The preparer requires
 a genuine original weights/normalization/tokenizer binding. The original seven
 `pi05_policy` camera/action/clock files remain unchanged; the SSR adapter's
 execution loop remains equivalent to that original loop. H20 renderer/device and

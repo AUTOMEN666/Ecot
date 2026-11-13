@@ -18,8 +18,10 @@ BASKETS={'white','blue','red'}
 def require(condition,message):
     if not condition:raise SubtaskConstraintError(message)
 
-def validate_arms(arms,objects):
+def validate_arms(arms,objects,*,known_release_transitions=None):
     require(type(arms)is dict and set(arms)=={'left','right'},'Both current arm observations required')
+    transitions={}if known_release_transitions is None else known_release_transitions
+    require(type(transitions)is dict and set(transitions)<={'left','right'},'Explicit release-transition arms required')
     ids={o['instance_id']:o for o in objects}
     for name,arm in arms.items():
         require(type(arm)is dict and set(arm)==ARM_FIELDS,'Exact current arm/phase fields required')
@@ -35,8 +37,19 @@ def validate_arms(arms,objects):
                 'Identified grasp must bind the actually held current instance')
             require(ids[arm['held_instance_id']]['location']=='held','Held arm/object observations contradict')
         else:require(arm['held_instance_id']is None,'No fabricated held identity for empty/unknown gripper')
+        transition=transitions.get(name)
+        if transition is not None:
+            require(type(transition)is dict and transition.get('instance_id')==arm['held_instance_id']
+                and transition.get('basket_color')==arm['observed_basket']in BASKETS
+                and type(transition.get('window_index'))is int and transition.get('window_index')in(1,2)
+                and transition.get('allowed_verbs')==['hold','open','release']
+                and arm['holding']=='identified'and arm['visibility']=='clear'
+                and arm['gripper_state']=='transitioning'and arm['motion_trend']=='release'
+                and arm['object_secured']=='yes'and arm['relation']=='over_basket'
+                and arm['release_ready']=='yes'and ids[arm['held_instance_id']]['released']is not True,
+                'Known opening release contradicts current visual arm/object facts')
         if arm['object_secured']=='yes':
-            require(arm['holding']=='identified'and arm['gripper_state']=='closed'and arm['visibility']=='clear',
+            require(arm['holding']=='identified'and(arm['gripper_state']=='closed'or transition is not None)and arm['visibility']=='clear',
                 'Secure grasp needs identified object, closed gripper and clear visual support')
         if arm['release_ready']=='yes':
             require(arm['holding']=='identified'and arm['object_secured']=='yes'
@@ -44,16 +57,25 @@ def validate_arms(arms,objects):
                 'Release readiness requires current secure grasp over a visibly identified basket')
     return deepcopy(arms)
 
-def action_envelopes(evidence,target,*,contact_transition=None):
+def action_envelopes(evidence,target,*,contact_transition=None,known_release_transitions=None):
     """Each arm's permitted immediate action verbs for this exact physical goal."""
     objects={o['instance_id']:o for o in evidence['objects']}
-    arms=validate_arms(evidence['arms'],evidence['objects'])
+    transitions={}if known_release_transitions is None else known_release_transitions
+    arms=validate_arms(evidence['arms'],evidence['objects'],known_release_transitions=transitions)
+    require(not transitions or contact_transition is None,'Opening release cannot borrow a closing transition')
     ident,basket=target['instance_id'],target['basket_color'];obj=objects.get(ident)
     result={}
     for name,arm in arms.items():
         actions=set();why=[]
         matches=arm['interaction_instance_id']==ident
-        if (contact_transition is not None and contact_transition.get('arm')==name
+        if name in transitions:
+            transition=transitions[name]
+            require(transition['instance_id']==ident and transition['basket_color']==basket,
+                'Opening release is bound to another physical goal')
+            actions={'hold','open','release'};why=['continue the temporally admitted opening release of the same supported target over the same ready basket; no lift or carry']
+        elif transitions:
+            actions={'hold'};why=['the other arm must not start a competing interaction during an admitted opening release']
+        elif (contact_transition is not None and contact_transition.get('arm')==name
                 and contact_transition.get('instance_id')==ident):
             require(obj is not None and obj['location']=='table' and obj['released']is not True
                 and arm['holding']=='unknown' and arm['held_instance_id']is None
@@ -100,10 +122,12 @@ def action_envelopes(evidence,target,*,contact_transition=None):
         else:
             actions={'hold'};why=['locked instance not currently observable; no new object interaction asserted']
         result[name]={'allowed_verbs':sorted(actions),'observed':arm,'grounds':why}
-    return {'target_instance_id':ident,'target_basket':basket,'category':target['category'],
+    envelope={'target_instance_id':ident,'target_basket':basket,'category':target['category'],
         'intent_horizon_steps':16,'execute_steps_before_reobserve':8,'by_arm':result,
         'perception_is_fallible':True,'output_repair_allowed':False,
         'known_contact_transition':deepcopy(contact_transition)}
+    if transitions:envelope['known_release_transitions']=deepcopy(transitions)
+    return envelope
 
 def mentioned_arms(text):
     refs=set(re.findall(r'\b(left|right|both)(?:-hand)?\s+(?:(?:open|closed|empty|free|robot)\s+){0,3}(?:arm|arms|gripper|grippers|hand|hands|fingers|grasp|grasps)\b',text,re.I))
@@ -111,7 +135,7 @@ def mentioned_arms(text):
     if'both'in refs:refs.discard('both');refs.update({'left','right'})
     return refs
 
-def explicit_action_actors(text):
+def explicit_action_actors(text,*,negation_detector=None):
     """Conservative extraction of explicit actor/action phrases, not a grader."""
     forms={'approach':'approach','approaches':'approach','approaching':'approach',
         'align':'align','aligns':'align','aligning':'align','open':'open','opens':'open','opening':'open',
@@ -131,24 +155,30 @@ def explicit_action_actors(text):
             for match in pattern.finditer(clause):
                 a,b=match.groups();who,word=(a,b)if actor_first else(b,a)
                 verb_start=match.start(2 if actor_first else 1)
+                if negation_detector is not None and negation_detector(clause,verb_start):continue
                 before=clause[:verb_start]
                 if word.lower()in{'open','opening'}and re.search(r'\b(?:the|an|a|keep|keeps|remain|remains|stay|stays|is|are)\s+(?:fully\s+)?$',before,re.I):
                     continue  # 'the open left gripper' is a state adjective.
                 result.append((forms[word.lower()],{'left','right'}if who.lower()=='both'else{who.lower()}))
     return result
 
-def validate_plan(context,envelope):
+def validate_plan(context,envelope,*,acting_arms=None,negation_detector=None):
     """Reject, never edit, an unsupported explicit next-action annotation."""
     summary=context['action']['summary'];reasoning=context['reasoning']
     match=re.match(r'^([A-Za-z]+)\b',summary)
     verb=match[1].lower()if match else None
     require(verb in ACTIONS,'Summary must begin with one admitted immediate-action verb')
-    arms=mentioned_arms(summary)
+    explicit_arms=mentioned_arms(summary)
+    if acting_arms is not None:
+        require(type(acting_arms)in(set,frozenset)and acting_arms<= {'left','right'}
+            and(not explicit_arms or explicit_arms==acting_arms),'Explicit and admitted acting arms disagree')
+    arms=explicit_arms if acting_arms is None else set(acting_arms)
     require(bool(arms),'Action Summary must identify its acting left/right/both arm or gripper')
     for arm in arms:
         require(verb in envelope['by_arm'][arm]['allowed_verbs'],
             f'Immediate {verb} is not visually admitted for the {arm} arm')
-    for action,actors in explicit_action_actors(summary+'; '+reasoning):
+    require(negation_detector is None or callable(negation_detector),'Explicit read-only negation parser required')
+    for action,actors in explicit_action_actors(summary+'; '+reasoning,negation_detector=negation_detector):
         for actor in actors:
             state_adjective=action=='open'and envelope['by_arm'][actor]['observed']['gripper_state']=='open'
             require(state_adjective or action in envelope['by_arm'][actor]['allowed_verbs'],
@@ -165,8 +195,10 @@ def validate_plan(context,envelope):
         'release':r'\b(?:release|releasing|drop|dropping)\s+(?:the|it|them|this|that)\b'}
     for action,pattern in critical.items():
         if action not in allowed:
-            require(re.search(pattern,summary+' '+reasoning,re.I)is None,
-                'Public short-term plan skips a currently unobserved prerequisite: '+action)
+            text=summary+' '+reasoning
+            for mention in re.finditer(pattern,text,re.I):
+                require(negation_detector is not None and negation_detector(text,mention.start()),
+                    'Public short-term plan skips a currently unobserved prerequisite: '+action)
     family=lexical_family(envelope['category'])
     if family is not None:
         for text in [summary,reasoning]:
@@ -178,7 +210,8 @@ def validate_plan(context,envelope):
         for claimed in ['open','closed']:
             state_claim=(r'\b'+name+r' gripper (?:is|stays?|remains?) (?:fully )?'+claimed+r'\b|'
                 r'\bkeep (?:the )?'+name+r' gripper (?:fully )?'+claimed+r'\b')
-            if re.search(state_claim,reasoning,re.I):
+            for mention in re.finditer(state_claim,reasoning,re.I):
+                if negation_detector is not None and negation_detector(reasoning,mention.start()):continue
                 require(observed==claimed,'Reasoning contradicts currently observed '+name+' gripper state')
     if verb in{'carry','lower','release'}:
         destinations=re.findall(r'\b(?:into|toward|towards|over|above|in) (?:the )?(white|blue|red) basket\b',summary,re.I)

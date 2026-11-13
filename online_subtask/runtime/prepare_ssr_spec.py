@@ -27,9 +27,17 @@ def build(binding_file,*,parent_root,audit_path,config_id=CONFIG_ID):
         from grounded_ssr_protocol import CONFIG_ID as GROUNDED_ID,SCENE_PROTOCOL,MOTION_PROTOCOL,validate_spec as grounded_validate
         from strict_grounded_ssr_protocol import CONFIG_ID as STRICT_ID,SCHEMA_FACTORY_SHA,validate_spec as strict_validate
         from enum_grounded_ssr_protocol import CONFIG_ID as ENUM_ID,validate_schema_factories,validate_spec as enum_validate
-        if config_id not in(GROUNDED_ID,STRICT_ID,ENUM_ID):raise ValueError('Unknown explicit SSR protocol')
+        from phase_grounded_ssr_protocol import CONFIG_ID as PHASE_ID,MOTION_INTERPRETATION,validate_spec as phase_validate
+        from release_grounded_ssr_protocol import CONFIG_ID as RELEASE_ID,MOTION_INTERPRETATION as RELEASE_INTERPRETATION,validate_spec as release_validate
+        if config_id not in(GROUNDED_ID,STRICT_ID,ENUM_ID,PHASE_ID,RELEASE_ID):raise ValueError('Unknown explicit SSR protocol')
         result.update(grounded_action_constraints=True,scene_evidence_protocol=SCENE_PROTOCOL,motion_evidence_protocol=MOTION_PROTOCOL)
-        if config_id==ENUM_ID:
+        if config_id==RELEASE_ID:
+            result.update(response_format_mode='json_schema_strict',motion_interpretation=RELEASE_INTERPRETATION,**validate_schema_factories())
+            release_validate(result)
+        elif config_id==PHASE_ID:
+            result.update(response_format_mode='json_schema_strict',motion_interpretation=MOTION_INTERPRETATION,**validate_schema_factories())
+            phase_validate(result)
+        elif config_id==ENUM_ID:
             result.update(response_format_mode='json_schema_strict',**validate_schema_factories())
             enum_validate(result)
         elif config_id==STRICT_ID:
@@ -42,13 +50,15 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--weights-binding',type=Path,required=True);p.add_argument('--parent-root',type=Path,required=True)
     p.add_argument('--audit-path',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
-    p.add_argument('--protocol',choices=['steady_ssr_v1','grounded_ssr_v2','grounded_strict_ssr_v3','grounded_strict_ssr_v4'],default='grounded_strict_ssr_v4')
+    p.add_argument('--protocol',choices=['steady_ssr_v1','grounded_ssr_v2','grounded_strict_ssr_v3','grounded_strict_ssr_v4','grounded_strict_ssr_v5','grounded_strict_ssr_v6'],default='grounded_strict_ssr_v6')
     args=p.parse_args()
     from grounded_ssr_protocol import CONFIG_ID as GROUNDED_ID
     from strict_grounded_ssr_protocol import CONFIG_ID as STRICT_ID
     from enum_grounded_ssr_protocol import CONFIG_ID as ENUM_ID
+    from phase_grounded_ssr_protocol import CONFIG_ID as PHASE_ID
+    from release_grounded_ssr_protocol import CONFIG_ID as RELEASE_ID
     spec=build(args.weights_binding,parent_root=args.parent_root,audit_path=args.audit_path,
-               config_id={'steady_ssr_v1':CONFIG_ID,'grounded_ssr_v2':GROUNDED_ID,'grounded_strict_ssr_v3':STRICT_ID,'grounded_strict_ssr_v4':ENUM_ID}[args.protocol])
+               config_id={'steady_ssr_v1':CONFIG_ID,'grounded_ssr_v2':GROUNDED_ID,'grounded_strict_ssr_v3':STRICT_ID,'grounded_strict_ssr_v4':ENUM_ID,'grounded_strict_ssr_v5':PHASE_ID,'grounded_strict_ssr_v6':RELEASE_ID}[args.protocol])
     import sys
     sys.path[:0]=[str(args.parent_root/'src'),str(args.parent_root/'evaluation')]
     from ssr_binding import load_weights

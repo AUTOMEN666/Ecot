@@ -13,9 +13,9 @@ def main():
         if rel.is_absolute()or '..'in rel.parts or str(rel)in seen:raise ValueError('Invalid SSR source path')
         if path.is_symlink()or not path.is_file()or sha(path)!=row['sha256']:raise ValueError('SSR source changed: '+str(rel))
         seen.add(str(rel))
-    active='mainhist93_tok65536_grounded_strict_ssr_v4'
+    active='mainhist93_tok65536_grounded_strict_ssr_v6'
     if manifest['current_protocol']!=active:raise ValueError('Active grounded protocol differs from source map')
-    for name in ['mainhist93_tok65536_steady_ssr_v1','mainhist93_tok65536_grounded_ssr_v2','mainhist93_tok65536_grounded_strict_ssr_v3',active]:
+    for name in ['mainhist93_tok65536_steady_ssr_v1','mainhist93_tok65536_grounded_ssr_v2','mainhist93_tok65536_grounded_strict_ssr_v3','mainhist93_tok65536_grounded_strict_ssr_v4','mainhist93_tok65536_grounded_strict_ssr_v5',active]:
         config=json.loads((root/('online_subtask/configs/'+name+'.json')).read_text());gen=config['generator']
         pins=[('prompt','prompt_sha256'),('training_reference','training_reference_sha256')]
         if 'observer_prompt'in gen:pins.append(('observer_prompt','observer_prompt_sha256'))
@@ -37,6 +37,8 @@ def main():
         raise ValueError('Original strict schema base factory changed')
     if gen['descriptor_or_SDK_to_category_mapping']is not False or gen['category_null_for_unknown']is not True:
         raise ValueError('Category tokens cannot become an automatic visual truth mapping')
+    if gen['motion_interpretation']!='release_progress_and_negative_constraints_v1':
+        raise ValueError('V6 phase/negative interpretation marker changed')
     if gen['host_rewrites_public_annotations']is not False or gen['quality_acceptance_passed']is not False:
         raise ValueError('Experimental quality boundaries changed')
     for row in manifest['unchanged_native_files']:

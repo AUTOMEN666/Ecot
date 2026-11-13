@@ -15,10 +15,20 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
     from grounded_ssr_protocol import CONFIG_ID as GROUNDED_ID
     from strict_grounded_ssr_protocol import CONFIG_ID as STRICT_ID
     from enum_grounded_ssr_protocol import CONFIG_ID as ENUM_ID
-    enumerated=spec.get('config_id')==ENUM_ID
+    from phase_grounded_ssr_protocol import CONFIG_ID as PHASE_ID
+    from release_grounded_ssr_protocol import CONFIG_ID as RELEASE_ID
+    releasing=spec.get('config_id')==RELEASE_ID
+    phased=spec.get('config_id')==PHASE_ID
+    enumerated=spec.get('config_id')in(ENUM_ID,PHASE_ID,RELEASE_ID)
     strict=spec.get('config_id')==STRICT_ID
-    grounded=spec.get('config_id')in(GROUNDED_ID,STRICT_ID,ENUM_ID)
-    if enumerated:
+    grounded=spec.get('config_id')in(GROUNDED_ID,STRICT_ID,ENUM_ID,PHASE_ID,RELEASE_ID)
+    if releasing:
+        from release_grounded_ssr_protocol import validate_spec as validate_release_spec
+        validate_release_spec(spec)
+    elif phased:
+        from phase_grounded_ssr_protocol import validate_spec as validate_phase_spec
+        validate_phase_spec(spec)
+    elif enumerated:
         from enum_grounded_ssr_protocol import validate_spec as validate_enum_spec
         validate_enum_spec(spec)
     elif strict:
@@ -38,7 +48,13 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
     # Fail before loading/sampling a policy if the real external formatter differs.
     actual_training_prompt(INSTRUCTION,load_reference()['examples'][0]['context'])
     if provider is None:
-        if enumerated:
+        if releasing:
+            from release_grounded_ssr_provider import ReleaseGroundedSSRProvider
+            provider_class=ReleaseGroundedSSRProvider
+        elif phased:
+            from phase_grounded_ssr_provider import PhaseGroundedSSRProvider
+            provider_class=PhaseGroundedSSRProvider
+        elif enumerated:
             from enum_grounded_ssr_provider import EnumGroundedSSRProvider
             provider_class=EnumGroundedSSRProvider
         elif strict:

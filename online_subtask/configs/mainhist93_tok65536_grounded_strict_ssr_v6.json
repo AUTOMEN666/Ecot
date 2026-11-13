@@ -1,0 +1,166 @@
+{
+  "schema": "ecot.classify_objects.grounded_strict_SSR.scientific_contract.v6",
+  "config_id": "mainhist93_tok65536_grounded_strict_ssr_v6",
+  "usage": "Active v6 experimental bounded release/negative constraints. Use prepare_ssr_spec.py --protocol grounded_strict_ssr_v6 with genuine noDropout EMA19566. V6 real API/whole-trajectory/native acceptance pending; v4 model-only realGPU19566 numerical evidence is separate.",
+  "task": "classify_objects",
+  "generator": {
+    "model": "deepseek-v4-1-flash-261017",
+    "temperature": 0,
+    "thinking": {
+      "type": "enabled"
+    },
+    "reasoning_effort": "high",
+    "max_tokens": 65536,
+    "API_calls_per_replan": 2,
+    "roles": [
+      "scene_observer",
+      "joint_subtask_SSR_selector"
+    ],
+    "output_keys": [
+      "subtask_id",
+      "reasoning",
+      "action.summary"
+    ],
+    "catalog_count": 288,
+    "catalog_sha256": "97734cb3db4e92fcf62beec96d635896d09d8f23c99c646170bf7736f8b48600",
+    "prompt": "runtime/grounded_ssr_selector_prompt.md",
+    "prompt_sha256": "6af96af181a4cc49b6075e64febb0236926fe25e5dcd89ebeb4cca6c1e14936d",
+    "training_reference": "runtime/ssr_training_reference.json",
+    "training_reference_sha256": "45acaa8f26b03d85d16b2a49593b0895c7583e1a8a2a5ed8eaaa7958e97f247d",
+    "training_reference_examples": 7,
+    "prospective_horizon_steps": 16,
+    "future_test_GT_actions_images": false,
+    "semantic_retry": false,
+    "ID_repair": false,
+    "fallback": false,
+    "observer_prompt": "runtime/grounded_ssr_observer_prompt_v6.md",
+    "observer_prompt_sha256": "c69acee736874e415f16a1e10c64faf385c677d12116a5559a5acdc2f61c5cc2",
+    "scene_evidence_protocol": "current_observation_local_uncertainty_v2",
+    "motion_evidence_protocol": "current_grasp_prerequisites_v1",
+    "model_generates_historical_frame_numbers": false,
+    "host_rewrites_public_annotations": false,
+    "quality_acceptance_passed": false,
+    "response_format_mode": "json_schema_strict",
+    "response_schema_factory": "runtime/grounded_response_schema_v2.py",
+    "response_schema_factory_sha256": "b66d2d5d89bf6d0ef88d93636d1464c1f11ac0534d54f912dc0a06dee47f4d37",
+    "response_schema_roles": {
+      "observer": "observer_response_format(catalog)",
+      "selector": "selector_response_format(catalog, actual_guard_allowed_ids)"
+    },
+    "fallback_to_json_object": false,
+    "response_schema_base_factory": "runtime/grounded_response_schema.py",
+    "response_schema_base_factory_sha256": "0504bf0830ec16f220eb0e1fb46fd5f56e9f7593c23f433ed6d778562d31c94b",
+    "category_tokens": [
+      "pen",
+      "watch",
+      "camera",
+      "plush_toy",
+      "toy_vehicle",
+      "block",
+      "box",
+      "ring",
+      "bracelet",
+      "pouch",
+      "strap",
+      "tool",
+      "bottle_cap",
+      "can",
+      "tracker"
+    ],
+    "category_null_for_unknown": true,
+    "descriptor_or_SDK_to_category_mapping": false,
+    "motion_interpretation": "release_progress_and_negative_constraints_v1",
+    "implicit_summary_actor": "Only Lift/Carry/Lower/Release with exactly one explicit Reasoning arm and one current clear closed secure identified holder of that exact target; never rewrite public text.",
+    "open_release_alias": "Open only when Release is already visually admitted over the exact target basket.",
+    "explicit_summary_temporal_chains_rejected": true,
+    "release_progress": {
+      "requires_prior_actual_adjacent_closed_ready_same_goal": true,
+      "current_actual_supported_opening_over_same_ready_basket": true,
+      "other_hand_clear_empty": true,
+      "allowed_verbs": [
+        "hold",
+        "open",
+        "release"
+      ],
+      "maximum_additional_execute8_windows": 2,
+      "maximum_additional_actions": 16,
+      "maximum_additional_seconds": 0.64,
+      "maximum_actions_from_last_closed_ready_report": 24,
+      "maximum_seconds_from_last_closed_ready_report": 0.96,
+      "label_oscillation_resets_budget": false,
+      "drop_regrasp_rearm_implemented": false
+    },
+    "negative_constraints": "Read-only finite direct negation prefixes, never general English semantic certification or public-text repair."
+  },
+  "observations": {
+    "current_cameras": [
+      "cam_high",
+      "cam_left_wrist",
+      "cam_right_wrist"
+    ],
+    "state_dim": 14,
+    "instruction": true,
+    "past_cameras": [
+      "cam_high"
+    ],
+    "maximum_past_timepoints": 93,
+    "maximum_total_images": 96,
+    "history_source_frame_rule": "floor(2.5*k) on25Hz action clock",
+    "selection": "uniform over whole strictly past episode prefix; retain first/latest past endpoints"
+  },
+  "executed_history": {
+    "maximum_past_records": 137,
+    "commit": "verified actual execution ACK only",
+    "fields": [
+      "subtask_id",
+      "subtask",
+      "observation_frame",
+      "executed_action_start",
+      "executed_action_end"
+    ],
+    "complete_actual_SSR_context_and_prompt_retained_in_ACK_audit": true
+  },
+  "timeouts": {
+    "HTTP_absolute_seconds": 600,
+    "shared_generation_budget_seconds": 1850,
+    "maximum_identical_request_attempts": 3,
+    "policy_RPC_seconds": 2100
+  },
+  "policy": {
+    "checkpoint_family": "genuine existing noDropout summary_subtask_reasoning full-parameter EMA",
+    "checkpoint_step": 19566,
+    "ecot_dropout_probability": 0.0,
+    "context_fields": [
+      "subtask",
+      "action.summary",
+      "reasoning"
+    ],
+    "prompt_composition": "exact actual original noDropout strict_prompt.compose_training_prompt bytes",
+    "predict_steps": 50,
+    "execute_steps": 8,
+    "flow_steps": 10,
+    "noise_seed": 42,
+    "action_hz": 25,
+    "action_limit": 1100,
+    "simulation_waiting": "frozen by unchanged SDK run/freeze envelope",
+    "success_and_termination": "original SDK rules"
+  },
+  "acceptance": {
+    "code_implemented": true,
+    "actual_API_GPU_native_acceptance": false,
+    "semantic_quality_or_task_success_improvement_claimed": false,
+    "actual_current3_full_schema_format_probe_passed": false,
+    "actual_full96_images_request_verified": false,
+    "historical_v3_current3_probe_is_not_v4_acceptance": true,
+    "historical_v4_real_model_only_GPU19566_numerical_passed": true,
+    "v6_live_generation_or_native_inferred_from_v4_model_only": false
+  },
+  "grounding": {
+    "uncertainty": "Local object/category/descriptor/basket scope; unknown-held cannot be hidden",
+    "instance_memory": "Host stamps current visual reports with actual source frame, two consecutive released-container reports confirm placement; drop/occlusion break streak",
+    "goal_correction": "Explicit model proposal with current corroborating views; no automatic ID substitution",
+    "immediate_action": "Summary phase/actor and explicit Reasoning intent checked against current grasp/placement prerequisites; lexical checks are not a visual accuracy oracle",
+    "post_placement": "Retain verified last goal for withdrawal/settling; never claim SDK success",
+    "known_contact_transition": "Original locked clear target; exactly one unknown hand, other clear/empty; adjacent same-hand enclosing/transitioning/closing visual reports; no unresolved held material; cumulative maximum two8-step uncertainty windows per same closure, without reset from label oscillation or opposite hand; Close/Hold only, other hand Hold-only; no support promotion/completion"
+  }
+}

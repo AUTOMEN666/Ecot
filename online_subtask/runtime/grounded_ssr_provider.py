@@ -40,6 +40,15 @@ class GroundedSSRProvider(SSRSteadyProvider):
         # rewriting model observations or changing the visual scene guard.
         pass
 
+    def validate_current_arms(self,evidence,proof):
+        return validate_arms(evidence['arms'],evidence['objects'])
+
+    def make_action_envelopes(self,evidence,target,**kwargs):
+        return action_envelopes(evidence,target,**kwargs)
+
+    def validate_public_plan(self,context,envelope):
+        return validate_plan(context,envelope)
+
     def history_metadata(self,request,proof):
         request=deepcopy(request);proof=deepcopy(proof)
         meta=strict_json(request['messages'][-1]['content'][0]['text'])
@@ -87,14 +96,14 @@ class GroundedSSRProvider(SSRSteadyProvider):
         evidence,receipt=SteadySubtaskProvider.observer_query(self,observer,observer_proof,
             started=started,unchanged=observer_unchanged)
         observer_unchanged();self.validate_observation_format(evidence)
-        validate_arms(evidence['arms'],evidence['objects'])
+        self.validate_current_arms(evidence,observer_proof)
         self.observer_receipt=receipt
         decision=self.guard.observe(evidence,episode_id=proof['episode_id'],frame=proof['current_frame'],
             available_frames=[x['frame']for x in proof['observations']],
             executed_records=proof['executed_subtask_history'])
         self._candidate_scene_sha=digest(self.guard.snapshot())
         for ident,target in decision['targets'].items():
-            self._motion_envelopes[ident]=action_envelopes(evidence,target,
+            self._motion_envelopes[ident]=self.make_action_envelopes(evidence,target,
                 contact_transition=decision.get('known_contact_transition'))
         envelopes={}
         for ident,target in decision['targets'].items():
@@ -140,7 +149,7 @@ class GroundedSSRProvider(SSRSteadyProvider):
                 or proof.get('grounded_motion_options_sha256')!=digest(self._motion_envelopes)
                 or ident not in self._motion_envelopes):
             raise SubtaskConstraintError('Current grounded candidate/phase evidence changed before selection')
-        motion=validate_plan(context,self._motion_envelopes[ident])
+        motion=self.validate_public_plan(context,self._motion_envelopes[ident])
         admission=self.guard.select(ident);proof['steady_guard']=admission
         self.guard.validate_injection({'subtask':context['subtask']},
             dict(proof,selected_id=ident,resolution=resolution),episode_id=self.episode_id,frame=proof['current_frame'])
@@ -158,4 +167,4 @@ class GroundedSSRProvider(SSRSteadyProvider):
         ident=lineage['selected_id']
         if ident not in self._motion_envelopes or digest(self._motion_envelopes[ident])!=self._ssr_authorization['motion_envelope_sha256']:
             raise SubtaskConstraintError('Motion evidence changed after authorization')
-        validate_plan(context,self._motion_envelopes[ident])
+        self.validate_public_plan(context,self._motion_envelopes[ident])

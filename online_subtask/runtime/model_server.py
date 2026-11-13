@@ -24,6 +24,14 @@ def validate_protocol_spec(spec):
     from grounded_ssr_protocol import CONFIG_ID as GROUNDED_CONFIG_ID
     from strict_grounded_ssr_protocol import CONFIG_ID as STRICT_CONFIG_ID
     from enum_grounded_ssr_protocol import CONFIG_ID as ENUM_CONFIG_ID
+    from phase_grounded_ssr_protocol import CONFIG_ID as PHASE_CONFIG_ID
+    from release_grounded_ssr_protocol import CONFIG_ID as RELEASE_CONFIG_ID
+    if spec.get('config_id')==RELEASE_CONFIG_ID:
+        from release_grounded_ssr_protocol import validate_spec
+        return validate_spec(spec)
+    if spec.get('config_id')==PHASE_CONFIG_ID:
+        from phase_grounded_ssr_protocol import validate_spec
+        return validate_spec(spec)
     if spec.get('config_id')==ENUM_CONFIG_ID:
         from enum_grounded_ssr_protocol import validate_spec
         return validate_spec(spec)
@@ -67,7 +75,9 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
     from grounded_ssr_protocol import CONFIG_ID as GROUNDED_CONFIG_ID
     from strict_grounded_ssr_protocol import CONFIG_ID as STRICT_CONFIG_ID
     from enum_grounded_ssr_protocol import CONFIG_ID as ENUM_CONFIG_ID
-    if spec.get('config_id')in(SSR_CONFIG_ID,GROUNDED_CONFIG_ID,STRICT_CONFIG_ID,ENUM_CONFIG_ID):
+    from phase_grounded_ssr_protocol import CONFIG_ID as PHASE_CONFIG_ID
+    from release_grounded_ssr_protocol import CONFIG_ID as RELEASE_CONFIG_ID
+    if spec.get('config_id')in(SSR_CONFIG_ID,GROUNDED_CONFIG_ID,STRICT_CONFIG_ID,ENUM_CONFIG_ID,PHASE_CONFIG_ID,RELEASE_CONFIG_ID):
         from ssr_model_server import create_model as create_ssr_model
         return create_ssr_model(spec,policy=policy,jax_module=jax_module,provider=provider)
     initialize_paths(spec['parent_root'])
@@ -271,7 +281,9 @@ def validate_entry_mode(spec,allow_legacy_replay=False):
     from grounded_ssr_protocol import CONFIG_ID as GROUNDED_CONFIG_ID
     from strict_grounded_ssr_protocol import CONFIG_ID as STRICT_CONFIG_ID
     from enum_grounded_ssr_protocol import CONFIG_ID as ENUM_CONFIG_ID
-    if not allow_legacy_replay and (spec.get('config_id')not in(SSR_CONFIG_ID,GROUNDED_CONFIG_ID,STRICT_CONFIG_ID,ENUM_CONFIG_ID)or spec.get('ssr_enabled')is not True):
+    from phase_grounded_ssr_protocol import CONFIG_ID as PHASE_CONFIG_ID
+    from release_grounded_ssr_protocol import CONFIG_ID as RELEASE_CONFIG_ID
+    if not allow_legacy_replay and (spec.get('config_id')not in(SSR_CONFIG_ID,GROUNDED_CONFIG_ID,STRICT_CONFIG_ID,ENUM_CONFIG_ID,PHASE_CONFIG_ID,RELEASE_CONFIG_ID)or spec.get('ssr_enabled')is not True):
         raise ValueError('This SSR branch requires an explicit SSR spec by default; use prepare_ssr_spec.py. Inherited Subtask-only replay requires --allow-legacy-replay.')
     return validate_protocol_spec(spec)
 

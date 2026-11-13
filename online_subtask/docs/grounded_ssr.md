@@ -1,6 +1,6 @@
 # Current visual facts and feasible short-term SSR
 
-`mainhist93_tok65536_grounded_strict_ssr_v4` is the active experimental quality revision
+`mainhist93_tok65536_grounded_strict_ssr_v6` is the active experimental quality revision
 for classify_objects. It inherits the genuine noDropout three-field EMA runtime,
 fixed288 exact lookup, actual executed Subtask memory and original native action
 loop. The selected checkpoint is EMA19566. No training or weight substitution.
@@ -22,6 +22,39 @@ descriptor-to-category mapping. The selector schema is unchanged. Its observer
 prompt also states the held/table consistency requirement explicitly. V4 whole
 trajectory API/quality acceptance remains pending. Earlier v2/v3 remain explicit;
 no version falls back to another on failure.
+
+V5 preserves v4 observer/schema and adds the explicit motion interpretation
+`release_open_and_unique_secured_actor_v1` to both request bodies and role proofs.
+Open is permitted only when Release already satisfies current secure holding,
+correct basket and release-readiness prerequisites. An implicit Summary actor is
+admitted only for Lift/Carry/Lower/Release if Reasoning names exactly one hand and
+there is exactly one current clear, closed, secure identified holder of that same
+target. No text is completed or rewritten. A second holder, ambiguity or unknown
+support prevents that inference. The actual v4 frame201/88 and202/88 parser false
+positives remain preserved; the203/64 unknown-gripper/Open contradiction remains
+rejected. Explicit Summary phase chains with “then”, “after that” or “followed by”
+are rejected. Other English constructions can escape lexical rules, so current
+facts and short-term intent still require independent visual review.
+
+V6 adds `release_progress_and_negative_constraints_v1`. The observer keeps the
+v4 prompt as a complete prefix and clarifies supported opening during a release.
+The previous real report must be exactly8 frames earlier and show the same
+closed, securely held active target over its admitted basket with readiness=yes.
+Current facts must still identify that supported object, transitioning/opening
+over the same ready basket, with the other hand clear and empty. Only Open,
+Release and Hold are permitted. Two subsequent8-action windows are allowed
+(16 additional actions/.64s); including the preceding observation interval, the
+last closed-ready report to final allowed block may span24 actions/.96s.
+Labels cannot reset the budget; drop/regrasp recovery of that same goal is not
+implemented. Real regression203 prior112→current120 satisfies this rule;
+real201 prior104 had readiness=no, so its112 report remains rejected. Neither
+CPU fixtures nor a constructed prior-ready example establishes that201 was fixed.
+
+A finite read-only negation parser also recognizes direct constraints such as
+“without releasing it” and “do not open the left gripper”. Positive action
+mentions remain checked. Unresolved syntax, quotes and double negation are not
+silently suppressed. No public text is repaired. These rules do not certify
+general language accuracy or all future-action feasibility.
 
 ## What changed and why
 
@@ -102,10 +135,10 @@ provenance, not source-host inode claims.
 
 ```sh
 python3 -B online_subtask/runtime/prepare_ssr_spec.py \
-  --protocol grounded_strict_ssr_v4 \
+  --protocol grounded_strict_ssr_v6 \
   --weights-binding /path/to/genuine_noDropout_EMA19566_binding.json \
   --parent-root /path/to/genuine_SSR_training_root \
-  --audit-path /new/run/seed1_native50_grounded_strict_ssr_mainhist93_65536_20261113_v4/case/actions.jsonl \
+  --audit-path /new/run/seed1_native50_grounded_strict_ssr_mainhist93_65536_20261113_v6/case/actions.jsonl \
   --output /new/run/model.json
 
 python3 -B online_subtask/runtime/model_server.py \
@@ -113,7 +146,7 @@ python3 -B online_subtask/runtime/model_server.py \
 ```
 
 Use the SSR SDK adapter with both `PI05_SSR_CHECKPOINT_STEP=19566` and
-`PI05_SSR_PROTOCOL_ID=mainhist93_tok65536_grounded_strict_ssr_v4`. The private native
+`PI05_SSR_PROTOCOL_ID=mainhist93_tok65536_grounded_strict_ssr_v6`. The private native
 preparer reads these from the specification; its128-action stop is an engineering
 diagnostic, not a formal SDK result. Native/H20 renderer and resource acceptance
 must be verified separately. All original `pi05_policy` action/camera/clock files
