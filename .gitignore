@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.venv/
+.env
+.env.*
+!.env.example
+dist/
+outputs/
+artifacts/
+cache/
+*.mp4
+*.npz
+*.pt
+*.pth
+*.safetensors
+*.ckpt
