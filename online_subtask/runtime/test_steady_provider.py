@@ -24,6 +24,47 @@ def acknowledge(provider, frame, lineage, selected='U0012'):
 
 
 class SteadyProviderContracts(unittest.TestCase):
+    def test_last_goal_stop_retains_completion_but_does_not_invent_SDK_success(self):
+        calls = []
+        def transport(request, proof):
+            calls.append(proof['call_role'])
+            if proof['call_role'] == 'scene_observer':
+                evidence = scene(obj()) if proof['current_frame'] == 0 else scene(
+                    obj(location='red', frame=8, placements=[7, 8]))
+                return response(canonical(evidence))
+            return response('{"subtask_id":"U0012"}')
+        with tempfile.TemporaryDirectory() as tmp:
+            p = SteadySubtaskProvider(tmp, selector_kind='deepseek', transport=transport)
+            p.reset('fixture'); capture_to(p, 0)
+            _, first = p.generate(triplet(0), INSTRUCTION, state14=state(0), episode_id='fixture', frame=0)
+            acknowledge(p, 0, first); capture_to(p, 8)
+            with self.assertRaises(SubtaskConstraintError):
+                p.generate(triplet(8), INSTRUCTION, state14=state(8), episode_id='fixture', frame=8)
+            stop = json.loads((Path(tmp) / 'steady_decision_stops.jsonl').read_text())
+            self.assertEqual(stop['decision']['confirmed_completion']['instance_id'], 'O1')
+            self.assertEqual(stop['scene_state']['completed_instance_ids'], ['O1'])
+            self.assertIsNone(stop['scene_state']['active_goal'])
+            self.assertIsNone(stop['SDK_outcome'])
+            self.assertEqual(calls, ['scene_observer', 'subtask_selector', 'scene_observer'])
+            self.assertEqual(len(p.executed_history.records), 1)
+
+    def test_observer_HTTP_error_body_is_retained_without_semantic_retry(self):
+        calls = []; raw = b'{"error":"offline fixture rejected observer request"}'
+        def transport(request, proof):
+            calls.append(proof)
+            error = RuntimeError('deepseek HTTP 400'); error.response_body = raw
+            raise error
+        with tempfile.TemporaryDirectory() as tmp:
+            p = SteadySubtaskProvider(tmp, selector_kind='deepseek', transport=transport)
+            p.reset('fixture'); capture_to(p, 0)
+            with self.assertRaises(RuntimeError):
+                p.generate(triplet(0), INSTRUCTION, state14=state(0), episode_id='fixture', frame=0)
+            self.assertEqual(len(calls), 1)
+            failures = list(Path(tmp).glob('observer_*_http_error.raw'))
+            self.assertEqual(len(failures), 1)
+            self.assertEqual(failures[0].read_bytes(), raw)
+            self.assertEqual(p.executed_history.records, [])
+
     def test_actual_ACK_then_two_visual_placement_frames_allow_a_legal_goal_switch(self):
         def transport(request, proof):
             frame = proof['current_frame']

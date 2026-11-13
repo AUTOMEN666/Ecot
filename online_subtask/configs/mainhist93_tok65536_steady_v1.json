@@ -105,7 +105,7 @@
     "reasoning_effort": "high",
     "max_tokens": 65536,
     "prompt_relative_to_online_subtask": "runtime/scene_observer_prompt.md",
-    "prompt_sha256": "343c7f0f02611a42c63bec2c323a0576ceb448c705af795732f4b6bc29515ad9",
+    "prompt_sha256": "5a8aec54e23da956ed470efb30da4ebf7007c1a40c0afece3dd038bd7f12ad3d",
     "output_keys": [
       "uncertain",
       "basket_visibility",
@@ -117,13 +117,15 @@
     "policy_receives_observer_state": false
   },
   "steady_constraints": {
-    "goal_lock": "Until two distinct post-selection, released in-destination observations of the same physical instance, including current frame",
+    "goal_lock": "Until two distinct released in-destination observations of the same physical instance AFTER selection and the most recent unplaced witness, including current frame",
     "category_to_basket": "Observed released placements only; not selected/executed textual plans",
     "basket_to_category": "One category per basket",
     "ambiguous_or_conflicting_evidence": "Decision stop before policy; SDK_outcome remains null",
     "new_audit_namespace": "seed1_native50_subtask_steady_20261113_v1",
     "semantic_substitution": false,
     "semantic_retry": false,
-    "full_episode_single_goal_lock": false
+    "full_episode_single_goal_lock": false,
+    "category_merging_by_host": false,
+    "final_goal_no_next_target": "Retain supported goal completion; record a decision stop with SDK_outcome null"
   }
 }

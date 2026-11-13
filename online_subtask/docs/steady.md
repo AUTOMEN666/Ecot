@@ -10,13 +10,14 @@ new protocol, `mainhist93_tok65536_steady_v1`, with its own output namespace.
 | Constraint | Executable behavior |
 | --- | --- |
 | Unfinished goal continuity | Once selected, the same physical instance, candidate ID, exact text and destination stay locked. The next selector request contains a singleton allowed ID. A different ID is rejected before policy inference. |
-| Goal completion | The locked instance must be visibly released inside its own destination in at least two distinct, transmitted observations after selection, including the current frame. Another similar instance, execution ACK, elapsed actions or an ID change cannot complete it. |
+| Goal completion | The locked instance must be visibly released inside its own destination in at least two distinct, transmitted observations after selection AND after its most recent observed drop/regrasp/unreleased state, including the current frame. Another similar instance, execution ACK, elapsed actions or an ID change cannot complete it. |
 | Same category, same basket | Category-to-basket assignments are established by visually observed released containment, including initial basket contents. A prior textual plan does not establish an assignment. |
 | Different categories, different baskets | Both directions of the mapping are checked. If pens occupy red, camera-to-red is not an allowed candidate, even though that ID exists in the288 catalogue. Mixed or contradictory observed contents stop the decision. |
-| Category names | Color-qualified and generic categories are rejected. Explicit descriptor nouns are checked against category; known writing-instrument, watch, plush and toy-vehicle aliases share a category. Ambiguous words such as box/device/tool/ring are not treated as reliable category labels. |
+| Category names | Color-qualified and generic categories are rejected. Broad word families only catch obvious descriptor/category contradictions; they NEVER replace or merge the observed category keys. Distinct reported categories such as toy_car and toy_bus remain distinct. Ambiguous words such as box/device/tool/ring are not reliable category labels. |
 | Physical instance identity | Matching descriptions do not merge different instances. Ambiguous new target identity stops admission. Omission/occlusion cannot complete a target; a positively observed later drop clears that instance's completion. |
 | Actual injection | The runtime independently checks the authorized ID/text, frame, episode, active goal and category mappings immediately before `policy.infer`. |
 | Uncertainty or conflict | Raise a recorded decision stop with `SDK_outcome=null`; do not inject, repair an ID, retry for semantics or substitute an answer. |
+| No next legal target | Preserve any supported current-goal completion and accepted scene facts, then stop without selecting a substitute. Completion of a last pick/place goal is not the SDK whole-task result. |
 
 This tests continuous following of the CURRENT goal, with legal switching after
 confirmed completion. It does not lock one target for the entire sorting episode.
@@ -33,7 +34,8 @@ inferred from an executed Subtask ledger. Each replan therefore performs:
 
 1. One visual-observer request using the SAME causal image payload as the selector.
    It returns typed object/category/location/release evidence and image-frame
-   references. These are fallible visual model observations, not GT.
+   references, including placement_frames and unplaced_frames. Positive and
+   negative witnesses cannot overlap. These are fallible model observations, not GT.
 2. Deterministic admission: update observed category/basket assignments, check
    completion of the active instance, and compute the legal subset of the288 IDs.
 3. One Subtask-selector request returning ONLY `{"subtask_id":"..."}`. Its ID must
@@ -96,6 +98,10 @@ is kept in its raw response and failure file; it is never silently overwritten.
 `steady_decision_stops.jsonl` is distinct from actual SDK outcomes. The original
 action/ACK ledger still contains only instructions followed by verified execution.
 Every reset clears instance tracking, maps, active goal and visual/exec histories.
+If no legal next target exists after the last supported placement, the stop record
+retains that completion, but leaves SDK_outcome null. This policy does not invent
+a return-to-origin Subtask or silently continue another target to obtain an SDK
+terminal result. A full-task benchmark must report such decision stops separately.
 
 ```sh
 python3 -E -B online_subtask/tests/run_cpu_tests.py
@@ -103,7 +109,7 @@ python3 -B tools/verify_archive.py
 ```
 
 Fixtures cover illegal first-frame choices, no-jump sequences, category/basket
-collisions, category aliases, false completion by a similar instance, drops,
+collisions, non-merging of category names, false completion by a similar instance, drops,
 legal completion/switching, missing/uncertain/future evidence, exact retries,
 shared deadlines, mode/namespace enforcement, actual runtime-before-infer admission
 and real ACK method wiring using mocked policy/transport. They do not measure
@@ -111,3 +117,6 @@ real image understanding, new API compatibility or physical Follow ECoT success.
 Historical provenance files describe the parent archive. The separate steady
 source manifest records all intentional branch adaptations without relabelling
 them as bytes from the original deployment.
+
+See [the follow-up review](steady_review.md) for reproduced defects in the initial
+steady commit, their regression checks and the remaining validation limits.

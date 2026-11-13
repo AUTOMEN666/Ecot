@@ -8,9 +8,10 @@ Use current wrists for actual grasp contents and MAIN for basket contents. Inspe
 all three baskets, including objects placed before this call. Different colors
 of the same kind of object have the SAME semantic category. Do not conflate a toy
 car, pen, watch, doll, etc. because their colors match. Use a stable lowercase
-singular category key such as "pen", "watch", "toy_vehicle", "plush_toy", "camera";
-use pen also for markers/styluses, watch also for smartwatch/watch bands, and
-toy_vehicle for toy cars/buses/trucks. Generic "toy" or "device" is insufficient.
+singular category key such as "pen", "watch", "toy_car", "plush_doll", "camera".
+Reuse the exact established key for the same kind of object. Do not collapse
+different kinds into a broad family such as "toy_vehicle" just because their
+names are related. Generic "toy" or "device" is insufficient.
 No color/size/position
 qualifiers. Reuse the registry's category vocabulary for equivalent types. A
 descriptor is wording, not a category or a physical-instance identifier.
@@ -40,12 +41,18 @@ policy grasps a different object, report that fact; do not redefine its goal.
 evidence_frames are unique increasing frame numbers of SUPPLIED images supporting
 this object's facts, including the CURRENT frame. placement_frames is the subset
 where this particular object is visibly released and inside the reported basket;
-otherwise []. Never infer these from the action range or history. Completion of
+otherwise []. unplaced_frames is the subset where that same instance is visibly
+on the table, held, regrasped or not released. Include the current frame if that
+is its current state. The two subsets must not overlap. Include intervening drops
+or regrasps even if the current image shows another placement. Never infer these
+from the action range or history. Completion of
 an active goal needs at least TWO supplied, distinct post-selection observations
-of released containment, ending with the current frame. If there is only one,
+of released containment, ending with the current frame, AFTER the most recent
+observed drop/regrasp/unreleased state. Do not reuse pre-drop placement frames.
+If there is only one,
 report only that frame; the program will keep the same Subtask. State14 is robot
 state, not an object category, Cartesian pose, grasp truth or placement truth.
 
 Return ONLY JSON with exactly these fields (the example is schema, not facts):
-{"uncertain":false,"basket_visibility":{"white":"clear","blue":"unknown","red":"clear"},"objects":[{"instance_id":"O1","category":"pen","descriptor_ids":["D001"],"location":"table","released":true,"evidence_frames":[0],"placement_frames":[]}]}
+{"uncertain":false,"basket_visibility":{"white":"clear","blue":"unknown","red":"clear"},"objects":[{"instance_id":"O1","category":"pen","descriptor_ids":["D004"],"location":"table","released":true,"evidence_frames":[0],"placement_frames":[],"unplaced_frames":[0]}]}
 Do not output Subtask, Summary, Reasoning, plans, task-success flags or extra fields.

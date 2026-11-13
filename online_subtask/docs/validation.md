@@ -9,7 +9,7 @@ PARENT-ARCHIVE checks; their GPU/API/clone assertions do not validate the new pa
 New hard constraints are covered by offline adversarial fixtures, not by a claim
 of correct visual recognition or physical Follow ECoT performance.
 
-Current complete run: **64 tests passed**,0 failures/errors/skips, including the3
+Current complete run: **71 tests passed**,0 failures/errors/skips, including the3
 local HTTP tests. See [steady_cpu_validation.json](../provenance/steady_cpu_validation.json).
 
 ## Packaged checkout

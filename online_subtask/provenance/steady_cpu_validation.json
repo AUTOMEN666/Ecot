@@ -12,7 +12,7 @@
     "test_steady_runtime",
     "test_subtask_guard"
   ],
-  "tests_run": 64,
+  "tests_run": 71,
   "failures": 0,
   "errors": 0,
   "skipped": 0,
@@ -24,5 +24,7 @@
   "command": "python3 -E -B online_subtask/tests/run_cpu_tests.py",
   "interpreter_version": "3.9.6 (default, Mar  6 2026, 16:22:43) ",
   "test_scope": "Offline fixtures and localhost HTTP only. No real API/weights/GPU/native rollout or semantic-quality pass.",
-  "original_source_branch_modified": false
+  "original_source_branch_modified": false,
+  "reviewed_initial_steady_commit": "8b82a0a2859534a00003146bd5e430a46b48ab26",
+  "followup_review": "online_subtask/docs/steady_review.md"
 }

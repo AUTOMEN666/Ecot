@@ -14,7 +14,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "06c6c2cdf072e9d2d53433351865cf38df4d83a0ebbf5cb6877b1d3abfbd253a",
+      "sha256": "c86d65630c38821deec6b35c9e21e106797dba337dd4e036a7f3321c7f962316",
       "base_sha256": "d7cb92c5ed4a07e21a7071a4c33684b1a124b14cefdcfee6ba71b3f7ea6ce0f4"
     },
     {
@@ -29,7 +29,7 @@
     },
     {
       "path": "online_subtask/configs/mainhist93_tok65536_steady_v1.json",
-      "sha256": "d71c561748fac12789b01b0685bd2c19aba4623ca2892853adddb80bf2133296",
+      "sha256": "d62138bf50a644c49b552452d652a86793735891822889c3f90cfb45a631cf41",
       "base_sha256": null
     },
     {
@@ -54,12 +54,17 @@
     },
     {
       "path": "online_subtask/docs/steady.md",
-      "sha256": "0efdd47736029185c1d814c109b5f35847d6f327472ebef28ddc49f75882b4fb",
+      "sha256": "3cd9fac60b106ee6e78021a4c71ad99f19ec6999f36e854250d605fd0dce0dae",
+      "base_sha256": null
+    },
+    {
+      "path": "online_subtask/docs/steady_review.md",
+      "sha256": "079c41f4c258e9ccae61d9f4f118fdd85e1dd19dadded52d7e883ea3146e7539",
       "base_sha256": null
     },
     {
       "path": "online_subtask/docs/validation.md",
-      "sha256": "2321daf00fd31cc429e62bf692d867d92e65a91108eca142000a170eb9b26f89",
+      "sha256": "a8a7c700ad9ae5b5725682d375b0c0fa55898f701ccd566a1d51f8f2b17631e5",
       "base_sha256": "03b2255a8d90e4ace6d781987de6be0f01f2d388cccb804063907f00a518fe08"
     },
     {
@@ -169,7 +174,7 @@
     },
     {
       "path": "online_subtask/provenance/steady_cpu_validation.json",
-      "sha256": "aabc3dfded7744312096d50046c77187e21bb14c4a740e00ae6facbef8510ad0",
+      "sha256": "bbb2805fb3aca8a0eeb478081124c25d7c8787936ecece126f2e4655cf5ad80f",
       "base_sha256": null
     },
     {
@@ -304,7 +309,7 @@
     },
     {
       "path": "online_subtask/runtime/scene_observer_prompt.md",
-      "sha256": "343c7f0f02611a42c63bec2c323a0576ceb448c705af795732f4b6bc29515ad9",
+      "sha256": "5a8aec54e23da956ed470efb30da4ebf7007c1a40c0afece3dd038bd7f12ad3d",
       "base_sha256": null
     },
     {
@@ -319,7 +324,7 @@
     },
     {
       "path": "online_subtask/runtime/steady_provider.py",
-      "sha256": "7cc0f94f4a3d65f3fd7d4dc3693b5d1273e67e5bb334784fdcd1117fc24a2bdf",
+      "sha256": "0bf04321c23b15d125476353a9406ec5b936c743a56ebf37b5145a0380771c53",
       "base_sha256": null
     },
     {
@@ -334,7 +339,7 @@
     },
     {
       "path": "online_subtask/runtime/subtask_guard.py",
-      "sha256": "b9254df1b8240b1d2e84835060a56887b3fa5c177c13f5492577dd33afca2bb6",
+      "sha256": "2b3618437eca5c764828473666b185c096607728692b80a57ce52d2b51639397",
       "base_sha256": null
     },
     {
@@ -374,7 +379,7 @@
     },
     {
       "path": "online_subtask/runtime/test_steady_provider.py",
-      "sha256": "ca9b0c8b78442401451b3ec0ba7603c0226802a1f837e8a553bf4b0b5f1511e6",
+      "sha256": "e6403fb735145e11c6380f31e479f667f64a83125ac58e1c8e89cc5a1d2c2fa7",
       "base_sha256": null
     },
     {
@@ -384,7 +389,7 @@
     },
     {
       "path": "online_subtask/runtime/test_subtask_guard.py",
-      "sha256": "7144cb280a6647a03236124fd19f8471a01b4ee91048af143a7535adde5c289f",
+      "sha256": "91dcaa6c61958c908804ccd37b50f4d9bafcacfa8173716eb865438255e97179",
       "base_sha256": null
     },
     {

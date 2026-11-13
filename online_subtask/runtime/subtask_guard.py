@@ -13,27 +13,17 @@ STEADY_CONFIG_ID = 'mainhist93_tok65536_steady_v1'
 STEADY_NAMESPACE = 'seed1_native50_subtask_steady_20261113_v1'
 BASKETS = ('white', 'blue', 'red')
 OBJECT_FIELDS = {'instance_id', 'category', 'descriptor_ids', 'location',
-                 'released', 'evidence_frames', 'placement_frames'}
+                 'released', 'evidence_frames', 'placement_frames', 'unplaced_frames'}
 COLOR_WORDS = {'white', 'black', 'blue', 'red', 'green', 'yellow', 'orange',
                'purple', 'pink', 'gold', 'silver', 'beige', 'cyan', 'brown', 'gray', 'grey'}
-CATEGORY_ALIASES = {
-    'marker': 'pen', 'stylus': 'pen', 'fountain_pen': 'pen', 'writing_instrument': 'pen',
-    'smartwatch': 'watch', 'wristwatch': 'watch', 'watch_band': 'watch', 'fitness_band': 'watch',
-    'wristband': 'watch', 'action_camera': 'camera', 'camera_device': 'camera',
-    'plush_doll': 'plush_toy', 'doll': 'plush_toy',
-    'toy_car': 'toy_vehicle', 'toy_bus': 'toy_vehicle', 'toy_truck': 'toy_vehicle',
-    'toy_engine': 'toy_vehicle',
-}
-
-
-def descriptor_category(phrase):
-    """Conservative lexical checks, NOT a classifier or test-scene taxonomy.
+def lexical_family(phrase):
+    """Broad lexical sanity check, NEVER a category key or an alias merger.
 
     Box/device/tool/ring and other ambiguous wording is left to visual evidence.
     This catches, for example, an observer calling an explicit camera a pen.
     """
-    words = set(re.findall(r'[a-z]+', phrase.lower()))
-    if words.intersection({'pen', 'marker', 'stylus'}):
+    words = set(re.findall(r'[a-z]+', phrase.lower().replace('_', ' ')))
+    if words.intersection({'pen', 'marker', 'stylus'}) or {'writing', 'instrument'} <= words:
         return 'pen'
     if words.intersection({'watch', 'smartwatch', 'wristwatch', 'wristband'}) or 'fitness band' in phrase:
         return 'watch'
@@ -59,7 +49,7 @@ class SubtaskGuard:
     def __init__(self, catalog):
         self.by_id = {item['id']: item for item in catalog['candidates']}
         self.descriptors = {item['descriptor_id'] for item in self.by_id.values()}
-        self.descriptor_categories = {item['descriptor_id']: descriptor_category(item['object_phrase'])
+        self.descriptor_families = {item['descriptor_id']: lexical_family(item['object_phrase'])
                                       for item in self.by_id.values()}
         self.reset(None)
 
@@ -120,22 +110,25 @@ class SubtaskGuard:
                     and category not in ('unknown', 'object', 'item', 'thing', 'toy', 'device')
                     and not COLOR_WORDS.intersection(category.split('_')),
                     'Semantic category must be explicit and independent of object color')
-            category = CATEGORY_ALIASES.get(category, category)
             descriptors = obj['descriptor_ids']
             require(type(descriptors) is list and len(set(descriptors)) == len(descriptors)
                     and all(type(d) is str and d in self.descriptors for d in descriptors),
                     'Only original catalogue descriptor IDs are allowed')
-            require(all(self.descriptor_categories[d] in (None, category) for d in descriptors),
+            require(all(self.descriptor_families[d] in (None, lexical_family(category)) for d in descriptors),
                     'Visual category contradicts an explicit catalogue descriptor')
             require(obj['location'] in ('table', 'held') + BASKETS and type(obj['released']) is bool,
                     'Explicit currently observed location/release required')
             require(not (obj['location'] == 'held' and obj['released']), 'A held object is not released')
-            refs, placements = obj['evidence_frames'], obj['placement_frames']
-            for values in (refs, placements):
+            refs, placements, unplaced = obj['evidence_frames'], obj['placement_frames'], obj['unplaced_frames']
+            for values in (refs, placements, unplaced):
                 require(type(values) is list and all(type(f) is int and f in frames for f in values)
                         and values == sorted(set(values)), 'Evidence refers to an absent/future/duplicate frame')
             require(bool(refs) and refs[-1] == frame, 'Object facts require a current image observation')
             require(set(placements) <= set(refs), 'Placement needs its own transmitted image evidence')
+            require(set(unplaced) <= set(refs) and not set(unplaced).intersection(placements),
+                    'Placed/unplaced witnesses must be supported and cannot contradict at one frame')
+            if obj['location'] in ('table', 'held') or not obj['released']:
+                require(frame in unplaced, 'Current unplaced/unreleased state needs a negative witness')
             require(not placements or obj['location'] in BASKETS and obj['released'],
                     'Placement frames require visible basket containment and release')
             if ident in known:
@@ -167,8 +160,10 @@ class SubtaskGuard:
             if target is not None:
                 require(self.by_id[active['subtask_id']]['descriptor_id'] in target['descriptor_ids'],
                         'Current visual identity contradicts the locked descriptor; stop without ID repair')
+                active['last_unplaced_at'] = max([active['last_unplaced_at']] + target['unplaced_frames'])
                 # A different similar instance cannot complete this locked goal.
-                after_start = [f for f in target['placement_frames'] if f > active['selected_at']]
+                barrier = max(active['selected_at'], active['last_unplaced_at'])
+                after_start = [f for f in target['placement_frames'] if f > barrier]
                 if (target['location'] == basket and target['released'] and len(after_start) >= 2
                         and after_start[-1] == frame and frame > active['selected_at']):
                     completion = dict(active, confirmed_at=frame, placement_frames=after_start)
@@ -200,16 +195,18 @@ class SubtaskGuard:
                     continue  # unseen basket contents cannot be assumed empty
                 targets[ident] = {'instance_id': obj['instance_id'], 'category': category,
                                   'basket_color': basket}
-        require(bool(targets), 'No unambiguous legal Subtask; stop before policy inference')
+        # Preserve accepted visual facts and a completed FINAL goal even when
+        # there is no next selectable target. This is not SDK task success.
         self.objects, self.category_to_basket, self.basket_to_category = known, categories, baskets
         self.completed, self.active = completed, active
         self.decision = {'episode_id': episode_id, 'frame': frame,
-                         'mode': 'locked' if active else 'new_goal',
+                         'mode': 'locked' if active else 'new_goal' if targets else 'no_legal_target',
                          'locked_id': active['subtask_id'] if active else None,
                          'allowed_ids': sorted(targets), 'targets': targets,
                          'category_to_basket': categories, 'basket_to_category': baskets,
                          'confirmed_completion': completion}
         self.authorization = None
+        require(bool(targets), 'No unambiguous legal Subtask; stop before policy inference')
         return deepcopy(self.decision)
 
     def select(self, selected_id):
@@ -217,7 +214,7 @@ class SubtaskGuard:
                 'Candidate violates the goal lock or category/basket constraints')
         if self.active is None:
             self.active = dict(self.decision['targets'][selected_id], subtask_id=selected_id,
-                               selected_at=self.decision['frame'])
+                               selected_at=self.decision['frame'], last_unplaced_at=self.decision['frame'])
         require(self.active['subtask_id'] == selected_id, 'Locked Subtask changed')
         result = dict(deepcopy(self.decision), active_goal=deepcopy(self.active),
                       raw_proposed_id=selected_id, actual_selected_id=selected_id,

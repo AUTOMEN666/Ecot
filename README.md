@@ -17,8 +17,10 @@ at most96 images, with a shared1850s budget. No Summary/Reasoning enters π0.5.
 The implementation and CPU fixtures are supplied here. A new real API/GPU/native
 rollout or semantic-quality improvement is not claimed. The existing checkpoint,
 normalization, policy inputs and action/SDK settings are retained.
-The complete offline suite passed **64 checks**, including the3 loopback HTTP
+The complete offline suite passed **71 checks**, including the3 loopback HTTP
 checks, with0 failures/errors/skips; see the [steady CPU receipt](online_subtask/provenance/steady_cpu_validation.json).
+The [follow-up review](online_subtask/docs/steady_review.md) documents three
+reproduced behavioral defects in the first steady commit and their corrections.
 
 ## Historical base archive
 

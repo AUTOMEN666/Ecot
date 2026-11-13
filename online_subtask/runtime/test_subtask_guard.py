@@ -7,11 +7,13 @@ from subtask_guard import SubtaskGuard, SubtaskConstraintError
 
 
 def obj(ident='O1', category='pen', descriptor='D004', location='table', frame=0,
-        placements=None, released=True):
+        placements=None, released=True, unplaced=None):
     placements = [] if placements is None else placements
+    unplaced = ([frame] if location in ('table', 'held') or not released else []) if unplaced is None else unplaced
     return dict(instance_id=ident, category=category, descriptor_ids=[descriptor] if descriptor else [],
                 location=location, released=released,
-                evidence_frames=sorted(set(placements + [frame])), placement_frames=placements)
+                evidence_frames=sorted(set(placements + unplaced + [frame])), placement_frames=placements,
+                unplaced_frames=unplaced)
 
 
 def scene(*objects):
@@ -179,13 +181,58 @@ class GoalAndSortingConstraints(unittest.TestCase):
         with self.assertRaisesRegex(SubtaskConstraintError, 'explicit catalogue descriptor'):
             observe(self.guard, scene(obj(category='pen', descriptor='D003')))
 
-    def test_category_aliases_do_not_split_markers_and_pens_into_different_baskets(self):
+    def test_word_families_do_not_merge_distinct_declared_categories(self):
         decision = observe(self.guard, scene(obj(category='marker', descriptor='D018',
                                                 location='red', placements=[0]),
                                              obj('O2', 'pen', 'D005')))
-        self.assertEqual(decision['category_to_basket'], {'pen': 'red'})
-        self.assertIn('U0015', decision['allowed_ids'])
-        self.assertNotIn('U0013', decision['allowed_ids'])
+        self.assertEqual(decision['category_to_basket'], {'marker': 'red'})
+        self.assertNotIn('U0015', decision['allowed_ids'])
+        self.assertIn('U0013', decision['allowed_ids'])
+
+    def test_different_toy_categories_cannot_be_folded_into_a_vehicle_class(self):
+        decision = observe(self.guard, scene(obj('O1', 'toy_car', 'D032', 'red', placements=[0]),
+                                             obj('O2', 'toy_bus', 'D093')))
+        self.assertEqual(decision['category_to_basket'], {'toy_car': 'red'})
+        self.assertNotIn('U0279', decision['allowed_ids'])
+        self.assertIn('U0277', decision['allowed_ids'])
+
+    def test_pre_drop_placement_is_not_reused_after_a_later_observed_drop(self):
+        self.start()
+        observe(self.guard, scene(obj(location='red', frame=8, placements=[8])), 8)
+        self.guard.select('U0012')
+        observe(self.guard, scene(obj(frame=16)), 16)
+        self.guard.select('U0012')
+        decision = observe(self.guard, scene(obj(location='red', frame=24, placements=[7, 24]),
+                                             obj('O2', 'camera', 'D003', frame=24)), 24)
+        self.assertEqual(decision['mode'], 'locked')
+        self.assertIsNone(decision['confirmed_completion'])
+        self.guard.select('U0012')
+        decision = observe(self.guard, scene(obj(location='red', frame=32, placements=[27, 32]),
+                                             obj('O2', 'camera', 'D003', frame=32)), 32)
+        self.assertEqual(decision['mode'], 'new_goal')
+        self.assertEqual(decision['confirmed_completion']['placement_frames'], [27, 32])
+
+    def test_drop_inside_one_observer_report_also_invalidates_older_placement(self):
+        self.start()
+        decision = observe(self.guard, scene(obj(location='red', frame=16, placements=[7, 16], unplaced=[10]),
+                                             obj('O2', 'camera', 'D003', frame=16)), 16)
+        self.assertEqual(decision['mode'], 'locked')
+        self.assertEqual(self.guard.active['last_unplaced_at'], 10)
+        self.assertIsNone(decision['confirmed_completion'])
+
+    def test_last_goal_completion_is_kept_when_no_next_target_exists(self):
+        self.start()
+        with self.assertRaisesRegex(SubtaskConstraintError, 'No unambiguous legal'):
+            observe(self.guard, scene(obj(location='red', frame=8, placements=[7, 8])), 8)
+        self.assertIsNone(self.guard.active)
+        self.assertIn('O1', self.guard.completed)
+        self.assertEqual(self.guard.decision['mode'], 'no_legal_target')
+        self.assertEqual(self.guard.decision['confirmed_completion']['instance_id'], 'O1')
+        self.assertEqual(self.guard.decision['allowed_ids'], [])
+
+    def test_one_frame_cannot_be_both_placed_and_unplaced(self):
+        with self.assertRaisesRegex(SubtaskConstraintError, 'cannot contradict'):
+            observe(self.guard, scene(obj(location='red', placements=[0], unplaced=[0])))
 
     def test_reset_clears_goal_mapping_instances_and_authorization(self):
         observe(self.guard, scene(obj(location='red', placements=[0]), obj('O2', 'pen', 'D005')))

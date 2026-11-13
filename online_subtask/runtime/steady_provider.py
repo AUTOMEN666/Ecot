@@ -2,6 +2,8 @@
 from copy import deepcopy
 from pathlib import Path
 import time
+import http.client
+import urllib.error
 from uuid import uuid4
 
 from multiview_provider import (MultiviewHistoryProvider, DEEPSEEK_MODEL, write,
@@ -82,11 +84,20 @@ class SteadySubtaskProvider(MultiviewHistoryProvider):
                       {'evidence': evidence, 'lineage': receipt})
                 return evidence, receipt
             except BaseException as error:
+                error_body = getattr(error, 'response_body', None)
+                if raw is None and error_body is None and isinstance(error, urllib.error.HTTPError):
+                    error_body = error.read()
+                reason = error.reason if isinstance(error, urllib.error.URLError) else error
+                if raw is None and error_body is None and isinstance(reason, http.client.IncompleteRead):
+                    error_body = reason.partial
+                if raw is None and error_body is not None:
+                    write(self.output_dir / (ident + '_http_error.raw'), error_body)
                 retry = empty_length or raw is None and transient_transport_error(error)
                 scheduled = retry and attempt < 3 and time.monotonic() - started + self.timeout <= RETRY_BUDGET_SECONDS
                 write(self.output_dir / (ident + '_failure.json'), {
                     'call_role': 'scene_observer', 'error_type': type(error).__name__, 'error': str(error),
                     'attempt_index': attempt, 'attempt_request_ids': ids, 'request_sha256': sha(body),
+                    'available_error_body_sha256': sha(error_body) if error_body is not None else None,
                     'HTTP_transport_receipt': meta.get('HTTP_transport_receipt'),
                     'retry_scheduled': scheduled, 'actual_injected': False, 'policy_called': False})
                 if not scheduled:
@@ -155,5 +166,5 @@ class SteadySubtaskProvider(MultiviewHistoryProvider):
                 stream.write(canonical({'event': 'steady_decision_stop', 'episode_id': kwargs.get('episode_id'),
                     'frame': kwargs.get('frame'), 'error_type': type(error).__name__, 'error': str(error),
                     'actual_injected': False, 'policy_called': False, 'SDK_outcome': None,
-                    'scene_state': self.guard.snapshot()}) + '\n')
+                    'scene_state': self.guard.snapshot(), 'decision': deepcopy(self.guard.decision)}) + '\n')
             raise
