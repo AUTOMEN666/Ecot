@@ -16,9 +16,11 @@ def prepare(a):
     from enum_grounded_ssr_protocol import CONFIG_ID as ENUM_ID,NAMESPACE as ENUM_NAMESPACE,validate_spec as validate_enum
     from phase_grounded_ssr_protocol import CONFIG_ID as PHASE_ID,NAMESPACE as PHASE_NAMESPACE,validate_spec as validate_phase
     from release_grounded_ssr_protocol import CONFIG_ID as RELEASE_ID,NAMESPACE as RELEASE_NAMESPACE,validate_spec as validate_release
+    from temporal_grounded_ssr_protocol import CONFIG_ID as TEMPORAL_ID,NAMESPACE as TEMPORAL_NAMESPACE,validate_spec as validate_temporal
     grounded=spec.get('config_id')==GROUNDED_ID
     strict=spec.get('config_id')==STRICT_ID
-    if spec.get('config_id')==RELEASE_ID:validate_release(spec);protocol_namespace=RELEASE_NAMESPACE
+    if spec.get('config_id')==TEMPORAL_ID:validate_temporal(spec);protocol_namespace=TEMPORAL_NAMESPACE
+    elif spec.get('config_id')==RELEASE_ID:validate_release(spec);protocol_namespace=RELEASE_NAMESPACE
     elif spec.get('config_id')==PHASE_ID:validate_phase(spec);protocol_namespace=PHASE_NAMESPACE
     elif spec.get('config_id')==ENUM_ID:validate_enum(spec);protocol_namespace=ENUM_NAMESPACE
     elif strict:validate_strict(spec);protocol_namespace=STRICT_NAMESPACE

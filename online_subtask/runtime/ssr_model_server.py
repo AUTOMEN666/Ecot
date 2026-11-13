@@ -17,12 +17,17 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
     from enum_grounded_ssr_protocol import CONFIG_ID as ENUM_ID
     from phase_grounded_ssr_protocol import CONFIG_ID as PHASE_ID
     from release_grounded_ssr_protocol import CONFIG_ID as RELEASE_ID
+    from temporal_grounded_ssr_protocol import CONFIG_ID as TEMPORAL_ID
+    temporal=spec.get('config_id')==TEMPORAL_ID
     releasing=spec.get('config_id')==RELEASE_ID
     phased=spec.get('config_id')==PHASE_ID
-    enumerated=spec.get('config_id')in(ENUM_ID,PHASE_ID,RELEASE_ID)
+    enumerated=spec.get('config_id')in(ENUM_ID,PHASE_ID,RELEASE_ID,TEMPORAL_ID)
     strict=spec.get('config_id')==STRICT_ID
-    grounded=spec.get('config_id')in(GROUNDED_ID,STRICT_ID,ENUM_ID,PHASE_ID,RELEASE_ID)
-    if releasing:
+    grounded=spec.get('config_id')in(GROUNDED_ID,STRICT_ID,ENUM_ID,PHASE_ID,RELEASE_ID,TEMPORAL_ID)
+    if temporal:
+        from temporal_grounded_ssr_protocol import validate_spec as validate_temporal_spec
+        validate_temporal_spec(spec)
+    elif releasing:
         from release_grounded_ssr_protocol import validate_spec as validate_release_spec
         validate_release_spec(spec)
     elif phased:
@@ -48,7 +53,10 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
     # Fail before loading/sampling a policy if the real external formatter differs.
     actual_training_prompt(INSTRUCTION,load_reference()['examples'][0]['context'])
     if provider is None:
-        if releasing:
+        if temporal:
+            from temporal_grounded_ssr_provider import TemporalGroundedSSRProvider
+            provider_class=TemporalGroundedSSRProvider
+        elif releasing:
             from release_grounded_ssr_provider import ReleaseGroundedSSRProvider
             provider_class=ReleaseGroundedSSRProvider
         elif phased:

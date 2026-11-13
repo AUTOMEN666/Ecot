@@ -2,7 +2,7 @@
 
 This branch implements causal online generation of three public ECoT fields and
 conditions the existing noDropout SSR π0.5 checkpoint **EMA19566** on those fields.
-The active experimental protocol is `mainhist93_tok65536_grounded_strict_ssr_v6`.
+The active experimental protocol is `mainhist93_tok65536_grounded_strict_ssr_v7`.
 Start with the [grounded SSR guide](online_subtask/docs/grounded_ssr.md).
 Whole-trajectory annotation quality and genuine H20 GPU/native acceptance are
 still being evaluated. Neither code tests nor a rendered source video establish
@@ -23,7 +23,7 @@ that the annotations are reliable or that task success improves.
 4. Execute up to8 actions from the50-step prediction. Only verified actual
    injection/action/clock ACKs commit a real online Subtask-history record.
 
-V6 retains v4 strict JSON Schema with a finite semantic category vocabulary plus
+V7 retains v4 strict JSON Schema with a finite semantic category vocabulary plus
 null. Categories are visually chosen, never inferred by the host from descriptor
 IDs or SDK labels. The selector schema remains byte-for-byte equivalent to the
 v3 selector factory. Earlier current3 probes showed limited format compatibility,
@@ -34,6 +34,16 @@ already exposed both an observer grasp contradiction and a false rejection of a
 completed-release clause. No v6 whole trajectory has passed quality acceptance.
 These failures are preserved while the implementation is revised; a strict
 schema does not certify the facts.
+
+V7 keeps those failed versions and adds a current hand/object consistency
+reminder. It also distinguishes one narrowly recognized completed-release
+clause from a future release instruction: “Retract the empty left arm from the
+white basket after releasing the pen.” This requires the exact same current
+instance visibly released in that basket, an open/empty acting hand and a
+sealed actual selector-proof/goal/envelope binding. Primary actions, actors,
+state claims and destinations still undergo the original checks. The public
+text is never rewritten. Other grammar can still be rejected; this is not a
+general tense parser or a visual accuracy guarantee.
 
 V5 also admits opening as the physical implementation of an already admitted
 release. A Summary may omit an actor only for Lift/Carry/Lower/Release when the
@@ -83,13 +93,20 @@ correction. Another similar object in a basket does not complete this instance.
 
 A real H20 numerical probe loaded the genuine EMA19566 with actual v4 generated
 three-field/current-frame input. Two fresh seed42 predictions were byte-identical.
-That establishes a narrow loader/numerical/input result; v6 live generation,
+That establishes a narrow loader/numerical/input result; v7 live generation,
 executed8-action ACKs and SDK task outcomes remain separate pending checks.
+
+A separate real v6 observer component accepted93 past MAIN images plus current3
+at source frame600 in about115 seconds, without retry. Independent standard
+JSON Schema validation passed. Its history was explicitly empty because this
+standalone probe had never generated earlier labels or executed actions. It
+does not establish selector96, a complete label-history pipeline or annotation
+accuracy, and does not serve as v7 prompt acceptance.
 
 ## Native adapter and evaluation
 
 Use `pi05_ssr_policy`, `PI05_SSR_CHECKPOINT_STEP=19566` and
-`PI05_SSR_PROTOCOL_ID=mainhist93_tok65536_grounded_strict_ssr_v6`. The preparer requires
+`PI05_SSR_PROTOCOL_ID=mainhist93_tok65536_grounded_strict_ssr_v7`. The preparer requires
 a genuine original weights/normalization/tokenizer binding. The original seven
 `pi05_policy` camera/action/clock files remain unchanged; the SSR adapter's
 execution loop remains equivalent to that original loop. H20 renderer/device and

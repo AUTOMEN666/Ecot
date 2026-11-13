@@ -154,7 +154,8 @@ class GroundedSceneGuard:
         require(bool(decision['allowed_ids']), decision.get('stop_reason', 'No grounded legal Subtask'))
         return deepcopy(decision)
 
-    def _validate(self, evidence, episode_id, frame, available_frames, executed_records):
+    def validate_observation_domain(self, episode_id, frame, available_frames, executed_records):
+        """Strict default timing/execution domain; separate audits must override explicitly."""
         require(episode_id == self.episode_id and bool(episode_id), 'Wrong grounded scene episode')
         require(type(frame) is int and frame == (0 if self.frame is None else self.frame + 8),
                 'Current visual observations must start0 and advance exactly8 real actions')
@@ -165,6 +166,9 @@ class GroundedSceneGuard:
         require(type(available_frames) in (list, tuple) and frame in available_frames
                 and all(type(f) is int and 0 <= f <= frame for f in available_frames),
                 'Only actual causal input image frames are admissible')
+
+    def _validate(self, evidence, episode_id, frame, available_frames, executed_records):
+        self.validate_observation_domain(episode_id, frame, available_frames, executed_records)
         require(type(evidence) is dict and BASE_FIELDS <= set(evidence)
                 and set(evidence) <= BASE_FIELDS | {'goal_correction'}, 'Exact current-observation scene schema required')
         require(evidence['scene_usable'] is True, 'Current scene images unusable; no grounded action')

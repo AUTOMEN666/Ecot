@@ -162,7 +162,7 @@ def explicit_action_actors(text,*,negation_detector=None):
                 result.append((forms[word.lower()],{'left','right'}if who.lower()=='both'else{who.lower()}))
     return result
 
-def validate_plan(context,envelope,*,acting_arms=None,negation_detector=None):
+def validate_plan(context,envelope,*,acting_arms=None,negation_detector=None,completed_release_predicate=None):
     """Reject, never edit, an unsupported explicit next-action annotation."""
     summary=context['action']['summary'];reasoning=context['reasoning']
     match=re.match(r'^([A-Za-z]+)\b',summary)
@@ -178,6 +178,8 @@ def validate_plan(context,envelope,*,acting_arms=None,negation_detector=None):
         require(verb in envelope['by_arm'][arm]['allowed_verbs'],
             f'Immediate {verb} is not visually admitted for the {arm} arm')
     require(negation_detector is None or callable(negation_detector),'Explicit read-only negation parser required')
+    require(completed_release_predicate is None or callable(completed_release_predicate),
+        'Explicit read-only completed-release predicate required')
     for action,actors in explicit_action_actors(summary+'; '+reasoning,negation_detector=negation_detector):
         for actor in actors:
             state_adjective=action=='open'and envelope['by_arm'][actor]['observed']['gripper_state']=='open'
@@ -197,7 +199,10 @@ def validate_plan(context,envelope,*,acting_arms=None,negation_detector=None):
         if action not in allowed:
             text=summary+' '+reasoning
             for mention in re.finditer(pattern,text,re.I):
-                require(negation_detector is not None and negation_detector(text,mention.start()),
+                negated=negation_detector is not None and negation_detector(text,mention.start())
+                completed=(action=='release'and completed_release_predicate is not None
+                    and completed_release_predicate(text,mention.start()))
+                require(negated or completed,
                     'Public short-term plan skips a currently unobserved prerequisite: '+action)
     family=lexical_family(envelope['category'])
     if family is not None:
