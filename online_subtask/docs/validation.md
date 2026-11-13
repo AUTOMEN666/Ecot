@@ -1,5 +1,17 @@
 # Verification scope
 
+## Steady branch
+
+This branch adds goal-lock/category-basket and observer/provider/runtime fixtures
+to the historical31-test suite. Use the current CPU runner and the separate
+steady validation receipt for actual counts/results. The sections below record
+PARENT-ARCHIVE checks; their GPU/API/clone assertions do not validate the new path.
+New hard constraints are covered by offline adversarial fixtures, not by a claim
+of correct visual recognition or physical Follow ECoT performance.
+
+Current complete run: **64 tests passed**,0 failures/errors/skips, including the3
+local HTTP tests. See [steady_cpu_validation.json](../provenance/steady_cpu_validation.json).
+
 ## Packaged checkout
 
 The release owner ran the complete suite from a copied checkout outside the

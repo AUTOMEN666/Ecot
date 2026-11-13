@@ -1,0 +1,28 @@
+{
+  "schema": "ecot.online_subtask.steady.cpu_test_run.v1",
+  "modules": [
+    "test_executed_history",
+    "test_executed_history_integration",
+    "test_history96",
+    "test_http_transport",
+    "test_json_object_prompt_compatibility",
+    "test_mainhistory93_65536",
+    "test_runtime_executed_history",
+    "test_steady_provider",
+    "test_steady_runtime",
+    "test_subtask_guard"
+  ],
+  "tests_run": 64,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "passed": true,
+  "loopback_HTTP_tests_included": true,
+  "actual_API_GPU_simulator_called": false,
+  "base_commit": "8e4f340940c56fbbe5c30e0ee578d6e5b8678321",
+  "configuration_id": "mainhist93_tok65536_steady_v1",
+  "command": "python3 -E -B online_subtask/tests/run_cpu_tests.py",
+  "interpreter_version": "3.9.6 (default, Mar  6 2026, 16:22:43) ",
+  "test_scope": "Offline fixtures and localhost HTTP only. No real API/weights/GPU/native rollout or semantic-quality pass.",
+  "original_source_branch_modified": false
+}

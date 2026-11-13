@@ -1,0 +1,129 @@
+{
+  "schema": "ecot.online_subtask.steady.scientific_config.v1",
+  "usage": "Declarative steady contract. Convert a genuine verified legacy model spec using runtime/prepare_steady_spec.py; not a simulator launcher.",
+  "config_id": "mainhist93_tok65536_steady_v1",
+  "protocol_config_id": "mainhist93_tok65536_steady_v1",
+  "selector": {
+    "entry": "runtime/steady_provider.py:SteadySubtaskProvider",
+    "provider": "deepseek",
+    "model": "deepseek-v4-1-flash-261017",
+    "temperature": 0,
+    "thinking": {
+      "type": "enabled"
+    },
+    "reasoning_effort": "high",
+    "max_tokens": 65536,
+    "response_format": {
+      "type": "json_object"
+    },
+    "output_keys": [
+      "subtask_id"
+    ],
+    "catalog_count": 288,
+    "catalog_relative_to_online_subtask": "runtime/ACTIVE_EXPANDED_CATALOG.json",
+    "catalog_sha256": "97734cb3db4e92fcf62beec96d635896d09d8f23c99c646170bf7736f8b48600",
+    "prompt_relative_to_online_subtask": "runtime/steady_selector_prompt.md",
+    "prompt_sha256": "b1531fed8ebd01338a4438fa8b1b734faa9fba8f7fa80e1bf3c36875f9489fef",
+    "semantic_retry": false,
+    "ID_repair": false,
+    "fallback": false
+  },
+  "observations": {
+    "current_cameras": [
+      "cam_high",
+      "cam_left_wrist",
+      "cam_right_wrist"
+    ],
+    "current_state_dimension": 14,
+    "instruction": "Sort the objects by category into the three baskets.",
+    "history_source_frame_rule": "floor(2.5*k), k=0,1,... on the25Hz action clock",
+    "past_cameras": [
+      "cam_high"
+    ],
+    "maximum_past_timepoints": 93,
+    "maximum_total_images": 96,
+    "past_frames": "Strictly before the current frame, same episode, uniformly selected from every captured source point over the complete prefix; preserve first/last when subsampling.",
+    "subsample_index_when_more_than93": "i*(N-1)//92, i=0..92",
+    "image_order": "Selected past MAIN images in time order, then current MAIN/left-wrist/right-wrist.",
+    "past_wrist_images_sent": false
+  },
+  "executed_history": {
+    "schema": "ecot.actual_executed_subtask_history.v1",
+    "commit": "Only after validated actual-execution ACK, including episode, exact ID/text/prompt/commands, action range and physics clock.",
+    "maximum_past_records": 137,
+    "fields": [
+      "subtask_id",
+      "subtask",
+      "observation_frame",
+      "executed_action_start",
+      "executed_action_end"
+    ],
+    "failed_requests_or_unexecuted_proposals_committed": false,
+    "same_instance_goal_ID_continuity": true,
+    "visual_evidence_correction_allowed": false,
+    "contradiction_handling": "Stop and preserve evidence; no automatic in-goal ID correction"
+  },
+  "timeouts": {
+    "HTTP_absolute_seconds": 600,
+    "whole_generation_retry_budget_seconds": 1850,
+    "maximum_identical_request_total_attempts": 3,
+    "policy_RPC_seconds": 2100,
+    "RPC_ping_seconds": 2100,
+    "timed_out_HTTP_child": "Kill and reap the exact request child before returning or retrying; key enters only private stdin.",
+    "retry_scope": "Only preserved transport/transient429/5xx and empty public-content length errors; body remains identical.",
+    "budget_scope": "ONE shared observer plus selector admission budget; not1850 for each call"
+  },
+  "policy": {
+    "ablation_variant": "A_subtask_online",
+    "EMA_step": 5000,
+    "predict_steps": 50,
+    "execute_steps": 8,
+    "flow_steps": 10,
+    "noise_seed": 42,
+    "action_hz": 25,
+    "SDK_action_limit": 1100,
+    "prompt_composition": "Instruction + ' Current subtask: ' + exact_catalog_text",
+    "inputs": "Current3RGB, State14 and composed prompt only; selector history is not sent to pi0.5.",
+    "waiting_simulation_frozen": true,
+    "success_and_termination": "Original SDK rules, including partial final execution ACK when native termination occurs."
+  },
+  "evaluation_scope_for_provenance_only": "New code; no actual API/GPU/native evaluation launched or measured by these changes.",
+  "deployment_limits": [
+    "Preserved runtime retains original namespace, layout/SDK, checkpoint identity and file-stat guards.",
+    "No checkpoint, normalizer, tokenizer, OpenPI, SDK, simulator, GPU environment or original layout assets are bundled.",
+    "CPU mocked behavior tests do not establish real API/GPU/native acceptance or scientific/semantic success.",
+    "Original prepare_native_sim.py is historical pilot material and is not a current quickstart."
+  ],
+  "steady_subtask_enabled": true,
+  "observer": {
+    "entry": "runtime/steady_provider.py:SteadySubtaskProvider.observer_query",
+    "model": "deepseek-v4-1-flash-261017",
+    "temperature": 0,
+    "thinking": {
+      "type": "enabled"
+    },
+    "reasoning_effort": "high",
+    "max_tokens": 65536,
+    "prompt_relative_to_online_subtask": "runtime/scene_observer_prompt.md",
+    "prompt_sha256": "343c7f0f02611a42c63bec2c323a0576ceb448c705af795732f4b6bc29515ad9",
+    "output_keys": [
+      "uncertain",
+      "basket_visibility",
+      "objects"
+    ],
+    "same_causal_images_as_selector": true,
+    "additional_API_calls_per_replan": 1,
+    "evidence_is_ground_truth": false,
+    "policy_receives_observer_state": false
+  },
+  "steady_constraints": {
+    "goal_lock": "Until two distinct post-selection, released in-destination observations of the same physical instance, including current frame",
+    "category_to_basket": "Observed released placements only; not selected/executed textual plans",
+    "basket_to_category": "One category per basket",
+    "ambiguous_or_conflicting_evidence": "Decision stop before policy; SDK_outcome remains null",
+    "new_audit_namespace": "seed1_native50_subtask_steady_20261113_v1",
+    "semantic_substitution": false,
+    "semantic_retry": false,
+    "full_episode_single_goal_lock": false
+  }
+}

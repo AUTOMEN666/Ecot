@@ -23,6 +23,10 @@ equivalent to the current protocol.
 
 ## Full policy and native execution prerequisites
 
+For this branch, use [steady.md](steady.md) and `prepare_steady_spec.py` to create
+an isolated steady specification. The historical namespace and pass-through
+selector described below are retained provenance, not this branch's default mode.
+
 Supply and independently verify all of the following outside the public source
 archive:
 

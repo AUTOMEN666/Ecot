@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 import subprocess
 import zipfile
@@ -24,7 +25,9 @@ def main():
     names = sorted(name.decode() for name in git('ls-tree', '-r', '--name-only', '-z', head).split(b'\0') if name)
     if not names:
         raise ValueError('No tracked source files')
-    target = output / ('ecot_online_generation_subtask_' + head[:12] + '.zip')
+    branch = git('branch', '--show-current').decode().strip()
+    stem = re.sub(r'[^A-Za-z0-9_.-]', '_', branch) or 'Ecot'
+    target = output / (stem + '_' + head[:12] + '.zip')
     files = []
     with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for name in names:

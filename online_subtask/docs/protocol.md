@@ -1,5 +1,9 @@
 # Online protocol: mainhist93_tok65536_v1
 
+This document preserves the historical source protocol. The steady branch's
+default runtime contract is documented in [steady.md](steady.md); it adds visual
+admission, a hard current-goal lock and program-enforced category/basket filtering.
+
 The source of truth is the preserved runtime and complete selector prompt.
 This document explains that contract; it does not substitute a shortened prompt.
 

@@ -6,6 +6,11 @@ from pathlib import Path
 
 def main():
     root = Path(__file__).resolve().parents[1]
+    amendments = {}
+    if (root / 'online_subtask/provenance/STEADY_SOURCE_MAP.json').exists():
+        from verify_steady import verify
+        amendments = {name: row['sha256'] for name, row in verify(root).items()
+                      if row['base_sha256'] != row['sha256']}
     mapping = json.loads((root / 'online_subtask/provenance/SOURCE_MAP.json').read_text())
     seen = set()
     changes = []
@@ -18,12 +23,12 @@ def main():
         if path.is_symlink() or not path.is_file():
             raise ValueError('Missing/nonregular archived source: ' + str(relative))
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
-        if digest != row['destination_sha256']:
+        if digest != amendments.get(str(relative), row['destination_sha256']):
             raise ValueError('Archived source changed: ' + str(relative))
-        if row['byte_identical']:
+        if row['byte_identical'] and str(relative) not in amendments:
             if digest != row['source_sha256']:
                 raise ValueError('Original source identity differs: ' + str(relative))
-        else:
+        elif not row['byte_identical']:
             changes.append(str(relative))
     expected_change = ['online_subtask/runtime/test_mainhistory93_65536.py']
     if changes != expected_change:
@@ -37,7 +42,7 @@ def main():
         path = root / relative
         if path.is_symlink() or not path.is_file():
             raise ValueError('Missing/nonregular archive utility: ' + str(relative))
-        if hashlib.sha256(path.read_bytes()).hexdigest() != row['destination_sha256']:
+        if hashlib.sha256(path.read_bytes()).hexdigest() != amendments.get(str(relative), row['destination_sha256']):
             raise ValueError('Archive utility/configuration changed: ' + str(relative))
     config = json.loads((root / 'online_subtask/configs/mainhist93_tok65536_v1.json').read_text())
     for path_key, digest_key in [('catalog_relative_to_online_subtask', 'catalog_sha256'),
@@ -45,8 +50,9 @@ def main():
         path = root / 'online_subtask' / config['selector'][path_key]
         if hashlib.sha256(path.read_bytes()).hexdigest() != config['selector'][digest_key]:
             raise ValueError('Fixed catalogue/prompt differs from configuration')
-    print(json.dumps({'verified_preserved_sources': len(seen), 'verified_archive_utilities': len(generated),
+    print(json.dumps({'verified_historical_mappings': len(seen), 'verified_archive_utilities': len(generated),
                       'adapted_sources': changes,
+                      'explicit_steady_adaptations': sorted(amendments),
                       'configuration_id': config['config_id'], 'network_or_models_called': False}))
 
 

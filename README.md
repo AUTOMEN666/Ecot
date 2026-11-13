@@ -1,4 +1,26 @@
-# Online Subtask ECoT archive
+# Steady online Subtask: Follow ECoT
+
+This branch adds executable goal continuity and category/basket admission to the
+original online Subtask implementation. An unfinished physical-instance goal is
+locked to one exact ID/text; a later target must respect observed category/basket
+assignments. Invalid/uncertain decisions stop before policy inference and are not
+reported as SDK outcomes. The original source branch is unchanged.
+
+**Start with [the steady protocol and integration instructions](online_subtask/docs/steady.md).**
+The new model-server CLI requires a steady configuration by default; create it
+from a genuine original model spec with `runtime/prepare_steady_spec.py`.
+The current ID is `mainhist93_tok65536_steady_v1`. A separate visual-observer call
+provides fallible causal scene evidence; deterministic code filters the original
+288 candidates, then the selector still returns only `subtask_id`. Each call uses
+at most96 images, with a shared1850s budget. No Summary/Reasoning enters π0.5.
+
+The implementation and CPU fixtures are supplied here. A new real API/GPU/native
+rollout or semantic-quality improvement is not claimed. The existing checkpoint,
+normalization, policy inputs and action/SDK settings are retained.
+The complete offline suite passed **64 checks**, including the3 loopback HTTP
+checks, with0 failures/errors/skips; see the [steady CPU receipt](online_subtask/provenance/steady_cpu_validation.json).
+
+## Historical base archive
 
 This repository preserves the deployed `mainhist93_tok65536_v1` online Subtask
 generation and π0.5 integration. DeepSeek selects one exact ID from a fixed
@@ -23,7 +45,7 @@ or a self-contained simulator distribution.
 | Policy | `A_subtask_online` EMA5000; predict50, execute up to8, flow10, noise42 |
 | Environment | 25Hz control; original SDK1100-action limit and success/termination rules; simulation frozen during waits |
 
-The actual generation entry point is
+The historical generation entry point is
 [`MultiviewHistoryProvider`](online_subtask/runtime/multiview_provider.py), using
 [`multiview_protocol.py`](online_subtask/runtime/multiview_protocol.py) and the
 complete [`selector_prompt.md`](online_subtask/runtime/selector_prompt.md).
@@ -31,7 +53,7 @@ complete [`selector_prompt.md`](online_subtask/runtime/selector_prompt.md).
 helpers; their legacy generation methods are not this configuration's entry
 points.
 
-The runtime order is:
+The original runtime order was:
 
 ```text
 current observation + causal history
@@ -44,8 +66,9 @@ current observation + causal history
 
 π0.5 receives only the current three images, State14 and composed prompt. The
 visual and executed histories are selector inputs, not policy image history.
-See the [protocol](online_subtask/docs/protocol.md) for sampling, continuity and
-ACK semantics.
+See the [base protocol](online_subtask/docs/protocol.md) for preserved sampling
+and ACK semantics, and [steady.md](online_subtask/docs/steady.md) for the current
+visual admission, hard lock and legal-switching semantics.
 
 ## CPU checks
 
@@ -83,7 +106,8 @@ verification remains pending in
 [validation.md](online_subtask/docs/validation.md). CPU checks do not establish
 native success, semantic correctness or complete GPU reproducibility.
 
-Verify the48 mapped sources and declared prompt/catalogue hashes locally:
+Verify the historical source mapping, explicit steady adaptations and declared
+prompt/catalogue hashes locally:
 
 ```sh
 python -B tools/verify_archive.py
@@ -105,9 +129,10 @@ check.
 
 | Path | Purpose |
 |---|---|
-| `online_subtask/runtime/` | Preserved runtime source, prompt, catalogue and original behavior tests |
+| `online_subtask/runtime/` | Runtime, steady visual guard/provider, catalogue and behavior tests |
 | `online_subtask/integration/experiment_contract/` | Parent experiment's source/support validation dependencies; reference material, not a training quickstart |
 | `online_subtask/configs/mainhist93_tok65536_v1.json` | Declarative snapshot of the fixed scientific configuration |
+| `online_subtask/configs/mainhist93_tok65536_steady_v1.json` | New steady protocol configuration and enforcement contract |
 | `online_subtask/configs/external_paths.example.json` | External-asset path placeholders; not a new runtime loader |
 | `online_subtask/tests/` | Isolated CPU runner and the explicitly identified prior-prompt fixture |
 | `online_subtask/docs/` | Protocol, integration requirements, verification scope and provenance |

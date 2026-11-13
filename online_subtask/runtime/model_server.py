@@ -20,21 +20,29 @@ def initialize_paths(parent):
 def validate_protocol_spec(spec):
     """Validate the actual prepared model configuration before model loading."""
     from multiview_protocol import PROTOCOLS,CATALOG_SHA,PROTOCOL_CONFIG_ID
+    from subtask_guard import STEADY_CONFIG_ID,STEADY_NAMESPACE
+    steady=spec.get('config_id')==STEADY_CONFIG_ID
+    expected_protocol=STEADY_CONFIG_ID if steady else PROTOCOL_CONFIG_ID
+    namespace=STEADY_NAMESPACE if steady else 'seed1_native50_mainhistory93_65536_20261113_v1'
+    if spec.get('steady_subtask_enabled',False) is not steady:
+        raise ValueError('Steady config identity and explicit enforcement flag must agree')
+    if steady and spec.get('provider')!='deepseek':
+        raise ValueError('Steady mode requires the verified DeepSeek scene-observer protocol')
     protocol_mode=spec.get('protocol_mode')
     if (spec.get('ablation_variant')!='A_subtask_online' or spec.get('isolated_multiview_probe')is not True or protocol_mode!='expanded_catalog_id'
             or spec.get('catalog_sha256')!=CATALOG_SHA
-            or spec.get('generator_protocol')!=PROTOCOLS[protocol_mode]
-            or 'seed1_native50_mainhistory93_65536_20261113_v1'not in Path(spec['audit_path']).parts
+            or spec.get('generator_protocol')!=expected_protocol
+            or namespace not in Path(spec['audit_path']).parts
             or spec.get('executed_subtask_history_enabled')is not True
             or spec.get('executed_history_protocol')!='ecot.actual_executed_subtask_history.v1'
-            or spec.get('config_id')!=PROTOCOL_CONFIG_ID or spec.get('protocol_config_id')!=PROTOCOL_CONFIG_ID or spec.get('max_tokens')!=65536
+            or spec.get('config_id')!=expected_protocol or spec.get('protocol_config_id')!=expected_protocol or spec.get('max_tokens')!=65536
             or spec.get('past_history_cameras')!=['cam_high']or spec.get('maximum_total_images')!=96
             or spec.get('maximum_past_timepoints')!=93
             or spec.get('selector_timeout_seconds')!=600 or spec.get('selector_retry_budget_seconds')!=1850
             or spec.get('policy_rpc_timeout_seconds')!=2100
             or spec.get('step')!=5000):
         raise ValueError('Only isolated A5000 multiview/history mode and new namespace admitted')
-    return {'config_id':PROTOCOL_CONFIG_ID,'maximum_past_timepoints':93,'maximum_total_images':96}
+    return {'config_id':expected_protocol,'steady_subtask_enabled':steady,'maximum_past_timepoints':93,'maximum_total_images':96}
 
 
 def create_model(spec,policy=None,jax_module=None,provider=None):
@@ -45,7 +53,9 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
     variant=spec.get('ablation_variant');online=variant=='A_subtask_online'
     from multiview_protocol import PROTOCOLS,CAMERAS,SubtaskAbstention,PROTOCOL_CONFIG_ID
     protocol_mode=spec.get('protocol_mode')
-    validate_protocol_spec(spec)
+    protocol_spec=validate_protocol_spec(spec)
+    steady=protocol_spec['steady_subtask_enabled']
+    actual_protocol=protocol_spec['config_id']
     condition='online_subtask'if online else'task_only'
     if (variant not in VARIANTS or spec.get('condition')!=condition or spec.get('effective_eval_ecot')is not online
             or spec.get('noise_seed')!=42 or spec.get('instruction')!=INSTRUCTION):
@@ -59,8 +69,14 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
         if spec.get('provider')not in ('deepseek','codex'):raise ValueError('Explicit DeepSeek/Codex selector required')
         if provider is None:
             from multiview_provider import MultiviewHistoryProvider
-            provider=MultiviewHistoryProvider(Path(spec['audit_path']).parent/'subtask_requests',
+            from steady_provider import SteadySubtaskProvider
+            provider_class=SteadySubtaskProvider if steady else MultiviewHistoryProvider
+            provider=provider_class(Path(spec['audit_path']).parent/'subtask_requests',
                 selector_kind=spec['provider'],relay_url=spec.get('relay_url','http://127.0.0.1:28782/select'),timeout_seconds=spec['selector_timeout_seconds'])
+        if steady:
+            from steady_provider import SteadySubtaskProvider
+            if not isinstance(provider,SteadySubtaskProvider):
+                raise ValueError('A legacy/injected provider cannot bypass steady enforcement')
     elif spec.get('provider')is not None or provider is not None:
         raise ValueError('B must not instantiate or supply an ECoT provider')
     if policy is None:
@@ -78,14 +94,15 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
             norm_stats=load(Path(binding['norm_stats_path']).parent),sample_kwargs={'num_steps':10})
         jax_module=jax
     if jax_module is None:raise ValueError('Actual JAX RNG implementation required')
-    metadata={'schema':'classify_subtask_mainhist93_tok65536_runtime_v1','protocol_config_id':PROTOCOL_CONFIG_ID,
+    metadata={'schema':'classify_subtask_mainhist93_tok65536_runtime_v1','protocol_config_id':actual_protocol,
+        'steady_subtask_enabled':steady,'scene_observer_enabled':steady,
         'source_export_binding_sha256':binding['binding_sha256'],'source_export_path':binding['export_path'],
         'step':binding['step'],'inference_params':binding['inference_params'],
         'planned_eval_ecot':online,'effective_eval_ecot':online,'source_training_eval_ecot':online,
         'ablation_variant':variant,'parameter_item_tree_sha256':binding['parameter_item_tree_sha256'],
         'runtime_condition':condition,'provider_process_count':0,'reasoner_process_count':0,
-        'provider_kind':spec['provider']+'_mainhist93_tok65536','provider_in_policy_process':online,
-        'generator_protocol':PROTOCOLS[protocol_mode],'protocol_mode':protocol_mode,
+        'provider_kind':spec['provider']+'_'+(actual_protocol if steady else 'mainhist93_tok65536'),'provider_in_policy_process':online,
+        'generator_protocol':actual_protocol,'protocol_mode':protocol_mode,
         'catalog_episode':spec.get('catalog_episode'),'catalog_sha256':spec.get('catalog_sha256'),
         'selector_first_empty_basket_planning_rule':True,'fixed_catalog_profile':'all_training_color_expanded288',
         'isolated_multiview_probe':True,'generator_current3RGB':True,'generator_history':True,'generator_measured_state14':True,'history_max_total_images':96,'history_source_frame_rule':'floor(2.5*k)','history_views_per_point':1,'captured_history_views_per_point':3,'past_history_cameras':['cam_high'],
@@ -170,6 +187,8 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
                         'protocol_mode':protocol_mode,'actual_injected':False,'policy_called':False,'fallback_used':False})
                     raise
                 validate_context(context)
+                if steady:
+                    provider.validate_injection(context,lineage,episode_id=self.episode_id,frame=self.frame_index)
                 prompt=compose_prompt(INSTRUCTION,context['subtask'],True)
                 if prompt!=INSTRUCTION+' Current subtask: '+context['subtask']:
                     raise ValueError('Actual training/inference Subtask composition differs')
@@ -209,7 +228,11 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
 def main():
     p=argparse.ArgumentParser();p.add_argument('--config',type=Path,required=True)
     p.add_argument('--port',type=int,required=True);p.add_argument('--ready-output',type=Path,required=True)
-    args=p.parse_args();spec=read(args.config);initialize_paths(spec['parent_root']);model=create_model(spec)
+    p.add_argument('--allow-legacy-replay',action='store_true',help='Explicitly replay the preserved unguarded protocol')
+    args=p.parse_args();spec=read(args.config)
+    if not args.allow_legacy_replay and spec.get('steady_subtask_enabled')is not True:
+        raise ValueError('This branch requires a steady spec by default; use prepare_steady_spec.py')
+    initialize_paths(spec['parent_root']);model=create_model(spec)
     from client_server.ws.model_server import PolicyServer,PolicyServerConfig
     server=PolicyServer(model,PolicyServerConfig(host='127.0.0.1',port=args.port,ws_ping_interval_s=20,ws_ping_timeout_s=2100))
     async def run():
