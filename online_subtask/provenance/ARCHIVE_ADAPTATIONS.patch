@@ -1,0 +1,11 @@
+--- deployed/core42132/test_mainhistory93_65536.py
++++ archive/online_subtask/runtime/test_mainhistory93_65536.py
+@@ -87,7 +87,7 @@
+         self.assertEqual(proof['history_frames'],[strict[i*(len(strict)-1)//92].frame for i in range(93)])
+         self.assertEqual(proof['history_frames'][0],0);self.assertEqual(proof['history_frames'][-1],1095)
+     def test_prompt_diff_is_only_visual_context_description(self):
+-        old=Path(__file__).resolve().parents[3]/'deepseek_seed1_mainhistory31_65536_20261113/code'/Path(__file__).parent.name/'selector_prompt.md'
++        old=Path(__file__).resolve().parent.parent/'tests/fixtures/mainhistory31_selector_prompt.md'
+         expected=old.read_text().replace('up to31 uniformly sampled strictly past MAIN-camera RGB views',
+             'up to93 uniformly sampled strictly past MAIN-camera RGB views').replace('at most34 images total','at most96 images total')
+         actual=(Path(__file__).parent/'selector_prompt.md').read_text()

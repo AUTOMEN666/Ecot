@@ -1,0 +1,99 @@
+{
+  "schema": "ecot.archived_execution_order_summary.v1",
+  "source_evidence_sha256": "bd4afa82a7771c7c7770ff9f1a8f761063aaddcad7b7bc49ef80729c8bf960df",
+  "deployed_model_server_sha256_by_host_role": {
+    "host_A": "ac89372dfc41ffccf27e3ae23828837cb45232ecc435dce7841488a42400d224",
+    "host_B": "ac89372dfc41ffccf27e3ae23828837cb45232ecc435dce7841488a42400d224"
+  },
+  "actual_inference_samples": [
+    {
+      "case_id": "seed1_layout04",
+      "observation_frame": 0,
+      "selected_id": "U0214",
+      "subtask": "Pick up the green wristwatch and place it into the white basket.",
+      "actual_policy_prompt": "Sort the objects by category into the three baskets. Current subtask: Pick up the green wristwatch and place it into the white basket.",
+      "context_source_frame": 0,
+      "predicted_actions": 50,
+      "executed_first_commands": 8,
+      "exact_current_generated_text_in_actual_policy_prompt": true
+    },
+    {
+      "case_id": "seed1_layout04",
+      "observation_frame": 8,
+      "selected_id": "U0214",
+      "subtask": "Pick up the green wristwatch and place it into the white basket.",
+      "actual_policy_prompt": "Sort the objects by category into the three baskets. Current subtask: Pick up the green wristwatch and place it into the white basket.",
+      "context_source_frame": 8,
+      "predicted_actions": 50,
+      "executed_first_commands": 8,
+      "exact_current_generated_text_in_actual_policy_prompt": true
+    },
+    {
+      "case_id": "seed1_layout05",
+      "observation_frame": 0,
+      "selected_id": "U0145",
+      "subtask": "Pick up the cyan toy car and place it into the white basket.",
+      "actual_policy_prompt": "Sort the objects by category into the three baskets. Current subtask: Pick up the cyan toy car and place it into the white basket.",
+      "context_source_frame": 0,
+      "predicted_actions": 50,
+      "executed_first_commands": 8,
+      "exact_current_generated_text_in_actual_policy_prompt": true
+    },
+    {
+      "case_id": "seed1_layout05",
+      "observation_frame": 8,
+      "selected_id": "U0145",
+      "subtask": "Pick up the cyan toy car and place it into the white basket.",
+      "actual_policy_prompt": "Sort the objects by category into the three baskets. Current subtask: Pick up the cyan toy car and place it into the white basket.",
+      "context_source_frame": 8,
+      "predicted_actions": 50,
+      "executed_first_commands": 8,
+      "exact_current_generated_text_in_actual_policy_prompt": true
+    },
+    {
+      "case_id": "seed1_layout02",
+      "observation_frame": 0,
+      "selected_id": "U0055",
+      "subtask": "Pick up the black metal watch bracelet and place it into the white basket.",
+      "actual_policy_prompt": "Sort the objects by category into the three baskets. Current subtask: Pick up the black metal watch bracelet and place it into the white basket.",
+      "context_source_frame": 0,
+      "predicted_actions": 50,
+      "executed_first_commands": 8,
+      "exact_current_generated_text_in_actual_policy_prompt": true
+    },
+    {
+      "case_id": "seed1_layout02",
+      "observation_frame": 8,
+      "selected_id": "U0055",
+      "subtask": "Pick up the black metal watch bracelet and place it into the white basket.",
+      "actual_policy_prompt": "Sort the objects by category into the three baskets. Current subtask: Pick up the black metal watch bracelet and place it into the white basket.",
+      "context_source_frame": 8,
+      "predicted_actions": 50,
+      "executed_first_commands": 8,
+      "exact_current_generated_text_in_actual_policy_prompt": true
+    },
+    {
+      "case_id": "seed1_layout03",
+      "observation_frame": 0,
+      "selected_id": "U0003",
+      "subtask": "Pick up the beige plush doll in blue overalls and place it into the red basket.",
+      "actual_policy_prompt": "Sort the objects by category into the three baskets. Current subtask: Pick up the beige plush doll in blue overalls and place it into the red basket.",
+      "context_source_frame": 0,
+      "predicted_actions": 50,
+      "executed_first_commands": 8,
+      "exact_current_generated_text_in_actual_policy_prompt": true
+    },
+    {
+      "case_id": "seed1_layout03",
+      "observation_frame": 8,
+      "selected_id": "U0003",
+      "subtask": "Pick up the beige plush doll in blue overalls and place it into the red basket.",
+      "actual_policy_prompt": "Sort the objects by category into the three baskets. Current subtask: Pick up the beige plush doll in blue overalls and place it into the red basket.",
+      "context_source_frame": 8,
+      "predicted_actions": 50,
+      "executed_first_commands": 8,
+      "exact_current_generated_text_in_actual_policy_prompt": true
+    }
+  ],
+  "scope": "Projection of existing deployed input records, not a new archive-checkout API/GPU/native rollout acceptance. No raw API bodies, private reasoning or original observations included."
+}

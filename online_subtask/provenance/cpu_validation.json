@@ -1,0 +1,184 @@
+{
+  "schema": "ecot.packaged_source_cpu_validation.v1",
+  "validation_date": "2026-11-13",
+  "configuration_id": "mainhist93_tok65536_v1",
+  "tested_tree_outside_original_workspace": true,
+  "python_environment_ignored": true,
+  "original_workspace_on_module_search_path": false,
+  "test_interpreter_version": "3.9.6 (default, Mar  6 2026, 16:22:43) \n[Clang 21.0.0 (clang-2100.0.123.102)]",
+  "numpy_version": "2.0.2",
+  "preserved_behavior_tests": {
+    "tests_run": 31,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "loopback_HTTP_tests_included": true
+  },
+  "API_calls": 0,
+  "GPU_inferences": 0,
+  "native_simulations": 0,
+  "matched_source_files_in_isolated_copy": [
+    {
+      "path": "online_subtask/runtime/ACTIVE_EXPANDED_CATALOG.json",
+      "sha256": "97734cb3db4e92fcf62beec96d635896d09d8f23c99c646170bf7736f8b48600"
+    },
+    {
+      "path": "online_subtask/runtime/NATIVE_COPY_BASELINE.json",
+      "sha256": "95fc6a94ce249a7f78395d1406666e949558e2b0b5a61e7322ec6c25d2f99253"
+    },
+    {
+      "path": "online_subtask/runtime/ONLINE8_REMOTE_INVOCATION_REFERENCE.md",
+      "sha256": "5da12dbd88641f08796cf8b30557679abe5f47e2ae0c7cb3352bfcdcd3f921e1"
+    },
+    {
+      "path": "online_subtask/runtime/ONLINE8_SOURCE_BASELINE.json",
+      "sha256": "5a03391b75e8bebbeb7befb1a2f3e47edee5362e17bd8c760d0cec4ce999ae0c"
+    },
+    {
+      "path": "online_subtask/runtime/REMOTE_INVOCATION.md",
+      "sha256": "9ee6c45125999fe9a82ffd3c82b1818b2ee3f0c99eb50df674598aec6ae4a567"
+    },
+    {
+      "path": "online_subtask/runtime/executed_history.py",
+      "sha256": "bdc03c43903b05eb2bb595d26bdbe71fb24a504a3b6b7c882d39637e157a3fac"
+    },
+    {
+      "path": "online_subtask/runtime/export_binding.py",
+      "sha256": "597ae11efd67960b4898f52cf973905ab01fec157fc077d6560ea8e04a35d65b"
+    },
+    {
+      "path": "online_subtask/runtime/history_client.py",
+      "sha256": "d6afca8d16e91e452719d790be3849007084c3879032ed03f723568f96322b08"
+    },
+    {
+      "path": "online_subtask/runtime/http_transport.py",
+      "sha256": "3dae444076c323fb0074811a823f7a03342481dc5ae364e48d3e2ef279e32232"
+    },
+    {
+      "path": "online_subtask/runtime/layout_manifest.py",
+      "sha256": "e52ff36815cdd94a5f15ec80cd92256efad6535beecd022de2e99eee16fcfe97"
+    },
+    {
+      "path": "online_subtask/runtime/model_server.py",
+      "sha256": "ac89372dfc41ffccf27e3ae23828837cb45232ecc435dce7841488a42400d224"
+    },
+    {
+      "path": "online_subtask/runtime/multiview_protocol.py",
+      "sha256": "681c3a8aaf87de1c54bc1d7011cf7916ddbdc60e6c1aa5bfbeabe60e0b15c259"
+    },
+    {
+      "path": "online_subtask/runtime/multiview_provider.py",
+      "sha256": "0c120dcdbed1fafd7824cee7b32b8c141818b362dc85ac3669d57f91224cfd1c"
+    },
+    {
+      "path": "online_subtask/runtime/namespace_fiveseed.py",
+      "sha256": "4c8c51e137007e0b01e31ec2eb999dcae705ed404fe3dc83c786e6a78e6eae99"
+    },
+    {
+      "path": "online_subtask/runtime/native_cpu_smoke.py",
+      "sha256": "ff4160aaedfb7f3bd11918bc44bdf7d046ca15345026b91311d51b857a0f6db8"
+    },
+    {
+      "path": "online_subtask/runtime/pi05_policy/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "online_subtask/runtime/pi05_policy/deploy.py",
+      "sha256": "d257f974c6d64018f735fc294ccfbebf0ee435c29d9ad1c28d1159b56e530bd2"
+    },
+    {
+      "path": "online_subtask/runtime/pi05_policy/freeze.py",
+      "sha256": "d1928595f5a4bf3cb99a6f64e5975159e5567c1367e62d1ca6b32db300687305"
+    },
+    {
+      "path": "online_subtask/runtime/pi05_policy/main_camera_action25hz.py",
+      "sha256": "ddd18fe53ee8317188c7ae194e7ec02bae18becf86a5b8c16958eb1e54707af8"
+    },
+    {
+      "path": "online_subtask/runtime/pi05_policy/native_model.py",
+      "sha256": "4819795629a5dcd517b6ad62d5d5e808414a0a897bd094f67489776f8acf3e10"
+    },
+    {
+      "path": "online_subtask/runtime/pi05_policy/physics_clock.py",
+      "sha256": "3a1b84a4b800247c733ebfeb8f093e39f539a73b23a4cbc991464b27289e2fe7"
+    },
+    {
+      "path": "online_subtask/runtime/pi05_policy/probe_readback.py",
+      "sha256": "79a98fb9dcbf025fdfa757efb792e28104b456d135fe984d1320ccf88007427e"
+    },
+    {
+      "path": "online_subtask/runtime/prepare_native_sim.py",
+      "sha256": "692ba9739efd71d2924d55496f6956ff0bee82ec5d6b3b1a3d773ff8ea520901"
+    },
+    {
+      "path": "online_subtask/runtime/prepare_policy.py",
+      "sha256": "825b528f8d7094d29ab6df02592098923219c73fecc46128ee47301bf250ed52"
+    },
+    {
+      "path": "online_subtask/runtime/rpc_contract.py",
+      "sha256": "2e140fea1a701f0fad4052a68c485150a18c9eaf2cc4ec545f51ed9d9122233b"
+    },
+    {
+      "path": "online_subtask/runtime/seed_namespace_validation.py",
+      "sha256": "0580d9833ab35cde001ae683696150d05684b5683e3fac9c917bad8be5b01ec6"
+    },
+    {
+      "path": "online_subtask/runtime/selector_prompt.md",
+      "sha256": "f18ee5fa2310d8aba963171c8d8846a6d92e7f05841fd75bcc9782c33a8e0561"
+    },
+    {
+      "path": "online_subtask/runtime/subtask_client.py",
+      "sha256": "433d49e709317b1d43005ccdf5c77232822b4738213c83c6cd355d0b0cd7a5fb"
+    },
+    {
+      "path": "online_subtask/runtime/test_executed_history.py",
+      "sha256": "c534a2cd2f15e90ef279591ad467ce83031b8f5bc5b9b041f8ee7ef05e817a84"
+    },
+    {
+      "path": "online_subtask/runtime/test_executed_history_integration.py",
+      "sha256": "14880f916837f852b24ced9d03b6e1d5426b9cd35084b91fe1db20b3cbedd5cc"
+    },
+    {
+      "path": "online_subtask/runtime/test_history96.py",
+      "sha256": "d9680fcfbe17a738c049737ed86938915b497b0c1d47e399f80bea99bd78d92f"
+    },
+    {
+      "path": "online_subtask/runtime/test_http_transport.py",
+      "sha256": "610e0bd0b3cf4a3ffd27dd42983da569b771dc95ae5b0ebae963d7652eef6586"
+    },
+    {
+      "path": "online_subtask/runtime/test_json_object_prompt_compatibility.py",
+      "sha256": "8caee13e0eb97b3e650e60589fc1b987d156a7694dd3bc88fcd76bd14d7cd55b"
+    },
+    {
+      "path": "online_subtask/runtime/test_mainhistory93_65536.py",
+      "sha256": "688160ef969951866208b1c2a621cb3f37f100683822826cc6a6f6de6ef59f58"
+    },
+    {
+      "path": "online_subtask/runtime/test_runtime_executed_history.py",
+      "sha256": "e3b1488cf2189c5d08a4186fe1088dedca0140cde8fe23b39d5ac3d9603dc9e2"
+    },
+    {
+      "path": "online_subtask/tests/fixtures/mainhistory31_selector_prompt.md",
+      "sha256": "971417b2eac74372c1411cd4e6d8828dc5bb7a07debbda84e34cf022ab633226"
+    },
+    {
+      "path": "online_subtask/tests/run_cpu_tests.py",
+      "sha256": "74e857860185669f64c67c139987921c58e05cd06edf0a558a3fa4341dca26b1"
+    },
+    {
+      "path": "online_subtask/configs/external_paths.example.json",
+      "sha256": "33d72abc9c785dce72b27094fcdb3b1d1c4c993475221278fbdb75e7f06a9c8e"
+    },
+    {
+      "path": "online_subtask/configs/mainhist93_tok65536_v1.json",
+      "sha256": "6bc3afa6d02599256c935cd3612e5ba65c22d499891239f81a5f446734f27d92"
+    }
+  ],
+  "source_map_validation": {
+    "mapped_files": 48,
+    "byte_identical_sources": 47,
+    "adaptation": "Only the old-prompt test fixture location changes; scientific runtime remains byte-identical."
+  },
+  "scope": "Existing mocked behavior tests on the packaged source, including strict transport deadlines and ACK/history wiring; not full external dependency or native GPU reproduction."
+}

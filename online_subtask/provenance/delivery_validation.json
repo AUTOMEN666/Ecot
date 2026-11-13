@@ -1,0 +1,40 @@
+{
+  "schema": "ecot.prepublication_source_delivery_validation.v1",
+  "git_commit": "7bf165fc1e3ce787c7873f581815b369bb184107",
+  "branch": "ecot_online_generation_subtask",
+  "tracked_files": 68,
+  "clone_file_hashes_match": true,
+  "clone_source_verification": {
+    "verified_preserved_sources": 48,
+    "verified_archive_utilities": 5,
+    "adapted_sources": [
+      "online_subtask/runtime/test_mainhistory93_65536.py"
+    ],
+    "configuration_id": "mainhist93_tok65536_v1",
+    "network_or_models_called": false
+  },
+  "ZIP_file_hashes_match": true,
+  "ZIP_source_verification": {
+    "verified_preserved_sources": 48,
+    "verified_archive_utilities": 5,
+    "adapted_sources": [
+      "online_subtask/runtime/test_mainhistory93_65536.py"
+    ],
+    "configuration_id": "mainhist93_tok65536_v1",
+    "network_or_models_called": false
+  },
+  "ZIP_integrity_check": true,
+  "same_environment_deterministic_rebuild": true,
+  "ZIP_sha256": "d5b77689a9370d1eae94ed0026010deaaadb78169124b258edeedf639e1033dd",
+  "ZIP_bytes": 242160,
+  "extracted_ZIP_CPU_tests": {
+    "tests_run": 31,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "original_workspace_on_module_search_path": false,
+  "API_GPU_native_calls": false,
+  "scope": "Clean clone and extracted ZIP validation of the source candidate identified by git_commit. Subsequent source-archive changes finalize documentation/evidence only. Final commit and full-ZIP identity are recorded in the PR and adjacent release checksum/manifest.",
+  "runtime_source_changed_after_validation": false
+}

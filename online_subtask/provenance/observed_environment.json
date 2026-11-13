@@ -1,0 +1,170 @@
+{
+  "schema": "ecot.observed_environment.v1",
+  "configuration_id": "mainhist93_tok65536_v1",
+  "observation_date": "2026-11-13",
+  "collection_scope": "read-only metadata and source hashes; no model/API calls or process signals",
+  "reproducibility_limit": "Observed package versions and selected source byte hashes, not an exact environment lock or a claim that a clean GPU deployment was reproduced. Missing Git HEAD remains unknown.",
+  "environments": {
+    "policy": {
+      "python": "3.11.17 (main, Oct 21 2026, 17:46:53) [Clang 23.1.3 ]",
+      "packages": {
+        "numpy": "1.26.4",
+        "jax": "0.5.3",
+        "jaxlib": "0.5.3",
+        "flax": "0.10.2",
+        "optax": "0.2.4",
+        "orbax-checkpoint": "0.11.13",
+        "openpi": "0.1.0",
+        "openpi-client": "0.1.0",
+        "websockets": "15.0.1",
+        "pillow": "11.2.1",
+        "torch": "2.10.0",
+        "transformers": "4.53.2",
+        "sentencepiece": "0.2.0"
+      }
+    },
+    "simulator": {
+      "python": "3.11.17 (main, Oct  1 2026, 20:17:42) [GCC 14.3.0]",
+      "packages": {
+        "numpy": "1.26.0",
+        "jax": null,
+        "jaxlib": null,
+        "flax": null,
+        "optax": null,
+        "orbax-checkpoint": null,
+        "openpi": null,
+        "openpi-client": null,
+        "websockets": "14.0",
+        "pillow": "11.3.0",
+        "torch": "2.7.0+cu128",
+        "transformers": "4.57.6",
+        "sentencepiece": null
+      }
+    }
+  },
+  "upstream": {
+    "openpi_vendor": {
+      "HEAD": null,
+      "tracked_modified_paths": null,
+      "files": [
+        {
+          "relative": "LICENSE",
+          "sha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+          "bytes": 11356
+        },
+        {
+          "relative": "pyproject.toml",
+          "sha256": "e1f457bd81622a47a4c4de17b92815977ac5fcd40116bec92398eb400bf76483",
+          "bytes": 3110
+        },
+        {
+          "relative": "uv.lock",
+          "sha256": "793488b5a55bb87200db90a61fd0af51922b686d94e1da4f4c587ab119b37d74",
+          "bytes": 795910
+        },
+        {
+          "relative": "src/openpi/models/tokenizer.py",
+          "sha256": "965be8b3c393a6811875bbc32da9e01a5d01cc2f87802de801cf7293e049748c",
+          "bytes": 17517
+        },
+        {
+          "relative": "src/openpi/models/pi0_config.py",
+          "sha256": "d321858c30b398126035ea2b6da09e1c422eeeebb5ebf8df631daf9dc77647fa",
+          "bytes": 4435
+        },
+        {
+          "relative": "src/openpi/policies/policy_config.py",
+          "sha256": "aaf42ab04a33b6c91d2447926211646c33ebd8ebfa427f026d7b6c4f7c45ec52",
+          "bytes": 4107
+        },
+        {
+          "relative": "src/openpi/transforms.py",
+          "sha256": "a1b94e9e72849a18834778f229c6bb389a495eb7fbe0aa800edea728b9424ff4",
+          "bytes": 15752
+        },
+        {
+          "relative": "src/openpi/training/checkpoints.py",
+          "sha256": "3cc32682ec3609e9075dabd991488edb9d7f6c045443f58963d733f99c468dbd",
+          "bytes": 5763
+        },
+        {
+          "relative": "src/openpi/training/config.py",
+          "sha256": "c34231f888dba5dc981d808765b3d98775ab845b04313bf53fcecd567c520b0d",
+          "bytes": 44594
+        },
+        {
+          "relative": "src/openpi/policies/aloha_policy.py",
+          "sha256": "50d7ad972d80142ecb0f03b0780dacfd3af212946f4c9aac31a204b02db4543d",
+          "bytes": 7543
+        }
+      ]
+    },
+    "robodojo_sdk": {
+      "HEAD": null,
+      "tracked_modified_paths": null,
+      "files": [
+        {
+          "relative": "LICENSE",
+          "sha256": "4f2b6958d25115c1bc461044e022889852d9e3a9bb854ab581c416514b9984a0",
+          "bytes": 1078
+        },
+        {
+          "relative": "pyproject.toml",
+          "sha256": "4cbfb3d9faf82a89498e602c29105fc85a48c17ad628468430dd31de27279e7d",
+          "bytes": 1535
+        },
+        {
+          "relative": "task/RoboDojo/tasks/classify_objects.py",
+          "sha256": "aef4333c088766375e21a928d53a9a93aaee285fecae41e22385acdc74dd11ac",
+          "bytes": 4361
+        }
+      ]
+    }
+  },
+  "parent_source_byte_hashes": [
+    {
+      "relative": "src/strict_prompt.py",
+      "sha256": "f13aa23c024c9241ea0c5a181f947772a558743444a0fb66179de00c6e6e28ea"
+    },
+    {
+      "relative": "src/subtask_data.py",
+      "sha256": "807bd5169cd9e111bff6acb395dfaf8fde81f7e32372cbccc58b86e4bd3c84ba"
+    },
+    {
+      "relative": "src/experiment_settings.py",
+      "sha256": "a18c22fd25c0d551ca9b5fa0ab1cc12d0c1d8673b2fccaca6b61adc7394229a1"
+    },
+    {
+      "relative": "src/cover_dataset.py",
+      "sha256": "0930560b85fa18f9290e7c6b9f515effb07b7387bda43eb9464c6dd8b7eeecc7"
+    },
+    {
+      "relative": "src/ablation_training_contract.py",
+      "sha256": "af37e9492a79db712a98e483b04c64079a84f67478eb9381a4701a6955e07021"
+    },
+    {
+      "relative": "src/fullparam_contract.py",
+      "sha256": "fc1c2a50a93351c4d765f6de447c4957d5a3714ca403b7f364017a5a68583072"
+    },
+    {
+      "relative": "src/train.py",
+      "sha256": "e35959aefa498a885797c38091f9a1f3839638023e6a8593d288639250db3e10"
+    },
+    {
+      "relative": "src/masked_pi05.py",
+      "sha256": "7be92494d1709b9e62bbf7405b4211f496c7c31071d61efa026e709f8dfbac2b"
+    },
+    {
+      "relative": "src/checkpoint_recovery.py",
+      "sha256": "3aff16e55d43ec18aeb57d0261912da130eb150342be4c27010f33c5e3bf63d6"
+    },
+    {
+      "relative": "evaluation_native/support/task_contract.py",
+      "sha256": "505b218e198892015d7394794eb3c0d2fa1ec8a0f1aab764b95c511c7928589d"
+    },
+    {
+      "relative": "evaluation_native/support/weights_contract.py",
+      "sha256": "19ff077143fd8834491934511e3c8e9d05d8e6e566dd9060df421f687913542e"
+    }
+  ]
+}
