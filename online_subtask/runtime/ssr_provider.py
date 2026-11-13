@@ -38,8 +38,26 @@ class SSRSteadyProvider(SteadySubtaskProvider):
     def reset_context_state(self):self._ssr_authorization=None
 
     def observer_query(self,request,proof,**kwargs):
+        # Query frames (e.g.16) need not lie on the floor(2.5*k) image-history
+        # grid. Registry timestamps therefore are NOT automatically image evidence
+        # in this request. Make the exact supplied frame domain explicit, without
+        # filtering/repairing any model response or changing the persistent guard.
+        request=deepcopy(request)
+        allowed=sorted({row['frame']for row in proof['observations']})
+        request['messages'][0]['content']+=('\nFRAME EVIDENCE CONTRACT: admissible_image_evidence_frames='+canonical(allowed)+
+            '. Every evidence_frames, placement_frames and unplaced_frames value must be from this exact list. '
+            'The scene_registry can contain older query-frame timestamps whose images are absent now; '
+            'do not copy those timestamps into any evidence array. Reassess using only the supplied images.\n')
+        from multiview_protocol import strict_json
+        metadata=strict_json(request['messages'][-1]['content'][0]['text'])
+        metadata.update(admissible_image_evidence_frames=allowed,
+            registry_timestamps_are_not_current_request_image_evidence=True)
+        request['messages'][-1]['content'][0]['text']=canonical(metadata)
         proof=dict(proof,protocol_config_id=CONFIG_ID,generator_protocol=CONFIG_ID,
-                   schema='ecot.classify.steady_ssr.observer.v1')
+                   schema='ecot.classify.steady_ssr.observer.v1',
+                   frame_evidence_contract_revision='explicit_supplied_frame_list_v1',
+                   admissible_image_evidence_frames=allowed,
+                   prompt_sha256=sha(request['messages'][0]['content'].encode()))
         return super().observer_query(request,proof,**kwargs)
 
     def prepare_selection(self,request,proof,**kwargs):

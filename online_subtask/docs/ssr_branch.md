@@ -58,6 +58,14 @@ calls share one1850s generation budget: HTTP600s, at most3 identical attempts fo
 the preserved transient/empty-length cases, and policy RPC2100s. Lifecycle
 exclusion spans generation AND policy inference.
 
+The observer receives an explicit `admissible_image_evidence_frames` list.
+Persistent scene memory can contain query timestamps absent from the current
+10Hz image sample (for example16 when the sample contains15 and17). Those memory
+timestamps are not admissible image evidence. Every returned evidence timestamp
+still passes the original strict guard; no response is filtered or repaired.
+This input clarification is recorded as
+`frame_evidence_contract_revision=explicit_supplied_frame_list_v1`.
+
 ## Genuine noDropout SSR checkpoint and startup
 
 Use an existing summary_subtask_reasoning, dropout0.0, full-parameter EMA model

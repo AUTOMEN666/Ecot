@@ -83,6 +83,22 @@ def runtime(tmp,wire=transport,events=None,step=17392):
             yield model,policy,provider,spec
 
 class SSRContracts(unittest.TestCase):
+    def test_registry_query_timestamp_is_not_admitted_as_an_absent_history_image(self):
+        seen=[]
+        def wire(request,proof):seen.append((deepcopy(request),deepcopy(proof)));return transport(request,proof)
+        with tempfile.TemporaryDirectory()as tmp,runtime(tmp,wire,step=19566)as(model,policy,p,spec):
+            model.reset()
+            for frame in [0,8,16,24]:
+                capture_to(p,frame);model.update_obs(obs(frame));commands=model.get_action();acknowledge(model,commands,frame)
+            request,proof=[row for row in seen if row[1]['current_frame']==24 and row[1]['call_role']=='scene_observer'][0]
+            allowed=[0,2,5,7,10,12,15,17,20,22,24]
+            self.assertEqual(proof['admissible_image_evidence_frames'],allowed)
+            metadata=json.loads(request['messages'][-1]['content'][0]['text'])
+            self.assertEqual(metadata['admissible_image_evidence_frames'],allowed)
+            self.assertEqual(metadata['scene_registry']['active_goal']['last_unplaced_at'],16)
+            self.assertNotIn(16,allowed)
+            self.assertIn('do not copy those timestamps',request['messages'][0]['content'])
+
     def test_actual_training_formatter_golden_examples_are_byte_identical(self):
         golden=json.loads((Path(__file__).parents[1]/'provenance/SSR_TRAINING_FORMAT_REFERENCE.json').read_text())
         self.assertEqual(golden['sample_count'],7);self.assertTrue(golden['actual_external_training_formatter_compared'])
