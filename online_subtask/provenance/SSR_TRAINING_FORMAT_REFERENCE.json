@@ -1,0 +1,103 @@
+{
+  "schema": "ecot.classify.original_no_dropout_SSR_training_format.v1",
+  "formatter_source_sha256": "7e0965bf81e22865ad3e44a91258e028e216c34b86522feb52806fe97f897b89",
+  "context_source_sha256": "6f3a3a0681c03f2d6325c4f83812980f180276cb423980388464a8492ea1ecc9",
+  "training_config_sha256": "33d426ba5b115e7067bc0e795ba34475f7c79a3b531e7e760fc735e747d4134b",
+  "dropout_probability": 0.0,
+  "rows": [
+    {
+      "episode": 200,
+      "frame": 0,
+      "context": {
+        "action": {
+          "summary": "Move the left arm toward the first black device to prepare a grasp."
+        },
+        "reasoning": "The left gripper keeps fully open while the left arm makes a moderate approach toward the nearby black device on the tabletop.",
+        "subtask": "Pick up the black device and place it into the white basket."
+      },
+      "expected_training_prompt": "Sort the objects by category into the three baskets.\nCurrent-frame action summary, subtask, and reasoning annotations: use the current observations, task, and supplied annotations. Missing or null fields are unspecified. No text response is requested.\nContext: {\"subtask\":\"Pick up the black device and place it into the white basket.\",\"action\":{\"summary\":\"Move the left arm toward the first black device to prepare a grasp.\"},\"reasoning\":\"The left gripper keeps fully open while the left arm makes a moderate approach toward the nearby black device on the tabletop.\"}",
+      "prompt_sha256": "6c945e2bd1b4d648b971b09c17ab3504f66acdad3e9f8efb2fabc335a856aedf"
+    },
+    {
+      "episode": 200,
+      "frame": 45,
+      "context": {
+        "action": {
+          "summary": "Carry the grasped black device toward the white basket."
+        },
+        "reasoning": "The left gripper stays closed around the black device while the left arm moves with a large extent.",
+        "subtask": "Pick up the black device and place it into the white basket."
+      },
+      "expected_training_prompt": "Sort the objects by category into the three baskets.\nCurrent-frame action summary, subtask, and reasoning annotations: use the current observations, task, and supplied annotations. Missing or null fields are unspecified. No text response is requested.\nContext: {\"subtask\":\"Pick up the black device and place it into the white basket.\",\"action\":{\"summary\":\"Carry the grasped black device toward the white basket.\"},\"reasoning\":\"The left gripper stays closed around the black device while the left arm moves with a large extent.\"}",
+      "prompt_sha256": "8c046846444228e4ea970158525dc26a7bc0856f53588b706c70fd9145217864"
+    },
+    {
+      "episode": 200,
+      "frame": 67,
+      "context": {
+        "action": {
+          "summary": "Release the black device into the white basket."
+        },
+        "reasoning": "The left arm is positioned over the white basket and the left gripper begins to open to release the black device.",
+        "subtask": "Pick up the black device and place it into the white basket."
+      },
+      "expected_training_prompt": "Sort the objects by category into the three baskets.\nCurrent-frame action summary, subtask, and reasoning annotations: use the current observations, task, and supplied annotations. Missing or null fields are unspecified. No text response is requested.\nContext: {\"subtask\":\"Pick up the black device and place it into the white basket.\",\"action\":{\"summary\":\"Release the black device into the white basket.\"},\"reasoning\":\"The left arm is positioned over the white basket and the left gripper begins to open to release the black device.\"}",
+      "prompt_sha256": "f7d04e4f33252c04c391ab556b959bf3656d9d6bdcd625ca629dac3230d1f747"
+    },
+    {
+      "episode": 200,
+      "frame": 226,
+      "context": {
+        "action": {
+          "summary": "Retract the left arm from the white basket after releasing a black object."
+        },
+        "reasoning": "The left arm pulls away from the white basket with the gripper open while the black object remains in the basket.",
+        "subtask": "Grasp the remaining black block and transfer it into the white basket."
+      },
+      "expected_training_prompt": "Sort the objects by category into the three baskets.\nCurrent-frame action summary, subtask, and reasoning annotations: use the current observations, task, and supplied annotations. Missing or null fields are unspecified. No text response is requested.\nContext: {\"subtask\":\"Grasp the remaining black block and transfer it into the white basket.\",\"action\":{\"summary\":\"Retract the left arm from the white basket after releasing a black object.\"},\"reasoning\":\"The left arm pulls away from the white basket with the gripper open while the black object remains in the basket.\"}",
+      "prompt_sha256": "3f003d7143b2b5076ad91843c7e56e1449912ecd3cbc3c9dca8c68bb01ab6dd2"
+    },
+    {
+      "episode": 200,
+      "frame": 110,
+      "context": {
+        "action": {
+          "summary": "Approach the next black device with the left arm to prepare a grasp."
+        },
+        "reasoning": "The left arm moves with the gripper kept open toward the next black device, before contact.",
+        "subtask": "Pick up the second black device and place it into the white basket."
+      },
+      "expected_training_prompt": "Sort the objects by category into the three baskets.\nCurrent-frame action summary, subtask, and reasoning annotations: use the current observations, task, and supplied annotations. Missing or null fields are unspecified. No text response is requested.\nContext: {\"subtask\":\"Pick up the second black device and place it into the white basket.\",\"action\":{\"summary\":\"Approach the next black device with the left arm to prepare a grasp.\"},\"reasoning\":\"The left arm moves with the gripper kept open toward the next black device, before contact.\"}",
+      "prompt_sha256": "c23a977ed57b0ca0c84afb8b5648bf6775959443784c60f6a50e149b547e3e41"
+    },
+    {
+      "episode": 200,
+      "frame": 215,
+      "context": {
+        "action": {
+          "summary": "Right arm starts reaching toward the remaining black block while the left arm clears the white basket."
+        },
+        "reasoning": "The right gripper stays open and moves toward the black block on the table, while the left gripper remains open above the white basket and retracts.",
+        "subtask": "Grasp the remaining black block and transfer it into the white basket."
+      },
+      "expected_training_prompt": "Sort the objects by category into the three baskets.\nCurrent-frame action summary, subtask, and reasoning annotations: use the current observations, task, and supplied annotations. Missing or null fields are unspecified. No text response is requested.\nContext: {\"subtask\":\"Grasp the remaining black block and transfer it into the white basket.\",\"action\":{\"summary\":\"Right arm starts reaching toward the remaining black block while the left arm clears the white basket.\"},\"reasoning\":\"The right gripper stays open and moves toward the black block on the table, while the left gripper remains open above the white basket and retracts.\"}",
+      "prompt_sha256": "f880bd091702c2d144dbdd85997240e96b33b57fe4cdf59aad759952dfb59c2f"
+    },
+    {
+      "episode": 200,
+      "frame": 430,
+      "context": {
+        "action": {
+          "summary": "Approach the wooden car with the left gripper to prepare a grasp."
+        },
+        "reasoning": "The left arm moves the open gripper toward the wooden car on the table, staying open until contact for grasping.",
+        "subtask": "Pick up the wooden car and place it into the blue basket."
+      },
+      "expected_training_prompt": "Sort the objects by category into the three baskets.\nCurrent-frame action summary, subtask, and reasoning annotations: use the current observations, task, and supplied annotations. Missing or null fields are unspecified. No text response is requested.\nContext: {\"subtask\":\"Pick up the wooden car and place it into the blue basket.\",\"action\":{\"summary\":\"Approach the wooden car with the left gripper to prepare a grasp.\"},\"reasoning\":\"The left arm moves the open gripper toward the wooden car on the table, staying open until contact for grasping.\"}",
+      "prompt_sha256": "5da58f9b468740935fea79acecfef3ed8383ebe8d064cb9f1f0f988b2399dab4"
+    }
+  ],
+  "sample_count": 7,
+  "actual_external_training_formatter_compared": true,
+  "GPU_API_called": false
+}

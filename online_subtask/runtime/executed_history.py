@@ -30,6 +30,7 @@ def validate_records(records,episode_id,frame,catalog):
     return deepcopy(records)
 
 class ExecutedSubtaskHistory:
+    checkpoint_step=5000
     def __init__(self,catalog):
         self.catalog=catalog;self.reset(None)
     def reset(self,episode_id):
@@ -42,6 +43,13 @@ class ExecutedSubtaskHistory:
             'executed_subtask_history_count':len(records),'latest_executed_subtask_record':deepcopy(records[-1])if records else None,
             'executed_subtask_ack_source_sha256':list(self.ack_source_hashes),
             'executed_subtask_ack_prefix_sha256':digest(self.ack_source_hashes)}
+
+    def validate_context(self,context):
+        if type(context)is not dict or set(context)!={'subtask'}:
+            raise ValueError('Exact Subtask-only injection context required')
+
+    def prompt_for_context(self,context):
+        return INSTRUCTION+' Current subtask: '+context['subtask']
     def commit(self,ack,*,expected_injection,expected_actions,expected_clock):
         if type(ack)is not dict or set(ack)!={'schema','injection','execution_clocks','chunk_end_reason'}or ack.get('schema')!=ACK_SCHEMA:
             raise ValueError('Exact actual execution ACK required')
@@ -51,15 +59,16 @@ class ExecutedSubtaskHistory:
             raise ValueError('ACK must match exact current actual policy injection')
         f=injection.get('execution_frame')
         if (injection.get('episode_id')!=self.episode_id or type(f)is not int or f!=8*len(self.records)
-                or f>1096 or injection.get('actual_injected')is not True or injection.get('checkpoint_step')!=5000
+                or f>1096 or injection.get('actual_injected')is not True or type(injection.get('checkpoint_step'))is not int or injection.get('checkpoint_step')!=self.checkpoint_step
                 or injection.get('training_composition_byte_equal')is not True):
             raise ValueError('ACK episode/frame/actual injection differs or was already committed')
         context=injection.get('context');lineage=injection.get('lineage',{})
+        self.validate_context(context)
         selected=lineage.get('selected_id');by_id={item['id']:item['text'] for item in self.catalog['candidates']}
-        if (type(context)is not dict or set(context)!={'subtask'}or type(selected)is not str
+        if (type(selected)is not str
                 or by_id.get(selected)!=context['subtask']or context['subtask']is None
                 or injection.get('context_json')!=canonical(context)
-                or injection.get('prompt')!=INSTRUCTION+' Current subtask: '+context['subtask']
+                or injection.get('prompt')!=self.prompt_for_context(context)
                 or injection.get('prompt_sha256')!=hashlib.sha256(injection['prompt'].encode()).hexdigest()
                 or lineage.get('resolution',{}).get('selected_id')!=selected):
             raise ValueError('ACK exact ID/text/prompt binding differs')

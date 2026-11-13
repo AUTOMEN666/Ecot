@@ -90,6 +90,10 @@ class MultiviewHistoryProvider:
         """Legacy ID lookup already validated; steady mode also checks admission."""
         return None
 
+    def resolve_selection(self,text):
+        """Default exact-ID protocol; derived SSR protocol validates its own schema."""
+        return resolve(text,self.catalog)
+
     def generate(self,pngs,instruction,*,state14,episode_id,frame):
         import errno,http.client,socket
         if self.episode_id!=episode_id:raise ValueError('Provider requires actual same-episode reset')
@@ -118,7 +122,7 @@ class MultiviewHistoryProvider:
             request_sha256=sha(request_body),live_provider_source_sha256=sha(Path(__file__).read_bytes()),
             executed_history_source_sha256=sha((Path(__file__).parent/'executed_history.py').read_bytes()),
             current_execution_frame=frame,current_episode_id=episode_id,image_sha256=current.image_sha256,
-            current_capture_json=str(capture_dir/f'frame_{frame}.json'),context_fields=['subtask'])
+            current_capture_json=str(capture_dir/f'frame_{frame}.json'),context_fields=list(getattr(self,'context_fields',('subtask',))))
         base_proof=dict(proof);attempt_ids=[];last_retry_error=None
         rpc_retry_budget_seconds=RETRY_BUDGET_SECONDS
         maximum_attempts=3 if self.selector_kind=='deepseek'else 1
@@ -167,7 +171,7 @@ class MultiviewHistoryProvider:
                     if messages_sha!=proof['messages_sha256']:raise ValueError('Codex relay actual messages SHA differs')
                     if not isinstance(completion_id,str)or not completion_id or not isinstance(actual_model,str)or not actual_model:
                         raise ValueError('Codex relay must return actual completion/model identity')
-                context,resolution=resolve(text,self.catalog)
+                context,resolution=self.resolve_selection(text)
                 self.validate_selection(context,resolution,proof)
                 proof.update(response_sha256=sha(raw),response_headers=headers,completion_id=completion_id,actual_model=actual_model,
                     raw_text=text,usage=usage,resolution=resolution,selected_id=resolution['selected_id'],context_sha256=sha(canonical(context).encode()),

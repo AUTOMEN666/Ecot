@@ -11,11 +11,11 @@ and integration evidence.
 |---|---|
 | [ecot_online_generation_subtask_classify_objects](https://github.com/AUTOMEN666/Ecot/tree/ecot_online_generation_subtask_classify_objects) | Original online Subtask implementation |
 | [ecot_online_generation_subtask_steady_classify_objects](https://github.com/AUTOMEN666/Ecot/tree/ecot_online_generation_subtask_steady_classify_objects) | Subtask implementation with steady goal and category/basket checks |
-| [ecot_online_generation_subtask_reasoning_and_action_summary_classify_objects](https://github.com/AUTOMEN666/Ecot/tree/ecot_online_generation_subtask_reasoning_and_action_summary_classify_objects) | Branch prepared for prospective Subtask, Reasoning and Action Summary work |
+| [ecot_online_generation_subtask_reasoning_and_action_summary_classify_objects](https://github.com/AUTOMEN666/Ecot/tree/ecot_online_generation_subtask_reasoning_and_action_summary_classify_objects) | Prospective SSR generation and noDropout three-field policy conditioning |
 
-The `_classify_objects` suffix identifies the task. The third branch currently
-inherits the steady Subtask-only runtime; its name does not claim that SSR
-generation, SSR policy injection or a new online evaluation has been completed.
+The `_classify_objects` suffix identifies the task. The third branch implements
+public SSR generation and noDropout three-field policy conditioning; empirical
+API/GPU/native semantic-quality acceptance is a separate step.
 Historical protocol IDs, archived ZIP names, source commits and validation
 receipts keep their original identities.
 

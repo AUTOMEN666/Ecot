@@ -28,6 +28,11 @@ class SteadySubtaskProvider(MultiviewHistoryProvider):
         self.guard = SubtaskGuard(self.catalog)
         self.observer_receipt = None
         self.stopped = None
+        self.reset_context_state()
+
+    def reset_context_state(self):
+        """Derived protocols clear their generation authorization under reset lock."""
+        return None
 
     @exclusive_rpc
     def reset(self, episode_id):
@@ -35,6 +40,7 @@ class SteadySubtaskProvider(MultiviewHistoryProvider):
         self.guard.reset(episode_id)
         self.observer_receipt = None
         self.stopped = None
+        self.reset_context_state()
 
     @exclusive_rpc
     def capture_history(self, *args, **kwargs):

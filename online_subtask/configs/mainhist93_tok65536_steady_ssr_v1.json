@@ -1,0 +1,98 @@
+{
+  "schema": "ecot.classify_objects.steady_SSR.scientific_contract.v1",
+  "config_id": "mainhist93_tok65536_steady_ssr_v1",
+  "usage": "Protocol snapshot; use runtime/prepare_ssr_spec.py with a genuine noDropout SSR weights binding and explicit checkpoint to make a runnable spec.",
+  "task": "classify_objects",
+  "generator": {
+    "model": "deepseek-v4-1-flash-261017",
+    "temperature": 0,
+    "thinking": {
+      "type": "enabled"
+    },
+    "reasoning_effort": "high",
+    "max_tokens": 65536,
+    "response_format": {
+      "type": "json_object"
+    },
+    "API_calls_per_replan": 2,
+    "roles": [
+      "scene_observer",
+      "joint_subtask_SSR_selector"
+    ],
+    "output_keys": [
+      "subtask_id",
+      "reasoning",
+      "action.summary"
+    ],
+    "catalog_count": 288,
+    "catalog_sha256": "97734cb3db4e92fcf62beec96d635896d09d8f23c99c646170bf7736f8b48600",
+    "prompt": "runtime/ssr_selector_prompt.md",
+    "prompt_sha256": "7c56799438b01aa25769ab20350eb2f51284879de96058a557e46bd559728b02",
+    "training_reference": "runtime/ssr_training_reference.json",
+    "training_reference_sha256": "45acaa8f26b03d85d16b2a49593b0895c7583e1a8a2a5ed8eaaa7958e97f247d",
+    "training_reference_examples": 7,
+    "prospective_horizon_steps": 16,
+    "future_test_GT_actions_images": false,
+    "semantic_retry": false,
+    "ID_repair": false,
+    "fallback": false
+  },
+  "observations": {
+    "current_cameras": [
+      "cam_high",
+      "cam_left_wrist",
+      "cam_right_wrist"
+    ],
+    "state_dim": 14,
+    "instruction": true,
+    "past_cameras": [
+      "cam_high"
+    ],
+    "maximum_past_timepoints": 93,
+    "maximum_total_images": 96,
+    "history_source_frame_rule": "floor(2.5*k) on25Hz action clock",
+    "selection": "uniform over whole strictly past episode prefix; retain first/latest past endpoints"
+  },
+  "executed_history": {
+    "maximum_past_records": 137,
+    "commit": "verified actual execution ACK only",
+    "fields": [
+      "subtask_id",
+      "subtask",
+      "observation_frame",
+      "executed_action_start",
+      "executed_action_end"
+    ],
+    "complete_actual_SSR_context_and_prompt_retained_in_ACK_audit": true
+  },
+  "timeouts": {
+    "HTTP_absolute_seconds": 600,
+    "shared_generation_budget_seconds": 1850,
+    "maximum_identical_request_attempts": 3,
+    "policy_RPC_seconds": 2100
+  },
+  "policy": {
+    "checkpoint_family": "genuine existing noDropout summary_subtask_reasoning full-parameter EMA",
+    "checkpoint_step": "explicitly selected in the real weights binding; no automatic substitution",
+    "ecot_dropout_probability": 0.0,
+    "context_fields": [
+      "subtask",
+      "action.summary",
+      "reasoning"
+    ],
+    "prompt_composition": "exact actual original noDropout strict_prompt.compose_training_prompt bytes",
+    "predict_steps": 50,
+    "execute_steps": 8,
+    "flow_steps": 10,
+    "noise_seed": 42,
+    "action_hz": 25,
+    "action_limit": 1100,
+    "simulation_waiting": "frozen by unchanged SDK run/freeze envelope",
+    "success_and_termination": "original SDK rules"
+  },
+  "acceptance": {
+    "code_implemented": true,
+    "actual_API_GPU_native_acceptance": false,
+    "semantic_quality_or_task_success_improvement_claimed": false
+  }
+}

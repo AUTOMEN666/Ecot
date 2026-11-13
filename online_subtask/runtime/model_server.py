@@ -20,6 +20,10 @@ def initialize_paths(parent):
 
 def validate_protocol_spec(spec):
     """Validate the actual prepared model configuration before model loading."""
+    from ssr_protocol import CONFIG_ID as SSR_CONFIG_ID
+    if spec.get('config_id')==SSR_CONFIG_ID:
+        from ssr_protocol import validate_spec
+        return validate_spec(spec)
     from multiview_protocol import PROTOCOLS,CATALOG_SHA,PROTOCOL_CONFIG_ID
     from subtask_guard import STEADY_CONFIG_ID,STEADY_NAMESPACE
     steady=spec.get('config_id')==STEADY_CONFIG_ID
@@ -47,6 +51,10 @@ def validate_protocol_spec(spec):
 
 
 def create_model(spec,policy=None,jax_module=None,provider=None):
+    from ssr_protocol import CONFIG_ID as SSR_CONFIG_ID
+    if spec.get('config_id')==SSR_CONFIG_ID:
+        from ssr_model_server import create_model as create_ssr_model
+        return create_ssr_model(spec,policy=policy,jax_module=jax_module,provider=provider)
     initialize_paths(spec['parent_root'])
     from pi05_policy.native_model import Model as NativeModel,to_commands,encode_obs
     from support.task_contract import INSTRUCTION
@@ -243,13 +251,19 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
     return RuntimeModel()
 
 
+def validate_entry_mode(spec,allow_legacy_replay=False):
+    from ssr_protocol import CONFIG_ID as SSR_CONFIG_ID
+    if not allow_legacy_replay and (spec.get('config_id')!=SSR_CONFIG_ID or spec.get('ssr_enabled')is not True):
+        raise ValueError('This SSR branch requires an explicit SSR spec by default; use prepare_ssr_spec.py. Inherited Subtask-only replay requires --allow-legacy-replay.')
+    return validate_protocol_spec(spec)
+
+
 def main():
     p=argparse.ArgumentParser();p.add_argument('--config',type=Path,required=True)
     p.add_argument('--port',type=int,required=True);p.add_argument('--ready-output',type=Path,required=True)
-    p.add_argument('--allow-legacy-replay',action='store_true',help='Explicitly replay the preserved unguarded protocol')
+    p.add_argument('--allow-legacy-replay',action='store_true',help='Explicitly run inherited Subtask-only protocols; this is not SSR')
     args=p.parse_args();spec=read(args.config)
-    if not args.allow_legacy_replay and spec.get('steady_subtask_enabled')is not True:
-        raise ValueError('This branch requires a steady spec by default; use prepare_steady_spec.py')
+    validate_entry_mode(spec,args.allow_legacy_replay)
     initialize_paths(spec['parent_root']);model=create_model(spec)
     from client_server.ws.model_server import PolicyServer,PolicyServerConfig
     server=PolicyServer(model,PolicyServerConfig(host='127.0.0.1',port=args.port,ws_ping_interval_s=20,ws_ping_timeout_s=2100))

@@ -3,7 +3,7 @@
   "base_branch": "ecot_online_generation_subtask_classify_objects",
   "base_commit": "8e4f340940c56fbbe5c30e0ee578d6e5b8678321",
   "branch": "ecot_online_generation_subtask_reasoning_and_action_summary_classify_objects",
-  "protocol_config_id": "mainhist93_tok65536_steady_v1",
+  "protocol_config_id": "mainhist93_tok65536_steady_ssr_v1",
   "scope": "Current branch adaptations; historical SOURCE_MAP.json and deployment receipts remain unchanged. No real API/GPU/native rollout is asserted.",
   "manifest_excludes_itself_to_avoid_self_reference": true,
   "files": [
@@ -14,7 +14,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "1c356784af79c203d96154359c1a63f7b2757cf2e1b148dfbf5a2a968f45d664",
+      "sha256": "7f30c0df7785dd5cd07bdaf6a4af8315a388a271aa8d2aa7160cf1c005f61b57",
       "base_sha256": "d7cb92c5ed4a07e21a7071a4c33684b1a124b14cefdcfee6ba71b3f7ea6ce0f4"
     },
     {
@@ -28,6 +28,11 @@
       "base_sha256": "33d72abc9c785dce72b27094fcdb3b1d1c4c993475221278fbdb75e7f06a9c8e"
     },
     {
+      "path": "online_subtask/configs/mainhist93_tok65536_steady_ssr_v1.json",
+      "base_sha256": null,
+      "sha256": "531ced63ff9e518c5a5d4b4c16d084384b2e52a8cfd36f303d703922a81eab7a"
+    },
+    {
       "path": "online_subtask/configs/mainhist93_tok65536_steady_v1.json",
       "sha256": "8b14a0e45e7b8b549dac08fdbddee995163022c9419657d5807253fb5f7a410e",
       "base_sha256": null
@@ -39,7 +44,12 @@
     },
     {
       "path": "online_subtask/docs/HANDOFF.md",
-      "sha256": "e08d547ce76dc64f4ca43e35d55f250fefd84980124148298e56015cfe4e3913",
+      "sha256": "d73bab0777b4aa5d9a193a811c94ace0b53a2207bc7fd1f570abd95ce3386595",
+      "base_sha256": null
+    },
+    {
+      "path": "online_subtask/docs/branches.md",
+      "sha256": "a6aff8498056e2bd97a8efc0518c7e93e499bace323a995ada401a1ce545d609",
       "base_sha256": null
     },
     {
@@ -56,6 +66,11 @@
       "path": "online_subtask/docs/provenance.md",
       "sha256": "ca74b29a25b9a13baeb57f0eea821fa3cc7d72d0711b78f404288c0271e1d61d",
       "base_sha256": "ca74b29a25b9a13baeb57f0eea821fa3cc7d72d0711b78f404288c0271e1d61d"
+    },
+    {
+      "path": "online_subtask/docs/ssr_branch.md",
+      "sha256": "e9a5d1de5880f68e02b724331021cf0b6f58416ed75bbac2ba9d5ea9c9631a9f",
+      "base_sha256": null
     },
     {
       "path": "online_subtask/docs/steady.md",
@@ -138,6 +153,11 @@
       "base_sha256": "1f0e957e6b8fe1e111ddb21b5c7420794bcda6c1fd6c310f9c4cf7c705c34f78"
     },
     {
+      "path": "online_subtask/provenance/SSR_TRAINING_FORMAT_REFERENCE.json",
+      "base_sha256": null,
+      "sha256": "db6f8cebc053ab01d0c0e0c249447d0c5e088da84a437d46623116935cd42f67"
+    },
+    {
       "path": "online_subtask/provenance/cpu_validation.json",
       "sha256": "4f9ee437d6ec042aa489c414f07c2bc9f7baafc77563e09c7bf3716f27a8deeb",
       "base_sha256": "4f9ee437d6ec042aa489c414f07c2bc9f7baafc77563e09c7bf3716f27a8deeb"
@@ -178,6 +198,11 @@
       "base_sha256": "f5a17bd3425f992a5d43f2c834423dc67122270c7891904f8e957c43c1ce53ac"
     },
     {
+      "path": "online_subtask/provenance/ssr_cpu_validation.json",
+      "base_sha256": null,
+      "sha256": "99fe58557539a2069f13068db84110cc17a07403c0d55b1719b14a5aceeb9ef9"
+    },
+    {
       "path": "online_subtask/provenance/steady_cpu_validation.json",
       "sha256": "bef92d193d6df8d68873e387a66318684bc633a4393f46f74d54c373145cf076",
       "base_sha256": null
@@ -209,7 +234,7 @@
     },
     {
       "path": "online_subtask/runtime/executed_history.py",
-      "sha256": "bdc03c43903b05eb2bb595d26bdbe71fb24a504a3b6b7c882d39637e157a3fac",
+      "sha256": "24933812374e226e0490883720dd3ae599e5303a2410bf554cd4ea29699e6224",
       "base_sha256": "bdc03c43903b05eb2bb595d26bdbe71fb24a504a3b6b7c882d39637e157a3fac"
     },
     {
@@ -234,7 +259,7 @@
     },
     {
       "path": "online_subtask/runtime/model_server.py",
-      "sha256": "b5fefaf9df8ccea532580fef70629d1cdd6a1d563e7765c50a8b462bbf300088",
+      "sha256": "0d529a25de308348b32425fc3bef6d72b1fc4f5b71bc703b2b5be0c46344c688",
       "base_sha256": "ac89372dfc41ffccf27e3ae23828837cb45232ecc435dce7841488a42400d224"
     },
     {
@@ -244,7 +269,7 @@
     },
     {
       "path": "online_subtask/runtime/multiview_provider.py",
-      "sha256": "55f4cc0c1673f3a2802bbec5631dd03472651761b789037c3505428dea4954ef",
+      "sha256": "1cb3ffd6c58511540c871a1d977fae5a56b3426fa966863a8de5217df6779ad8",
       "base_sha256": "0c120dcdbed1fafd7824cee7b32b8c141818b362dc85ac3669d57f91224cfd1c"
     },
     {
@@ -303,6 +328,11 @@
       "base_sha256": "825b528f8d7094d29ab6df02592098923219c73fecc46128ee47301bf250ed52"
     },
     {
+      "path": "online_subtask/runtime/prepare_ssr_spec.py",
+      "base_sha256": null,
+      "sha256": "3d34036d52596ea4df36847c9ad02f14f2db7c6d15c5553efb6b38d811450c3a"
+    },
+    {
       "path": "online_subtask/runtime/prepare_steady_spec.py",
       "sha256": "433141e66bdc64054366a755e6ae9147658fde09ba64e51ce996940bc6e92684",
       "base_sha256": null
@@ -333,8 +363,38 @@
       "base_sha256": "f18ee5fa2310d8aba963171c8d8846a6d92e7f05841fd75bcc9782c33a8e0561"
     },
     {
+      "path": "online_subtask/runtime/ssr_binding.py",
+      "base_sha256": null,
+      "sha256": "1632e59d72d257ceaead63c94d6ca2cf273d5e492a2be95c9f49ae72305d0911"
+    },
+    {
+      "path": "online_subtask/runtime/ssr_model_server.py",
+      "base_sha256": null,
+      "sha256": "edf373ebb1254227d45692baeb8fbf0c9b264878d8015664862ae92ca143c01f"
+    },
+    {
+      "path": "online_subtask/runtime/ssr_protocol.py",
+      "base_sha256": null,
+      "sha256": "51c113822a845575ec08e90bb0ba3fd1f8841e44cce0858bf495db5f52a6c85e"
+    },
+    {
+      "path": "online_subtask/runtime/ssr_provider.py",
+      "base_sha256": null,
+      "sha256": "c880851004c7780e0e529f2715a9e003b437cb859591183b9c928ca7ea333bc0"
+    },
+    {
+      "path": "online_subtask/runtime/ssr_selector_prompt.md",
+      "base_sha256": null,
+      "sha256": "7c56799438b01aa25769ab20350eb2f51284879de96058a557e46bd559728b02"
+    },
+    {
+      "path": "online_subtask/runtime/ssr_training_reference.json",
+      "base_sha256": null,
+      "sha256": "45acaa8f26b03d85d16b2a49593b0895c7583e1a8a2a5ed8eaaa7958e97f247d"
+    },
+    {
       "path": "online_subtask/runtime/steady_provider.py",
-      "sha256": "30420bb51e3bf6653a77e1ee84689b9d0066421e7e9d21079052ee08be4acc25",
+      "sha256": "49f117dc7f65f8899db0835dd0498c0fc51e650a69965c9756236edec3f72f49",
       "base_sha256": null
     },
     {
@@ -388,6 +448,11 @@
       "base_sha256": "e3b1488cf2189c5d08a4186fe1088dedca0140cde8fe23b39d5ac3d9603dc9e2"
     },
     {
+      "path": "online_subtask/runtime/test_ssr.py",
+      "base_sha256": null,
+      "sha256": "53407f823ec8bf4a7bdd0bee8648f9a61b162badff7f1a58dfcb44d7f7b6cb2e"
+    },
+    {
       "path": "online_subtask/runtime/test_steady_concurrency.py",
       "sha256": "f704aaeaaba5d52cc0c7ae9970fb541be4612a962a79d256350f5f67f3ca8b26",
       "base_sha256": null
@@ -438,18 +503,13 @@
       "base_sha256": "0c3a5baeac4daf7ae036c28bcbcfbe41885eafc39e1096b9d69b41baf8ff664a"
     },
     {
+      "path": "tools/verify_ssr.py",
+      "base_sha256": null,
+      "sha256": "ff7931f8a3ba73a2a87f40a5f2aef5d5178b0dda6a8b34df64ca357c6f5b0028"
+    },
+    {
       "path": "tools/verify_steady.py",
       "sha256": "0dd154fc8659f59dd3bf2e658877d6f37ecab815d5f52a18bb07881b62a0fde3",
-      "base_sha256": null
-    },
-    {
-      "path": "online_subtask/docs/branches.md",
-      "sha256": "04029185eb1a0f6859196f378819dcaabf2e1c854c276376d12b326d12ce4b19",
-      "base_sha256": null
-    },
-    {
-      "path": "online_subtask/docs/ssr_branch.md",
-      "sha256": "df1521b5e691554cb6e8c60f553c68790ab3dd886cdbf8ba7a95f9d2d2568219",
       "base_sha256": null
     }
   ],
@@ -461,5 +521,21 @@
     "derived_from_commit": "28fc9730adf5222382f4aa177916217062a1e7d5",
     "runtime_and_scientific_settings_changed": false,
     "historical_base_commit_preserved": "8e4f340940c56fbbe5c30e0ee578d6e5b8678321"
-  }
+  },
+  "inherited_steady_protocol_config_id": "mainhist93_tok65536_steady_v1",
+  "SSR_implementation": {
+    "source_parent_commit": "3e8f27e9b89f48d3e6cca665c8fd8bb6736f6274",
+    "public_fields": [
+      "subtask",
+      "action.summary",
+      "reasoning"
+    ],
+    "actual_policy_conditioning": true,
+    "actual_API_GPU_native_acceptance": false,
+    "noDropout_SSR_checkpoint_required": true
+  },
+  "manifest_exclusions": [
+    "online_subtask/provenance/SSR_IMPLEMENTATION_SOURCE_MAP.json",
+    "online_subtask/provenance/STEADY_SOURCE_MAP.json"
+  ]
 }
