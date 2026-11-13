@@ -24,7 +24,8 @@ def main():
     sys.path.insert(0, str(runtime))
     modules = [path.stem for path in sorted(runtime.glob('test_*.py'))
                if not (args.exclude_http and path.stem == 'test_http_transport')]
-    if not {'test_subtask_guard','test_steady_provider','test_steady_runtime','test_steady_concurrency'} <= set(modules):
+    if not {'test_subtask_guard','test_steady_provider','test_steady_runtime','test_steady_concurrency',
+            'test_steady_invariants','test_steady_delivery'} <= set(modules):
         raise ValueError('Steady branch must include state, provider, runtime and lifecycle checks')
     suite = unittest.TestLoader().loadTestsFromNames(modules)
     result = unittest.TextTestRunner(verbosity=2).run(suite)

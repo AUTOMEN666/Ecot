@@ -15,10 +15,17 @@ names are related. Generic "toy" or "device" is insufficient.
 No color/size/position
 qualifiers. Reuse the registry's category vocabulary for equivalent types. A
 descriptor is wording, not a category or a physical-instance identifier.
+The registry also binds each already observed descriptor ID to its category.
+Do not give that same descriptor a different category for a new instance. A
+contradiction must be reported as uncertain, not resolved with another category
+name or a new instance ID. This does not merge different observed object kinds.
 
 Assign stable visual instance IDs O1, O2, ... and track the SAME physical object
 across frames. Never rename the active object or exchange it for a similar one.
 Reuse the supplied registry; it is fallible history, not verified scene truth.
+Do not invent a new instance ID for an object matching an occluded known one.
+Use a new ID only when a distinct physical instance is supported. An already
+distinguished instance may keep its own ID when a similar object is occluded.
 An identity/category contradiction must set uncertain=true, not silently create
 a replacement instance or a new synonym category. If uncertain about identity,
 category, descriptor compatibility or basket contents needed for a decision,
@@ -37,6 +44,9 @@ supported INSIDE it, not hovering above or near it. released=true requires visib
 gripper disengagement. A dropped object is on the table and unfinished. Another
 similar instance in a basket does not complete the active instance. If the action
 policy grasps a different object, report that fact; do not redefine its goal.
+With no unfinished locked goal, report held objects carefully: new targets must
+finish an actually held object before another table pickup. If a held object
+cannot be identified, do not hide it to make a table target available.
 
 evidence_frames are unique increasing frame numbers of SUPPLIED images supporting
 this object's facts, including the CURRENT frame. placement_frames is the subset

@@ -261,6 +261,8 @@ class GoalAndSortingConstraints(unittest.TestCase):
         self.assertIsNone(self.guard.authorization)
         self.assertEqual(self.guard.category_to_basket, {})
         self.assertEqual(self.guard.objects, {})
+        self.assertEqual(self.guard.descriptor_to_category, {})
+        self.assertEqual(self.guard.identity_ambiguities, {})
 
 
 if __name__ == '__main__':

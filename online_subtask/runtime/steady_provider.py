@@ -1,6 +1,8 @@
 """Visual scene admission + singleton goal lock; policy still receives Subtask only."""
 from copy import deepcopy
 from pathlib import Path
+import os
+import shutil
 import time
 import http.client
 import urllib.error
@@ -39,8 +41,52 @@ class SteadySubtaskProvider(MultiviewHistoryProvider):
         return super().capture_history(*args, **kwargs)
 
     @exclusive_rpc
-    def acknowledge_executed_subtask(self, *args, **kwargs):
-        return super().acknowledge_executed_subtask(*args, **kwargs)
+    def acknowledge_executed_subtask(self, ack, *, expected_injection, expected_actions, expected_clock):
+        if self.stopped is not None:
+            raise SubtaskConstraintError('Steady episode stopped; reset required before another ACK')
+        # Validate on a private ledger. Failed persistence must not admit a
+        # history prefix that cannot be reconciled against the execution log.
+        candidate = deepcopy(self.executed_history)
+        receipt = candidate.commit(ack, expected_injection=expected_injection,
+            expected_actions=expected_actions, expected_clock=expected_clock)
+        try:
+            self._persist_execution_ACK({**receipt, 'ack_source': ack})
+        except Exception as error:
+            self.stopped = {'stage': 'execution_ACK_persistence', 'error_type': type(error).__name__}
+            try:
+                write(self.output_dir / (uuid4().hex + '_execution_history_stop.json'), {
+                    'event': 'steady_execution_history_stop', 'episode_id': self.episode_id,
+                    'frame': receipt['record']['observation_frame'], 'error_type': type(error).__name__,
+                    'actual_injected': True, 'actual_execution_ACK_validated': True,
+                    'history_published': False, 'SDK_outcome': None, 'stage': 'execution_ACK_persistence'})
+            except OSError:
+                pass  # Preserve the primary I/O failure even if no artifact can be written.
+            raise
+        self.executed_history = candidate
+        return receipt
+
+    def _persist_execution_ACK(self, row):
+        # A partial append could corrupt both this ACK and the following episode's
+        # first row. Replace the bounded per-case log only after the new complete
+        # bytes are synced; failed writes leave the old prefix intact.
+        path = self.output_dir / 'executed_subtask_history.jsonl'
+        temporary = self.output_dir / (uuid4().hex + '_execution_history.tmp')
+        try:
+            with temporary.open('xb') as stream:
+                if path.exists():
+                    with path.open('rb') as previous:
+                        shutil.copyfileobj(previous, stream, 1 << 20)
+                stream.write((canonical(row) + '\n').encode())
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(temporary, path)
+            directory = os.open(str(self.output_dir), os.O_RDONLY | getattr(os, 'O_DIRECTORY', 0))
+            try:
+                os.fsync(directory)
+            finally:
+                os.close(directory)
+        finally:
+            temporary.unlink(missing_ok=True)
 
     def observer_query(self, request, proof, *, started, unchanged):
         """Same transport, model/settings and shared1850s budget, max3 same-body attempts.
@@ -131,12 +177,17 @@ class SteadySubtaskProvider(MultiviewHistoryProvider):
             unchanged()
             if sha(canonical(self.guard.snapshot()).encode()) != state_sha:
                 raise SubtaskConstraintError('Scene registry changed during observer request')
-        evidence, receipt = self.observer_query(observer, proof, started=started, unchanged=unchanged_observer)
+        observer_proof = dict(proof, schema='ecot.mainhist93_tok65536.steady.observer.v1',
+            protocol_config_id=STEADY_CONFIG_ID, generator_protocol=STEADY_CONFIG_ID,
+            steady_protocol=STEADY_CONFIG_ID, call_role='scene_observer',
+            prompt_sha256=sha((HERE / 'scene_observer_prompt.md').read_bytes()),
+            scene_registry_sha256=state_sha)
+        evidence, receipt = self.observer_query(observer, observer_proof, started=started, unchanged=unchanged_observer)
         unchanged_observer()
+        self.observer_receipt = receipt
         decision = self.guard.observe(evidence, episode_id=proof['episode_id'], frame=proof['current_frame'],
                                       available_frames=[o['frame'] for o in proof['observations']],
                                       executed_records=proof['executed_subtask_history'])
-        self.observer_receipt = receipt
         request = deepcopy(request)
         request['messages'][0]['content'] = (HERE / 'steady_selector_prompt.md').read_text()
         allowed = set(decision['allowed_ids'])
@@ -164,6 +215,8 @@ class SteadySubtaskProvider(MultiviewHistoryProvider):
 
     @exclusive_rpc
     def validate_injection(self, context, lineage, *, episode_id, frame):
+        if self.stopped is not None:
+            raise SubtaskConstraintError('Stopped episode cannot authorize another policy injection')
         self.guard.validate_injection(context, lineage, episode_id=episode_id, frame=frame)
 
     @exclusive_rpc
@@ -175,6 +228,7 @@ class SteadySubtaskProvider(MultiviewHistoryProvider):
         if self.stopped is not None:
             raise SubtaskConstraintError('Steady decision already stopped; an explicit new episode reset is required')
         try:
+            self.observer_receipt = None
             return super().generate(*args, **kwargs)
         except Exception as error:
             self.stopped = {'frame': kwargs.get('frame'), 'error_type': type(error).__name__}
@@ -183,5 +237,8 @@ class SteadySubtaskProvider(MultiviewHistoryProvider):
                 stream.write(canonical({'event': 'steady_decision_stop', 'episode_id': kwargs.get('episode_id'),
                     'frame': kwargs.get('frame'), 'error_type': type(error).__name__, 'error': str(error),
                     'actual_injected': False, 'policy_called': False, 'SDK_outcome': None,
-                    'scene_state': self.guard.snapshot(), 'decision': deepcopy(self.guard.decision)}) + '\n')
+                    'scene_state': self.guard.snapshot(), 'observer_receipt': deepcopy(self.observer_receipt),
+                    'decision': deepcopy(self.guard.decision) if self.guard.decision is not None
+                        and self.guard.decision['frame'] == kwargs.get('frame') else None,
+                    'last_admitted_decision': deepcopy(self.guard.decision)}) + '\n')
             raise

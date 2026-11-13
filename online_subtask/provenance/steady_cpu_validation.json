@@ -9,11 +9,13 @@
     "test_mainhistory93_65536",
     "test_runtime_executed_history",
     "test_steady_concurrency",
+    "test_steady_delivery",
+    "test_steady_invariants",
     "test_steady_provider",
     "test_steady_runtime",
     "test_subtask_guard"
   ],
-  "tests_run": 78,
+  "tests_run": 102,
   "failures": 0,
   "errors": 0,
   "skipped": 0,
@@ -22,11 +24,20 @@
   "actual_API_GPU_simulator_called": false,
   "base_commit": "8e4f340940c56fbbe5c30e0ee578d6e5b8678321",
   "configuration_id": "mainhist93_tok65536_steady_v1",
-  "command": "python3 -E -B online_subtask/tests/run_cpu_tests.py --report /private/tmp/ecot_steady_second_review_cpu.json",
+  "command": "python3 -E -B online_subtask/tests/run_cpu_tests.py --report /private/tmp/ecot_steady_final_cpu.json",
   "interpreter_version": "3.9.6 (default, Mar  6 2026, 16:22:43) ",
   "test_scope": "Offline fixtures and localhost HTTP only. No real API/weights/GPU/native rollout or semantic-quality pass.",
   "original_source_branch_modified": false,
   "reviewed_initial_steady_commit": "8b82a0a2859534a00003146bd5e430a46b48ab26",
   "followup_review": "online_subtask/docs/steady_review.md",
-  "second_reviewed_commit": "51b81245a5c3bb4946c973017643e6c614907ba0"
+  "second_reviewed_commit": "51b81245a5c3bb4946c973017643e6c614907ba0",
+  "final_reviewed_commit": "46c59ecb80c046f1434d7b3606a52189824b6970",
+  "grouped_task_checks": {
+    "locked_alternative_IDs_rejected": 287,
+    "category_basket_visibility_combinations": 24,
+    "complete_mock_episode_goals": 3,
+    "complete_mock_episode_policy_chunks_executed_and_ACKed": 6,
+    "identity_ambiguity_checked_across_intervening_goals": true,
+    "ACK_failure_before_and_after_atomic_replace": true
+  }
 }

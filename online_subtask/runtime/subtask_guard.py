@@ -58,6 +58,8 @@ class SubtaskGuard:
         self.objects = {}
         self.category_to_basket = {}
         self.basket_to_category = {}
+        self.descriptor_to_category = {}
+        self.identity_ambiguities = {}
         self.completed = set()
         self.active = None
         self.decision = None
@@ -67,6 +69,8 @@ class SubtaskGuard:
         return deepcopy({'episode_id': self.episode_id, 'known_objects': self.objects,
                          'category_to_basket': self.category_to_basket,
                          'basket_to_category': self.basket_to_category,
+                         'descriptor_to_category': self.descriptor_to_category,
+                         'identity_ambiguities': self.identity_ambiguities,
                          'completed_instance_ids': sorted(self.completed),
                          'active_goal': self.active})
 
@@ -99,6 +103,8 @@ class SubtaskGuard:
         known = deepcopy(self.objects)
         categories = dict(self.category_to_basket)
         baskets = dict(self.basket_to_category)
+        descriptor_categories = dict(self.descriptor_to_category)
+        ambiguities = deepcopy(self.identity_ambiguities)
         completed = set(self.completed)
         visible = {}
         for obj in evidence['objects']:
@@ -111,11 +117,16 @@ class SubtaskGuard:
                     and not COLOR_WORDS.intersection(category.split('_')),
                     'Semantic category must be explicit and independent of object color')
             descriptors = obj['descriptor_ids']
-            require(type(descriptors) is list and len(set(descriptors)) == len(descriptors)
-                    and all(type(d) is str and d in self.descriptors for d in descriptors),
+            require(type(descriptors) is list
+                    and all(type(d) is str and d in self.descriptors for d in descriptors)
+                    and len(set(descriptors)) == len(descriptors),
                     'Only original catalogue descriptor IDs are allowed')
             require(all(self.descriptor_families[d] in (None, lexical_family(category)) for d in descriptors),
                     'Visual category contradicts an explicit catalogue descriptor')
+            for desc in descriptors:
+                require(descriptor_categories.get(desc, category) == category,
+                        'Same catalogue descriptor assigned contradictory visual categories')
+                descriptor_categories[desc] = category
             require(obj['location'] in ('table', 'held') + BASKETS and type(obj['released']) is bool,
                     'Explicit currently observed location/release required')
             require(not (obj['location'] == 'held' and obj['released']), 'A held object is not released')
@@ -136,7 +147,7 @@ class SubtaskGuard:
                         'Visual identity/category contradiction; explicit review required')
             visible[ident] = dict(deepcopy(obj), category=category)
             known[ident] = dict(deepcopy(obj), category=category)
-            if obj['location'] in ('table', 'held'):
+            if obj['location'] in ('table', 'held') or not obj['released']:
                 # Positive evidence of a drop undoes completion, not its category assignment.
                 completed.discard(ident)
             if obj['location'] in BASKETS and obj['released']:
@@ -149,6 +160,20 @@ class SubtaskGuard:
                         'Different categories observed in the same basket')
                 categories[category] = basket
                 baskets[basket] = category
+        require(len(known) <= 64, 'Visual instance registry exceeded its bounded object limit')
+        for ident, obj in visible.items():
+            conflicts = set(ambiguities.get(ident, []))
+            if ident not in self.objects or not self.objects[ident]['descriptor_ids']:
+                conflicts.update(old_id for old_id, old in self.objects.items()
+                    if old_id != ident and old_id not in visible
+                    and set(old['descriptor_ids']).intersection(obj['descriptor_ids']))
+            # Repeatedly reporting a new ID is not independent identity evidence.
+            # Resolve a suspected alias only with both instances explicitly visible.
+            conflicts.difference_update(visible)
+            if conflicts:
+                ambiguities[ident] = sorted(conflicts)
+            else:
+                ambiguities.pop(ident, None)
         active = deepcopy(self.active)
         completion = None
         if active is not None:
@@ -177,9 +202,12 @@ class SubtaskGuard:
         else:
             # A textual ID must identify one visible unfinished physical instance.
             owners = {}
+            held = any(obj['location'] == 'held' for obj in visible.values())
             for obj in visible.values():
                 if obj['location'] not in ('table', 'held') or obj['instance_id'] in completed:
                     continue
+                if held and obj['location'] != 'held':
+                    continue  # Finish an actually held object before selecting a table pickup.
                 for desc in obj['descriptor_ids']:
                     owners.setdefault(desc, []).append(obj)
             for ident, candidate in self.by_id.items():
@@ -187,6 +215,8 @@ class SubtaskGuard:
                 if len(objects) != 1:
                     continue  # ambiguous identity is never resolved by a host guess
                 obj = objects[0]
+                if obj['instance_id'] in ambiguities:
+                    continue
                 category, basket = obj['category'], candidate['basket_color']
                 if (categories.get(category, basket) != basket
                         or baskets.get(basket, category) != category):
@@ -198,6 +228,8 @@ class SubtaskGuard:
         # Preserve accepted visual facts and a completed FINAL goal even when
         # there is no next selectable target. This is not SDK task success.
         self.objects, self.category_to_basket, self.basket_to_category = known, categories, baskets
+        self.descriptor_to_category = descriptor_categories
+        self.identity_ambiguities = ambiguities
         self.completed, self.active = completed, active
         self.decision = {'episode_id': episode_id, 'frame': frame,
                          'mode': 'locked' if active else 'new_goal' if targets else 'no_legal_target',
@@ -218,6 +250,7 @@ class SubtaskGuard:
         require(self.active['subtask_id'] == selected_id, 'Locked Subtask changed')
         result = dict(deepcopy(self.decision), active_goal=deepcopy(self.active),
                       raw_proposed_id=selected_id, actual_selected_id=selected_id,
+                      scene_state_sha256=digest(self.snapshot()),
                       program_substitution=False, evidence_is_visual_model_output_not_GT=True)
         self.authorization = deepcopy(result)
         return result
@@ -227,6 +260,8 @@ class SubtaskGuard:
                 and self.authorization['frame'] == frame, 'No current steady authorization')
         require(digest(lineage.get('steady_guard')) == digest(self.authorization),
                 'Steady authorization was changed or belongs to an earlier decision')
+        require(digest(self.snapshot()) == self.authorization['scene_state_sha256'],
+                'Scene evidence changed after candidate admission')
         require(self.category_to_basket == self.authorization['category_to_basket']
                 and self.basket_to_category == self.authorization['basket_to_category']
                 and self.active == self.authorization['active_goal'],

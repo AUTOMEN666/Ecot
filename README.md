@@ -17,10 +17,13 @@ at most96 images, with a shared1850s budget. No Summary/Reasoning enters π0.5.
 The implementation and CPU fixtures are supplied here. A new real API/GPU/native
 rollout or semantic-quality improvement is not claimed. The existing checkpoint,
 normalization, policy inputs and action/SDK settings are retained.
-The complete offline suite passed **78 checks**, including the3 loopback HTTP
+The complete offline suite passed **102 checks**, including the3 loopback HTTP
 checks, with0 failures/errors/skips; see the [steady CPU receipt](online_subtask/provenance/steady_cpu_validation.json).
 The [follow-up reviews](online_subtask/docs/steady_review.md) document reproduced
 defects and corrections, including worker-thread overlap and basket visibility.
+The final review also covers held-object priority, descriptor/category consistency,
+instance alias ambiguity, durable execution history and a complete mocked
+three-goal episode. [Handoff](online_subtask/docs/HANDOFF.md) records the final scope.
 
 ## Historical base archive
 

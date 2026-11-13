@@ -105,7 +105,7 @@
     "reasoning_effort": "high",
     "max_tokens": 65536,
     "prompt_relative_to_online_subtask": "runtime/scene_observer_prompt.md",
-    "prompt_sha256": "5a8aec54e23da956ed470efb30da4ebf7007c1a40c0afece3dd038bd7f12ad3d",
+    "prompt_sha256": "b8ce658658aff5b50608fd8bac9af9f24fc9eb60d3b0458fa7bb5a54b8e7d0ef",
     "output_keys": [
       "uncertain",
       "basket_visibility",
@@ -129,6 +129,13 @@
     "final_goal_no_next_target": "Retain supported goal completion; record a decision stop with SDK_outcome null",
     "new_destination_visibility": "Current inspected basket contents required for every new goal, including assigned baskets; active goal stays locked through occlusion",
     "lifecycle_rpc_overlap": "Nonblocking per-model and per-provider gates reject overlapping calls before mutation; model gate spans API and policy inference",
-    "delayed_old_episode_request": "Reject before decision-stop handler; no new API call or new-episode stop latch"
+    "delayed_old_episode_request": "Reject before decision-stop handler; no new API call or new-episode stop latch",
+    "new_goal_held_object_priority": true,
+    "descriptor_to_category": "Same observed descriptor keeps its category across instances and occlusion; conflicts stop; no host semantic merging",
+    "instance_alias_ambiguity": "New IDs matching occluded known instances remain ineligible until explicit co-visibility; repetition or intervening goals cannot clear ambiguity",
+    "instance_registry_limit": 64,
+    "actual_observation_ownership": "Copy input arrays and clock at admission; isolate policy transforms from stored observation",
+    "authorization_binds_full_scene_registry": true,
+    "execution_history_persistence": "Validate ACK on private ledger; sync temporary log, atomically replace and sync directory before publishing prefix; I/O failure stops episode"
   }
 }

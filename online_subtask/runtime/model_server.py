@@ -105,7 +105,9 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
         'provider_kind':spec['provider']+'_'+(actual_protocol if steady else 'mainhist93_tok65536'),'provider_in_policy_process':online,
         'generator_protocol':actual_protocol,'protocol_mode':protocol_mode,
         'catalog_episode':spec.get('catalog_episode'),'catalog_sha256':spec.get('catalog_sha256'),
-        'selector_first_empty_basket_planning_rule':True,'fixed_catalog_profile':'all_training_color_expanded288',
+        'selector_first_empty_basket_planning_rule':not steady,'fixed_catalog_profile':'all_training_color_expanded288',
+        'selector_held_object_priority':steady,'descriptor_category_consistency':steady,
+        'runtime_lifecycle_rpc_exclusive':steady,
         'isolated_multiview_probe':True,'generator_current3RGB':True,'generator_history':True,'generator_measured_state14':True,'history_max_total_images':96,'history_source_frame_rule':'floor(2.5*k)','history_views_per_point':1,'captured_history_views_per_point':3,'past_history_cameras':['cam_high'],
         'max_tokens':65536,'selector_timeout_seconds':600,'selector_retry_budget_seconds':1850,'policy_rpc_timeout_seconds':2100,
         'generator_actual_executed_subtask_history':True,'executed_history_max_past_records':137,
@@ -131,7 +133,10 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
             if online:provider.reset(self.episode_id)
         @exclusive_rpc
         def update_obs(self,obs):
-            return super().update_obs(obs)
+            # Own the admitted observation across long API waits. In particular,
+            # np.asarray(float32_state) in the native encoder can retain a caller
+            # buffer; a lock alone cannot prevent that caller mutating the array.
+            return super().update_obs(deepcopy(obs)if steady else obs)
         @exclusive_rpc
         def record_terminal_observation(self,payload):
             return super().record_terminal_observation(payload)
@@ -205,7 +210,7 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
                 prompt=compose_prompt(INSTRUCTION,context['subtask'],True)
                 if prompt!=INSTRUCTION+' Current subtask: '+context['subtask']:
                     raise ValueError('Actual training/inference Subtask composition differs')
-            actual={**self.current,'prompt':prompt}
+            actual={**(deepcopy(self.current)if steady else self.current),'prompt':prompt}
             _,sample_rng=self._jax.random.split(self.policy._rng)
             noise=np.asarray(self._jax.random.normal(sample_rng,(1,50,32)),dtype=np.float32)
             if noise.shape!=(1,50,32)or not np.isfinite(noise).all():raise ValueError('Invalid actual sampling noise')

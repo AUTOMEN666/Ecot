@@ -34,11 +34,35 @@ admitted a new target into an assigned basket whose current contents were unknow
 | Direct provider overlap and delayed old calls | A separate provider gate covers its public lifecycle methods. Busy rejection occurs outside the stop handler and starts no additional API attempt. Old-episode generation is rejected before it can latch the new episode. Tests verify the original request still completes, a later reset works, and an inference exception releases the model gate. |
 | Unknown contents of an assigned destination | Require current clear basket-content observation for ALL new goals. A test completes one pen goal while red contents are unknown and rejects the next pen-to-red goal, preserving the first completion. A separate test confirms that occlusion alone does not change an unfinished locked goal. |
 
-The complete suite now passes **78 tests**, including all3 localhost HTTP tests,
+That review's complete suite passed **78 tests**, including all3 localhost HTTP tests,
 with0 failures/errors/skips. Seven added checks cover the two visibility cases
 and five lifecycle cases. The test receipt lists the modules and offline scope.
 No actual API, weights, GPU or native simulator was used. A busy RPC is a rejected
 caller operation, not a generated decision, execution record or SDK outcome.
+
+## Final requirement review
+
+Reviewed candidate: `46c59ecb80c046f1434d7b3606a52189824b6970`.
+The review checked the task requirements across the guard, provider, actual model
+adapter, ACK persistence, prompts and delivered source package.
+
+| Finding | Correction and evidence |
+| --- | --- |
+| A new goal could ignore a held object | Restrict new targets to held objects when any are observed. An unnameable held object stops admission; two identified held objects can supply targets. Existing unfinished goals remain locked. |
+| The same descriptor could be renamed into a new category on another instance | Keep an episode-local descriptor/category ledger. Contradictions stop atomically, including when the original object is occluded. Exact category keys remain distinct; there is no host semantic merging. |
+| A new instance ID could bypass an occluded known object's identity | Persist the ambiguity of newly named targets sharing a descriptor with an absent known instance. Repetition and intervening goals cannot clear it; explicit co-visibility can. Previously distinguished IDs remain usable, and explicitly separate visible instances can still use the same catalogue ID. |
+| A regrasp inside a basket could leave stale completion | Any current unreleased/regrasped observation clears that instance's completion, including inside a basket. It does not switch another active goal or erase the established category mapping. |
+| NumPy input buffers and policy transforms could change stored observations | Copy the admitted observation/clock at update and isolate policy input transforms. Tests mutate caller arrays and policy inputs and check the stored/current evidence remains unchanged. Full-scene digests also bind injection authorization. |
+| ACK state could advance before execution evidence was safely logged | Validate on a private ledger. Write a complete temporary log, sync it, replace the old log atomically and sync the directory before publishing the ledger. Persistence faults stop the episode; tests preserve a previous committed prefix and admit no new history. Invalid ACK validation can still be corrected without a semantic redraw. |
+| Observer and stop artifacts could misidentify the evidence | Observer records now identify the actual steady protocol, prompt and registry hashes. A failed new observation links its observer receipt, sets current decision to null and preserves the last admitted decision separately. Stopped providers reject old injection authorizations. |
+
+All **102 test methods** pass, including3 localhost transport tests, with0
+failures/errors/skips. The24 new methods include24 category/basket/visibility
+combinations and all287 alternative IDs while locked. A complete mocked episode
+executes and ACKs six policy chunks across three objects/categories: each ID is
+kept through grasp, two supported placements permit each switch, and final
+completion is preserved separately from the SDK result. These are software
+behavior checks; they are not50 real cases or a visual recognition accuracy score.
 
 ## Remaining limits
 
