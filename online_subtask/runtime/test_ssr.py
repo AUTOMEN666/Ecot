@@ -98,6 +98,9 @@ class SSRContracts(unittest.TestCase):
             self.assertEqual(metadata['scene_registry']['active_goal']['last_unplaced_at'],16)
             self.assertNotIn(16,allowed)
             self.assertIn('do not copy those timestamps',request['messages'][0]['content'])
+            selector=[row for row in seen if row[1]['current_frame']==24 and row[1]['call_role']=='subtask_selector'][0]
+            self.assertEqual(selector[1]['observer_prompt_sha256'],proof['prompt_sha256'])
+            self.assertEqual(selector[1]['frame_evidence_contract_revision'],'explicit_supplied_frame_list_v1')
 
     def test_actual_training_formatter_golden_examples_are_byte_identical(self):
         golden=json.loads((Path(__file__).parents[1]/'provenance/SSR_TRAINING_FORMAT_REFERENCE.json').read_text())

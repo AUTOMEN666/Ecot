@@ -75,6 +75,8 @@ class SSRSteadyProvider(SteadySubtaskProvider):
                      prompt_sha256=sha((HERE/'ssr_selector_prompt.md').read_bytes()),
                      messages_sha256=sha(canonical(request['messages']).encode()),
                      training_reference_sha256=REFERENCE_SHA,prospective_horizon_steps=HORIZON_STEPS,
+                     observer_prompt_sha256=self.observer_receipt['prompt_sha256'],
+                     frame_evidence_contract_revision=self.observer_receipt['frame_evidence_contract_revision'],
                      SSR_generated_then_discarded=False,future_test_information_supplied=False)
         return request,proof
 
