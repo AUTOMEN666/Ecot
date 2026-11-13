@@ -13,16 +13,23 @@ new protocol, `mainhist93_tok65536_steady_v1`, with its own output namespace.
 | Goal completion | The locked instance must be visibly released inside its own destination in at least two distinct, transmitted observations after selection AND after its most recent observed drop/regrasp/unreleased state, including the current frame. Another similar instance, execution ACK, elapsed actions or an ID change cannot complete it. |
 | Same category, same basket | Category-to-basket assignments are established by visually observed released containment, including initial basket contents. A prior textual plan does not establish an assignment. |
 | Different categories, different baskets | Both directions of the mapping are checked. If pens occupy red, camera-to-red is not an allowed candidate, even though that ID exists in the288 catalogue. Mixed or contradictory observed contents stop the decision. |
+| New destination visibility | Every newly selected destination must have currently inspected contents, including a previously assigned basket. An unfinished locked goal remains locked through basket occlusion. |
 | Category names | Color-qualified and generic categories are rejected. Broad word families only catch obvious descriptor/category contradictions; they NEVER replace or merge the observed category keys. Distinct reported categories such as toy_car and toy_bus remain distinct. Ambiguous words such as box/device/tool/ring are not reliable category labels. |
 | Physical instance identity | Matching descriptions do not merge different instances. Ambiguous new target identity stops admission. Omission/occlusion cannot complete a target; a positively observed later drop clears that instance's completion. |
 | Actual injection | The runtime independently checks the authorized ID/text, frame, episode, active goal and category mappings immediately before `policy.infer`. |
 | Uncertainty or conflict | Raise a recorded decision stop with `SDK_outcome=null`; do not inject, repair an ID, retry for semantics or substitute an answer. |
 | No next legal target | Preserve any supported current-goal completion and accepted scene facts, then stop without selecting a substitute. Completion of a last pick/place goal is not the SDK whole-task result. |
+| Worker-thread lifecycle | Reject overlapping reset, observation, history, ACK, injection-read, terminal and action RPCs before mutation. The model gate spans both API calls AND policy inference; the provider also protects direct use. |
 
 This tests continuous following of the CURRENT goal, with legal switching after
 confirmed completion. It does not lock one target for the entire sorting episode.
 Decision stops are latched until an explicit new episode reset: another RPC call
 cannot silently redraw a rejected semantic answer in the same episode.
+An overlapping RPC raises `RPCBusyError` without being queued, starting another
+API request or latching a decision stop. Reset can be issued after the active RPC
+returns; it cannot mutate a running generation or inference. A delayed direct
+provider request naming an old episode is rejected before the stop handler, so it
+cannot poison the new episode. These gates do not change legacy replay behavior.
 No simulator labels, object poses, reward, task-success truth, expert annotations
 or future images are introduced as generator/policy inputs.
 

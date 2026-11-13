@@ -10,6 +10,7 @@ from multiview_provider import (MultiviewHistoryProvider, DEEPSEEK_MODEL, write,
                                transient_transport_error)
 from multiview_protocol import canonical, sha, strict_json, RETRY_BUDGET_SECONDS
 from subtask_guard import SubtaskGuard, SubtaskConstraintError, STEADY_CONFIG_ID
+from rpc_lifecycle import exclusive_rpc, lifecycle_lock
 
 HERE = Path(__file__).resolve().parent
 
@@ -17,6 +18,7 @@ HERE = Path(__file__).resolve().parent
 class SteadySubtaskProvider(MultiviewHistoryProvider):
     protocol_config_id = STEADY_CONFIG_ID
     def __init__(self, *args, **kwargs):
+        self._rpc_lock = lifecycle_lock()
         super().__init__(*args, **kwargs)
         # The existing Codex relay has no observer-schema contract. Fail before use.
         if self.selector_kind != 'deepseek':
@@ -25,11 +27,20 @@ class SteadySubtaskProvider(MultiviewHistoryProvider):
         self.observer_receipt = None
         self.stopped = None
 
+    @exclusive_rpc
     def reset(self, episode_id):
         super().reset(episode_id)
         self.guard.reset(episode_id)
         self.observer_receipt = None
         self.stopped = None
+
+    @exclusive_rpc
+    def capture_history(self, *args, **kwargs):
+        return super().capture_history(*args, **kwargs)
+
+    @exclusive_rpc
+    def acknowledge_executed_subtask(self, *args, **kwargs):
+        return super().acknowledge_executed_subtask(*args, **kwargs)
 
     def observer_query(self, request, proof, *, started, unchanged):
         """Same transport, model/settings and shared1850s budget, max3 same-body attempts.
@@ -151,10 +162,16 @@ class SteadySubtaskProvider(MultiviewHistoryProvider):
         self.guard.validate_injection(context, dict(proof, selected_id=resolution['selected_id'], resolution=resolution),
                                       episode_id=self.episode_id, frame=proof['current_frame'])
 
+    @exclusive_rpc
     def validate_injection(self, context, lineage, *, episode_id, frame):
         self.guard.validate_injection(context, lineage, episode_id=episode_id, frame=frame)
 
+    @exclusive_rpc
     def generate(self, *args, **kwargs):
+        # Reject a delayed caller from a prior episode BEFORE the decision-stop
+        # handler can latch the current episode. No API request is admitted.
+        if not self.episode_id or kwargs.get('episode_id') != self.episode_id:
+            raise ValueError('Provider requires actual same-episode reset')
         if self.stopped is not None:
             raise SubtaskConstraintError('Steady decision already stopped; an explicit new episode reset is required')
         try:

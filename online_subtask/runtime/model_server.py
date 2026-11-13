@@ -10,6 +10,7 @@ import sys
 import time
 import numpy as np
 from export_binding import read,validate_binding,VARIANTS
+from rpc_lifecycle import exclusive_rpc,lifecycle_lock
 
 
 def initialize_paths(parent):
@@ -118,14 +119,23 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
 
     class RuntimeModel(NativeModel):
         def __init__(self):
+            self._rpc_lock=lifecycle_lock()if steady else None
             # Reuse the immutable native observation/action implementation with
             # an already-verified policy; never falsify a legacy weight identity.
             super().__init__({'audit_path':spec['audit_path'],'binding':metadata,
                               'noise_seed':42,'instruction':INSTRUCTION},policy=policy)
             self._jax=jax_module;self.latest_injection=None;self.latest_commands=None
+        @exclusive_rpc
         def reset(self):
             super().reset();self.latest_injection=None;self.latest_commands=None
             if online:provider.reset(self.episode_id)
+        @exclusive_rpc
+        def update_obs(self,obs):
+            return super().update_obs(obs)
+        @exclusive_rpc
+        def record_terminal_observation(self,payload):
+            return super().record_terminal_observation(payload)
+        @exclusive_rpc
         def record_history_observation(self,obs):
             # This path never calls update_obs/get_action/infer or changes policy RNG.
             frame=obs.get('frame_index')
@@ -150,6 +160,7 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
             return {'history_frame':frame,'episode_id':self.episode_id,'policy_called':False,'RNG_advanced':False,
                 'capture_count':record['history_source_index']+1,'current_views':record['current_views']}
 
+        @exclusive_rpc
         def acknowledge_executed_subtask(self,obs):
             if not online or self.latest_injection is None or self.latest_commands is None:
                 raise ValueError('Cannot commit a generation without actual policy injection/commands')
@@ -167,10 +178,12 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
                 'RNG_after_sha256':hashlib.sha256(rng_after.tobytes()).hexdigest(),'policy_frame_index_unchanged':True})
             return receipt
 
+        @exclusive_rpc
         def current_injection(self):
             if not online or self.latest_injection is None or self.latest_injection['execution_frame']!=self.frame_index:
                 raise ValueError('No current actual Subtask injection is available')
             return deepcopy(self.latest_injection)
+        @exclusive_rpc
         def get_action(self):
             if self.current is None or self.predicted_at==self.frame_index:raise ValueError('Fresh actual SDK observation required')
             if self.current['prompt']!=INSTRUCTION:raise ValueError('SDK must supply exactly the full original Instruction')

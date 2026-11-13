@@ -126,6 +126,9 @@
     "semantic_retry": false,
     "full_episode_single_goal_lock": false,
     "category_merging_by_host": false,
-    "final_goal_no_next_target": "Retain supported goal completion; record a decision stop with SDK_outcome null"
+    "final_goal_no_next_target": "Retain supported goal completion; record a decision stop with SDK_outcome null",
+    "new_destination_visibility": "Current inspected basket contents required for every new goal, including assigned baskets; active goal stays locked through occlusion",
+    "lifecycle_rpc_overlap": "Nonblocking per-model and per-provider gates reject overlapping calls before mutation; model gate spans API and policy inference",
+    "delayed_old_episode_request": "Reject before decision-stop handler; no new API call or new-episode stop latch"
   }
 }

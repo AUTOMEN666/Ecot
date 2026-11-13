@@ -191,8 +191,8 @@ class SubtaskGuard:
                 if (categories.get(category, basket) != basket
                         or baskets.get(basket, category) != category):
                     continue
-                if basket not in baskets and visibility[basket] != 'clear':
-                    continue  # unseen basket contents cannot be assumed empty
+                if visibility[basket] != 'clear':
+                    continue  # even an assigned basket may now have unseen conflicting contents
                 targets[ident] = {'instance_id': obj['instance_id'], 'category': category,
                                   'basket_color': basket}
         # Preserve accepted visual facts and a completed FINAL goal even when

@@ -14,7 +14,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "c86d65630c38821deec6b35c9e21e106797dba337dd4e036a7f3321c7f962316",
+      "sha256": "e63a638b13bfc874a4f3ff43c290d0a7399fae8ca71cb45f3f5bbcc4e25ddaee",
       "base_sha256": "d7cb92c5ed4a07e21a7071a4c33684b1a124b14cefdcfee6ba71b3f7ea6ce0f4"
     },
     {
@@ -29,7 +29,7 @@
     },
     {
       "path": "online_subtask/configs/mainhist93_tok65536_steady_v1.json",
-      "sha256": "d62138bf50a644c49b552452d652a86793735891822889c3f90cfb45a631cf41",
+      "sha256": "be8e619c889bf10148f47a02dbd5084190daa8199d4b1fefd5b2db35465ccd5a",
       "base_sha256": null
     },
     {
@@ -54,12 +54,12 @@
     },
     {
       "path": "online_subtask/docs/steady.md",
-      "sha256": "3cd9fac60b106ee6e78021a4c71ad99f19ec6999f36e854250d605fd0dce0dae",
+      "sha256": "c887be16d979320c0aadd75a78eba7d9a0e4537242a0d404223d7a5de6a19d1a",
       "base_sha256": null
     },
     {
       "path": "online_subtask/docs/steady_review.md",
-      "sha256": "079c41f4c258e9ccae61d9f4f118fdd85e1dd19dadded52d7e883ea3146e7539",
+      "sha256": "c497a51340b22870d9975afc08a7a6958787de4da4ba93119e0acde3ba6b76c1",
       "base_sha256": null
     },
     {
@@ -174,7 +174,7 @@
     },
     {
       "path": "online_subtask/provenance/steady_cpu_validation.json",
-      "sha256": "bbb2805fb3aca8a0eeb478081124c25d7c8787936ecece126f2e4655cf5ad80f",
+      "sha256": "d7e21cf8f7c523445c6a99c07b508dbbc4bfe65a9bd24875d80178cc721a6479",
       "base_sha256": null
     },
     {
@@ -229,7 +229,7 @@
     },
     {
       "path": "online_subtask/runtime/model_server.py",
-      "sha256": "a7487c132abd7a1e6074e6dbd30b2f7d3ab4da066a12b3a391c61bef40f2e2c1",
+      "sha256": "355e0db6911c5271dac36d28fede04d8705b290bc6cfe0b4feb6a1d97cda4b1a",
       "base_sha256": "ac89372dfc41ffccf27e3ae23828837cb45232ecc435dce7841488a42400d224"
     },
     {
@@ -308,6 +308,11 @@
       "base_sha256": "2e140fea1a701f0fad4052a68c485150a18c9eaf2cc4ec545f51ed9d9122233b"
     },
     {
+      "path": "online_subtask/runtime/rpc_lifecycle.py",
+      "sha256": "27a867c3058034f0a28eee725d2adae2d81c71603a9bb627a883c258f62be568",
+      "base_sha256": null
+    },
+    {
       "path": "online_subtask/runtime/scene_observer_prompt.md",
       "sha256": "5a8aec54e23da956ed470efb30da4ebf7007c1a40c0afece3dd038bd7f12ad3d",
       "base_sha256": null
@@ -324,7 +329,7 @@
     },
     {
       "path": "online_subtask/runtime/steady_provider.py",
-      "sha256": "0bf04321c23b15d125476353a9406ec5b936c743a56ebf37b5145a0380771c53",
+      "sha256": "2d242fd20d7550ab96253c543510c71e81c8c754fd6f6e739fea0ad5e00ee4da",
       "base_sha256": null
     },
     {
@@ -339,7 +344,7 @@
     },
     {
       "path": "online_subtask/runtime/subtask_guard.py",
-      "sha256": "2b3618437eca5c764828473666b185c096607728692b80a57ce52d2b51639397",
+      "sha256": "163bb1049a452d8bba7052d0b4b62438a538cc52e4bbf17ef3616a2cbe4b1ab2",
       "base_sha256": null
     },
     {
@@ -378,6 +383,11 @@
       "base_sha256": "e3b1488cf2189c5d08a4186fe1088dedca0140cde8fe23b39d5ac3d9603dc9e2"
     },
     {
+      "path": "online_subtask/runtime/test_steady_concurrency.py",
+      "sha256": "f704aaeaaba5d52cc0c7ae9970fb541be4612a962a79d256350f5f67f3ca8b26",
+      "base_sha256": null
+    },
+    {
       "path": "online_subtask/runtime/test_steady_provider.py",
       "sha256": "e6403fb735145e11c6380f31e479f667f64a83125ac58e1c8e89cc5a1d2c2fa7",
       "base_sha256": null
@@ -389,7 +399,7 @@
     },
     {
       "path": "online_subtask/runtime/test_subtask_guard.py",
-      "sha256": "91dcaa6c61958c908804ccd37b50f4d9bafcacfa8173716eb865438255e97179",
+      "sha256": "a7b46a2785c78cbaf790eb9fc519e7bfca7ec650083a60b62c65d0be08d70876",
       "base_sha256": null
     },
     {
@@ -399,7 +409,7 @@
     },
     {
       "path": "online_subtask/tests/run_cpu_tests.py",
-      "sha256": "7934eb19e1c120af0963a22814ce45789da1e901e93a9cb4b11653ea311223b0",
+      "sha256": "5ab2779dc8f62fa81394c63bbe037073f8593ced5dd6197fa92afe4c18ff727f",
       "base_sha256": "74e857860185669f64c67c139987921c58e05cd06edf0a558a3fa4341dca26b1"
     },
     {

@@ -1,7 +1,8 @@
 # Follow-up review of the steady implementation
 
-Reviewed candidate: `8b82a0a2859534a00003146bd5e430a46b48ab26`.
-This review reproduced three behavioral defects in that initial steady commit.
+Initially reviewed candidate: `8b82a0a2859534a00003146bd5e430a46b48ab26`.
+The first review reproduced three behavioral defects in that initial steady commit
+and a missing error-evidence artifact.
 The original `ecot_online_generation_subtask` branch is unchanged.
 
 | Finding | Reproduced behavior before correction | Correction |
@@ -14,9 +15,30 @@ The original `ecot_online_generation_subtask` branch is unchanged.
 Regression checks cover each finding, including contradictory placed/unplaced
 witnesses, distinct writing-related categories, two different toy categories,
 drops across calls and within one report, and the real provider/ACK path for the
-last-goal stop. The complete offline suite passes **71 tests**, including the3
+last-goal stop. That review's complete offline suite passed **71 tests**, including the3
 loopback HTTP tests, with0 failures/errors/skips. The retained test receipt records
 the command and scope. There were no real API, checkpoint, GPU or native episodes.
+
+## Second follow-up review
+
+Reviewed candidate: `51b81245a5c3bb4946c973017643e6c614907ba0`.
+Controlled worker threads reproduced a reset during an observer wait: reset
+changed the model/provider episode, the old request failed its causal-state check,
+and its exception handler then latched `stopped` on the NEW episode. No policy
+call was required to reproduce this state corruption. A guard fixture also
+admitted a new target into an assigned basket whose current contents were unknown.
+
+| Finding | Correction and regression evidence |
+| --- | --- |
+| Model lifecycle RPC overlap | A nonblocking per-model gate covers reset, observation updates, captures, ACK, injection reads, terminal records and the entire action call. Overlap is rejected before mutation. Tests hold the observer and, separately, policy inference; reset/update/duplicate actions cannot change the active call's episode, frame, inputs or RNG. |
+| Direct provider overlap and delayed old calls | A separate provider gate covers its public lifecycle methods. Busy rejection occurs outside the stop handler and starts no additional API attempt. Old-episode generation is rejected before it can latch the new episode. Tests verify the original request still completes, a later reset works, and an inference exception releases the model gate. |
+| Unknown contents of an assigned destination | Require current clear basket-content observation for ALL new goals. A test completes one pen goal while red contents are unknown and rejects the next pen-to-red goal, preserving the first completion. A separate test confirms that occlusion alone does not change an unfinished locked goal. |
+
+The complete suite now passes **78 tests**, including all3 localhost HTTP tests,
+with0 failures/errors/skips. Seven added checks cover the two visibility cases
+and five lifecycle cases. The test receipt lists the modules and offline scope.
+No actual API, weights, GPU or native simulator was used. A busy RPC is a rejected
+caller operation, not a generated decision, execution record or SDK outcome.
 
 ## Remaining limits
 

@@ -48,6 +48,25 @@ class GoalAndSortingConstraints(unittest.TestCase):
         self.assertEqual(self.guard.category_to_basket, {})
         self.assertEqual(self.guard.basket_to_category, {})
 
+    def test_new_goal_requires_clear_contents_even_for_an_assigned_basket(self):
+        self.start()
+        evidence = scene(obj(location='red', frame=8, placements=[7, 8]),
+                         obj('O2', 'pen', 'D005', frame=8))
+        evidence['basket_visibility']['red'] = 'unknown'
+        with self.assertRaisesRegex(SubtaskConstraintError, 'No unambiguous legal'):
+            observe(self.guard, evidence, 8)
+        self.assertEqual(self.guard.category_to_basket, {'pen': 'red'})
+        self.assertIn('O1', self.guard.completed)
+        self.assertIsNone(self.guard.active)
+
+    def test_basket_occlusion_does_not_switch_an_unfinished_locked_goal(self):
+        self.start()
+        evidence = scene(obj(location='held', frame=8, released=False))
+        evidence['basket_visibility']['red'] = 'unknown'
+        decision = observe(self.guard, evidence, 8)
+        self.assertEqual(decision['allowed_ids'], ['U0012'])
+        self.assertEqual(decision['mode'], 'locked')
+
     def test_no_jump_across_approach_grasp_carry_and_occlusion(self):
         self.start()
         for frame, evidence in [(8, scene(obj(location='held', frame=8, released=False))),
