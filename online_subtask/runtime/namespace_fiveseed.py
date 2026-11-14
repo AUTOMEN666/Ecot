@@ -4,9 +4,6 @@ import ast
 import importlib.util
 from pathlib import Path
 
-SOURCE = Path('/mnt/xzt/robodojo/src/RoboDojo')
-
-
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
@@ -21,7 +18,7 @@ def links(source, destination, exclude=()):
 def patch_seed_source(text, rows):
     ids = [row['layout_id'] for row in rows]
     if not ids or len(set(ids)) != len(ids) or not all(type(i) is int and i >= 0 for i in ids):
-        raise ValueError('Distinct nonnegative official seed1 classify_objects layout IDs required')
+        raise ValueError('Distinct nonnegative official seed1 stack_bowls_random layout IDs required')
     needle = '        all_layout_ids = list(range(len(matching_files)))'
     if text.count(needle) != 1:
         raise ValueError('Native seed declaration changed')
@@ -59,6 +56,25 @@ def verify_private_assets(source):
     return {'global_configs_sha256':sha(path),'actual_private_ASSETS_PATH':str(actual)}
 
 
+def patch_readback_source(text):
+    needle = '            self.reward_manager.init_state()'
+    if text.count(needle) != 1:
+        raise ValueError('Native reward initialize site changed')
+    legacy = ('            from support.probe_readback import install_private_reward_readback\n'
+              '            if not hasattr(self, "_ervla_readback_audit"):\n'
+              '                self._ervla_readback_audit = install_private_reward_readback(self)\n')
+    own = ('            from pi05_policy.probe_readback import install_private_reward_readback\n'
+           '            if not hasattr(self, "_pi05_reward_readback_audit"):\n'
+           '                self._pi05_reward_readback_audit = install_private_reward_readback(self)\n')
+    if legacy in text:
+        if text.count(legacy) != 1 or text.count('support.') != 1:
+            raise ValueError('Unreviewed legacy project dependencies in native SDK')
+        return text.replace(legacy, own)
+    if 'support.' in text or 'install_private_reward_readback' in text:
+        raise ValueError('Unreviewed reward readback adapter; do not duplicate it')
+    return text.replace(needle, own + needle)
+
+
 def build(folder, ids, adapter, alias, *, seed, manifest):
     from layout_manifest import rows_for
     source_root=Path(manifest['sdk_source'])
@@ -66,19 +82,19 @@ def build(folder, ids, adapter, alias, *, seed, manifest):
     source = folder / 'src/RoboDojo'
     source.parent.mkdir(parents=True, exist_ok=True)
     rows=rows_for(manifest,seed,ids)
-    pool=rows_for(manifest,seed,list(range(50)))
+    pool=rows_for(manifest,seed,list(range(30)))
     for row in rows:
         if sha(row['path'])!=row['sha256']:raise ValueError('Frozen scene/layout changed before namespace construction')
     links(source_root, source, {'Assets','env', 'src', 'XPolicyLab', 'eval_result', '.git'})
     # Only this private SDK sees the frozen overlay. Original shared Assets
-    # remain untouched; all20 filenames retain native loader ID semantics.
+    # remain untouched; all30 filenames retain native loader ID semantics.
     relative=Path('Assets')
     for next_name in ('Eval_Layout','RoboDojo','arx_x5',str(seed)):
         links(source_root/relative,source/relative,{next_name})
         relative=relative/next_name
     (source/relative).mkdir()
     for row in pool:
-        (source/relative/f"classify_objects_{row['layout_id']}.json").symlink_to(Path(row['path']).resolve(strict=True))
+        (source/relative/f"stack_bowls_random_{row['layout_id']}.json").symlink_to(Path(row['path']).resolve(strict=True))
     links(source_root / 'env', source / 'env', {'seed_manager', '__pycache__'})
     links(source_root / 'env/seed_manager', source / 'env/seed_manager', {'seed_manager.py', '__pycache__'})
     (source / 'env/seed_manager/seed_manager.py').write_text(
@@ -89,13 +105,7 @@ def build(folder, ids, adapter, alias, *, seed, manifest):
     # Existing SDK's reward parser mixes CUDA tensors with NumPy. This bridge
     # only converts pose/point readbacks to NumPy; no rule/threshold is changed.
     text = (source_root / 'src/eval_client/eval_env.py').read_text()
-    needle = '            self.reward_manager.init_state()'
-    if text.count(needle) != 1:
-        raise ValueError('Native reward initialize site changed')
-    text = text.replace(needle,
-        '            from pi05_policy.probe_readback import install_private_reward_readback\n'
-        '            if not hasattr(self, "_pi05_reward_readback_audit"):\n'
-        '                self._pi05_reward_readback_audit = install_private_reward_readback(self)\n' + needle)
+    text = patch_readback_source(text)
     (source / 'src/eval_client/eval_env.py').write_text(text)
     links(source_root / 'XPolicyLab', source / 'XPolicyLab', {'policy', '__pycache__'})
     (source / 'XPolicyLab/policy').mkdir()

@@ -1,154 +1,43 @@
-# Online Subtask for classify_objects
+# Stack Bowls：π0.5 在线 Subtask 测评
 
-## Task scope and branches
+本分支 ecot_online_generation_subtask_stack_bowls 从分类分支
+ecot_online_generation_subtask_classify_objects 的 commit
+95188146ce7191aa15d8a23a545707712e267d81 独立适配。
+DeepSeek生成当前Subtask，π0.5接收文本并预测动作。
+**此PR交付代码与验证。尚未执行DeepSeek在线策略闭环或正式30回合，没有成功率结果。环境核函数和独立初始化检查与测评结果分开记录。**
 
-This implementation targets **`classify_objects`**: the sorting instruction,
-fixed288 Subtask catalogue, object descriptors, basket rules and policy bindings
-are specific to this task. Other tasks require their own catalogue, constraints
-and integration evidence.
-
-| Branch | Purpose |
+| 项目 | 固定设置 |
 |---|---|
-| [ecot_online_generation_subtask_classify_objects](https://github.com/AUTOMEN666/Ecot/tree/ecot_online_generation_subtask_classify_objects) | Original online Subtask implementation |
-| [ecot_online_generation_subtask_steady_classify_objects](https://github.com/AUTOMEN666/Ecot/tree/ecot_online_generation_subtask_steady_classify_objects) | Subtask implementation with steady goal and category/basket checks |
-| [ecot_online_generation_subtask_reasoning_and_action_summary_classify_objects](https://github.com/AUTOMEN666/Ecot/tree/ecot_online_generation_subtask_reasoning_and_action_summary_classify_objects) | Branch prepared for prospective Subtask, Reasoning and Action Summary work |
+| 权重 | 官方π0.5 Base独立全参训练的Stack Bowls100，EMA10000 |
+| 原训练 | episodes3000–3099，44674有效起点，Subtask-only，dropout0，总训练15000步 |
+| 任务 | 原生stack_bowls_random，保留SDK成功/终止逻辑，800动作上限 |
+| 场景 | seed1，已有30个Random布局0–29，各一次；不生成新布局或重复凑数 |
+| 接入 | 先独立一个完整原生工程回合，通过后再正式30；工程回合不进分母 |
+| 策略 | 当前三路RGB、State14、Instruction＋Subtask；noise42，predict50/execute8/flow10，25Hz |
+| 在线生成 | 当前三图/State14、至多93张严格过去主图及对应State14、已确认执行的Subtask历史 |
+| 等待 | 生成、推理、历史采集和ACK等待期间不推进仿真，核对全场景/机器人/物理时钟 |
+| 视频 | 25Hz主相机与逐动作实际注入文本同步MP4 |
 
-The `_classify_objects` suffix identifies the task. The third branch currently
-inherits the steady Subtask-only runtime; its name does not claim that SSR
-generation, SSR policy injection or a new online evaluation has been completed.
-Historical protocol IDs, archived ZIP names, source commits and validation
-receipts keep their original identities.
+策略文本：
+~~~text
+Stack the three bowls together. Current subtask: {原训练Subtask原文}
+~~~
+不注入Summary、Reasoning、bbox、场景真值、未来帧或专家动作。
+源训练eval_ecot=false保持原样，新测评明确记录effective_eval_ecot=true。
 
-This repository preserves the deployed `mainhist93_tok65536_v1` online Subtask
-generation and π0.5 integration. DeepSeek selects one exact ID from a fixed
-288-entry catalogue using current observations, sampled visual history and
-acknowledged executed Subtasks. The selected catalogue text conditions the next
-policy prediction.
+- [Prompt](online_subtask/runtime/selector_prompt.md)：移除分类/篮子规则，加入叠碗、支撑栈、分阶段完成与恢复规则。
+- [协议](online_subtask/docs/protocol.md)：DeepSeek输出候选ID，宿主精确映射原训练文本。
+- [接入步骤](online_subtask/docs/integration.md)：权重、布局、工程验收、30回合、视频与统计。
+- [测评定义](experiment/evaluation.md)、[交接](handoff.md)、[验证范围](online_subtask/docs/validation.md)。
+- runtime是当前代码；reference/classify_objects仅保留历史分类证据，不是叠碗运行入口。
 
-This is an experiment-specific source archive. It preserves strict asset,
-observation, timing and execution checks; it is not a general training repository
-or a self-contained simulator distribution.
-
-## Preserved configuration
-
-| Component | Contract |
-|---|---|
-| Current observation | Synchronized main, left-wrist and right-wrist RGB; measured State14; complete task instruction |
-| Visual history | Up to93 strictly past main-camera observations, uniformly sampled over the whole episode's approximately10Hz capture grid; up to96 images including the current3 |
-| Executed history | Complete chronological exact ID/text, observation frame and executed action range; added only after a verified execution ACK |
-| DeepSeek | `deepseek-v4-1-flash-261017`, `max_tokens=65536`, temperature0, thinking enabled, reasoning effort high, JSON output |
-| Output | Only `{"subtask_id":"one listed ID"}`; exact text lookup in the frozen288 catalogue |
-| Time bounds | HTTP600s; identical-request retry admission budget1850s; policy RPC/ping2100s; at most3 total identical attempts |
-| Policy | `A_subtask_online` EMA5000; predict50, execute up to8, flow10, noise42 |
-| Environment | 25Hz control; original SDK1100-action limit and success/termination rules; simulation frozen during waits |
-
-The actual generation entry point is
-[`MultiviewHistoryProvider`](online_subtask/runtime/multiview_provider.py), using
-[`multiview_protocol.py`](online_subtask/runtime/multiview_protocol.py) and the
-complete [`selector_prompt.md`](online_subtask/runtime/selector_prompt.md).
-`SubtaskClient` and `HistoryClient` retain older implementations and shared
-helpers; their legacy generation methods are not this configuration's entry
-points.
-
-The runtime order is:
-
-```text
-current observation + causal history
-  → DeepSeek single ID → unchanged catalogue text
-  → Instruction + " Current subtask: " + Subtask
-  → π0.5 predicts50 → SDK executes up to8
-  → verify actual actions/clocks and commit execution ACK
-  → next observation and request
-```
-
-π0.5 receives only the current three images, State14 and composed prompt. The
-visual and executed histories are selector inputs, not policy image history.
-See the [protocol](online_subtask/docs/protocol.md) for sampling, continuity and
-ACK semantics.
-
-## CPU checks
-
-From the repository root, use a separate Python3.11 environment with NumPy.
-The observed policy environment used Python3.11.17 and NumPy1.26.4:
-
-```sh
-python3.11 -m venv .venv
-. .venv/bin/activate
-python -m pip install 'numpy==1.26.4'
-python -B -m unittest discover -s online_subtask/runtime -p 'test_*.py' -v
-```
-
-These checks use local fixtures and mocked policy/transport dependencies. Three
-HTTP transport checks bind a temporary loopback port; allow local loopback
-binding for the full suite. They do not need an API key, external API access,
-checkpoint, GPU or native simulator. NumPy installation alone is not an exact
-environment lock for full policy execution.
-
-The packaged runner can also ignore inherited `PYTHONPATH`:
-
-```sh
-python -E -B online_subtask/tests/run_cpu_tests.py
-```
-
-Use `-I` in place of `-E` for stronger interpreter isolation when NumPy is
-installed in that interpreter's regular site-packages, as in the virtual
-environment above. `-I` hides user-site packages.
-
-The release owner's copied checkout passed all31 CPU checks, including the3
-loopback tests, with0 failures/errors/skips and without the original workspace
-on its import path. That check used Python3.9.6 and NumPy2.0.2; it is distinct
-from the observed policy deployment environment above. Final clone/ZIP
-verification remains pending in
-[validation.md](online_subtask/docs/validation.md). CPU checks do not establish
-native success, semantic correctness or complete GPU reproducibility.
-
-Verify the48 mapped sources and declared prompt/catalogue hashes locally:
-
-```sh
-python -B tools/verify_archive.py
-```
-
-From a clean committed checkout, build a deterministic source ZIP into a
-directory outside the repository:
-
-```sh
-python -B tools/build_source_archive.py --output-dir ../source-archives
-```
-
-The builder also writes SHA256 and per-file manifest sidecars. It excludes Git
-metadata and refuses uncommitted source changes. This command documents the
-build procedure; final archive/clone acceptance remains a separate release
-check.
-
-## Integration and repository layout
-
-| Path | Purpose |
-|---|---|
-| `online_subtask/runtime/` | Preserved runtime source, prompt, catalogue and original behavior tests |
-| `online_subtask/integration/experiment_contract/` | Parent experiment's source/support validation dependencies; reference material, not a training quickstart |
-| `online_subtask/configs/mainhist93_tok65536_v1.json` | Declarative snapshot of the fixed scientific configuration |
-| `online_subtask/configs/external_paths.example.json` | External-asset path placeholders; not a new runtime loader |
-| `online_subtask/tests/` | Isolated CPU runner and the explicitly identified prior-prompt fixture |
-| `online_subtask/docs/` | Protocol, integration requirements, verification scope and provenance |
-| `online_subtask/provenance/` | Source mappings, hashes and release evidence supplied with this archive |
-
-Full GPU execution additionally needs the original compatible OpenPI/SDK
-sources, trained checkpoint and EMA export, normalizer, parent configuration,
-tokenizer assets, layout data and genuine training/data-audit/binding evidence.
-Their identity checks remain enforced. Paths alone cannot recreate missing
-assets or authorize a new machine binding. Follow the
-[integration requirements](online_subtask/docs/integration.md) before adapting
-the runtime.
-
-`prepare_policy.py` is a retained historical CPU preparation tool.
-`prepare_native_sim.py` retains a seed0 pilot interface that is not a current
-50-case launcher. Neither is a complete quickstart for this configuration.
-Machine-specific queues, recovery supervisors and web/video publishers are not
-part of this archive's public runtime startup flow. The separate GT-trajectory
-offline SSR annotation experiment is outside this archive.
-
-Weights, datasets, trajectory images/videos, raw API responses, private reasoning,
-credentials and operational host/process logs are not distributed here.
-See [provenance](online_subtask/docs/provenance.md) and
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for source and licensing scope.
-No new license is assigned to the experiment-specific code by this archive.
+CPU验证需NumPy、Pillow；视频测试还需ffmpeg/ffprobe。完整套件仅访问临时127.0.0.1 HTTP服务。
+~~~sh
+python -E -B online_subtask/tests/run_cpu_tests.py --report /tmp/stack_bowls_cpu.json
+python -E -B tools/verify_archive.py
+python -E -B online_subtask/runtime/native_cpu_smoke.py
+~~~
+可用 --exclude-http 排除回环HTTP测试；缺少ffmpeg时视频测试明确跳过。
+合成fixture和CPU合约验证不证明真实模型识别或动作跟随正确。
+仓库不含权重、SDK资产、密钥、真实API请求或视频；依赖已有环境与合法GPU分配。
+本代码不做GPU预约或synthetic parking。

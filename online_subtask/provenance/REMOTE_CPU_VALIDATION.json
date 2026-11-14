@@ -1,0 +1,25 @@
+{
+  "schema": "ecot.stack_bowls.actual_remote_CPU_validation.v1",
+  "checked_at_UTC": "2026-11-14T01:04:11.419412+00:00",
+  "host": "h20-6",
+  "training_check": {
+    "passed": true,
+    "step": 10000,
+    "inference_params": "EMA",
+    "source_training_eval_ecot": false,
+    "file_count": 49,
+    "full_parameter_hashes_verified": false
+  },
+  "actual_SDK_check": {
+    "passed": true,
+    "existing_random_layouts": 30,
+    "selected_layout": 0,
+    "original_SDK_action_limit": 800,
+    "private_RPC_timeout_seconds": 2100,
+    "manifest_sha256": "42a0fc51805060cc68a6f5eb9e85cc9e58c8674547a9a38ff51b244f0158929f",
+    "temporary_private_namespace_created_and_cleaned": true,
+    "shared_SDK_modified": false
+  },
+  "API_GPU_native_started": false,
+  "scope": "Actual training/source/normalizer/seal metadata and actual SDK/private CPU preparation; not actual inference or simulation acceptance"
+}

@@ -1,103 +1,124 @@
-"""ISOLATED A5000 expanded288 online8 hard-grouping DeepSeek/Codex case."""
+"""Stack Bowls EMA10000 online Subtask policy, exact original training formatter."""
 from __future__ import annotations
 import argparse
 import asyncio
 from copy import deepcopy
 import hashlib
 import json
+import os
 from pathlib import Path
 import sys
 import time
 import numpy as np
-from export_binding import read,validate_binding,VARIANTS
-
-
-def initialize_paths(parent):
-    parent=Path(parent)
-    sys.path[:0]=[str(Path(__file__).resolve().parent),str(parent/'src'),str(parent/'evaluation_native')]
+from export_binding import read, validate_binding, canonical_sha
+from task_contract import (TASK, TRAIN_TASK, INSTRUCTION, CHECKPOINT_STEP, VARIANT,
+                           PROTOCOL_CONFIG_ID, OUTPUT_NAMESPACE, compose_prompt)
 
 
 def validate_protocol_spec(spec):
-    """Validate the actual prepared model configuration before model loading."""
-    from multiview_protocol import PROTOCOLS,CATALOG_SHA,PROTOCOL_CONFIG_ID
-    protocol_mode=spec.get('protocol_mode')
-    if (spec.get('ablation_variant')!='A_subtask_online' or spec.get('isolated_multiview_probe')is not True or protocol_mode!='expanded_catalog_id'
-            or spec.get('catalog_sha256')!=CATALOG_SHA
-            or spec.get('generator_protocol')!=PROTOCOLS[protocol_mode]
-            or 'seed1_native50_mainhistory93_65536_20261113_v1'not in Path(spec['audit_path']).parts
-            or spec.get('executed_subtask_history_enabled')is not True
-            or spec.get('executed_history_protocol')!='ecot.actual_executed_subtask_history.v1'
-            or spec.get('config_id')!=PROTOCOL_CONFIG_ID or spec.get('protocol_config_id')!=PROTOCOL_CONFIG_ID or spec.get('max_tokens')!=65536
-            or spec.get('past_history_cameras')!=['cam_high']or spec.get('maximum_total_images')!=96
-            or spec.get('maximum_past_timepoints')!=93
-            or spec.get('selector_timeout_seconds')!=600 or spec.get('selector_retry_budget_seconds')!=1850
-            or spec.get('policy_rpc_timeout_seconds')!=2100
-            or spec.get('step')!=5000):
-        raise ValueError('Only isolated A5000 multiview/history mode and new namespace admitted')
-    return {'config_id':PROTOCOL_CONFIG_ID,'maximum_past_timepoints':93,'maximum_total_images':96}
+    from multiview_protocol import PROTOCOLS, CATALOG_SHA
+    expected = {
+        'task': TASK, 'training_task': TRAIN_TASK, 'variant': VARIANT,
+        'condition': 'online_subtask', 'effective_eval_ecot': True,
+        'source_training_eval_ecot': False, 'step': CHECKPOINT_STEP,
+        'noise_seed': 42, 'instruction': INSTRUCTION, 'provider': 'deepseek',
+        'protocol_mode': 'expanded_catalog_id', 'catalog_sha256': CATALOG_SHA,
+        'generator_protocol': PROTOCOLS['expanded_catalog_id'],
+        'config_id': PROTOCOL_CONFIG_ID, 'protocol_config_id': PROTOCOL_CONFIG_ID,
+        'max_tokens': 65536, 'past_history_cameras': ['cam_high'],
+        'maximum_total_images': 96, 'maximum_past_timepoints': 93,
+        'selector_timeout_seconds': 600, 'selector_retry_budget_seconds': 1850,
+        'policy_rpc_timeout_seconds': 2100, 'cadence_execution_frames': 8,
+        'executed_subtask_history_enabled': True,
+        'executed_history_protocol': 'ecot.actual_executed_subtask_history.v1',
+    }
+    if any(spec.get(k) != v for k, v in expected.items()):
+        raise ValueError('Exact Stack Bowls Random/EMA10000 online protocol required')
+    if OUTPUT_NAMESPACE not in Path(spec['audit_path']).parts:
+        raise ValueError('New isolated Stack Bowls output namespace required')
+    from import_contract import validate_policy_environment
+    environment = validate_policy_environment(spec.get('policy_environment', {}))
+    if spec.get('policy_environment_sha256', canonical_sha({})) != canonical_sha(environment):
+        raise ValueError('Policy process library/compiler environment differs')
+    return {'config_id': PROTOCOL_CONFIG_ID, 'maximum_past_timepoints': 93,
+            'maximum_total_images': 96}
 
 
-def create_model(spec,policy=None,jax_module=None,provider=None):
-    initialize_paths(spec['parent_root'])
-    from pi05_policy.native_model import Model as NativeModel,to_commands,encode_obs
-    from support.task_contract import INSTRUCTION
-    from subtask_data import compose_prompt
-    variant=spec.get('ablation_variant');online=variant=='A_subtask_online'
-    from multiview_protocol import PROTOCOLS,CAMERAS,SubtaskAbstention,PROTOCOL_CONFIG_ID
-    protocol_mode=spec.get('protocol_mode')
+def create_model(spec, policy=None, jax_module=None, provider=None, training_prompt_formatter=None):
+    from pi05_policy.native_model import Model as NativeModel, to_commands, encode_obs
+    from multiview_protocol import PROTOCOLS, CAMERAS, SubtaskAbstention
     validate_protocol_spec(spec)
-    condition='online_subtask'if online else'task_only'
-    if (variant not in VARIANTS or spec.get('condition')!=condition or spec.get('effective_eval_ecot')is not online
-            or spec.get('noise_seed')!=42 or spec.get('instruction')!=INSTRUCTION):
-        raise ValueError('Exact own runtime/noise42/Instruction condition required')
-    binding=read(spec['export_binding']);validate_binding(binding,full_hashes=False)
-    if(spec.get('step')!=binding['step']or variant!=binding['ablation_variant']
-            or binding['training_identity'].get('eval_ecot')is not online
-            or binding['training_identity'].get('train_ecot')is not True):
-        raise ValueError('Actual own step/variant/training identity differs')
-    if online:
-        if spec.get('provider')not in ('deepseek','codex'):raise ValueError('Explicit DeepSeek/Codex selector required')
-        if provider is None:
-            from multiview_provider import MultiviewHistoryProvider
-            provider=MultiviewHistoryProvider(Path(spec['audit_path']).parent/'subtask_requests',
-                selector_kind=spec['provider'],relay_url=spec.get('relay_url','http://127.0.0.1:28782/select'),timeout_seconds=spec['selector_timeout_seconds'])
-    elif spec.get('provider')is not None or provider is not None:
-        raise ValueError('B must not instantiate or supply an ECoT provider')
+    binding = read(spec['export_binding'])
+    validate_binding(binding, full_hashes=False)
+    if (binding['step'] != CHECKPOINT_STEP or binding['variant'] != VARIANT
+            or binding['parent_root'] != str(Path(spec['parent_root']).resolve())
+            or binding['training_identity'].get('eval_ecot') is not False
+            or binding['training_identity'].get('train_ecot') is not True):
+        raise ValueError('Genuine Stack Bowls training identity differs; do not rewrite it')
+    online, variant, protocol_mode = True, VARIANT, 'expanded_catalog_id'
+    condition = 'online_subtask'
+    if provider is None:
+        from multiview_provider import MultiviewHistoryProvider
+        provider = MultiviewHistoryProvider(Path(spec['audit_path']).parent / 'subtask_requests',
+                                            selector_kind='deepseek',
+                                            timeout_seconds=spec['selector_timeout_seconds'])
     if policy is None:
+        if training_prompt_formatter is not None:
+            raise ValueError('Production formatting must come from the bound training source')
+        from import_contract import validate_policy_environment
+        if spec.get('runtime_import_contract', {}).get('parent_root') != binding['parent_root']:
+            raise ValueError('Source-bound training imports required; prepare the policy on this host')
+        os.environ.update(validate_policy_environment(spec.get('policy_environment', {})))
+        os.environ['OPENPI_DATA_HOME'] = str(Path(binding['parent_root']) / 'cache/openpi')
+        os.environ['JAX_COMPILATION_CACHE_DIR'] = str(Path(spec['audit_path']).parent / 'cache/jax')
+        os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
+        from import_contract import activate
+        imports = activate(spec['runtime_import_contract'])
         import jax
         from openpi.models.pi0_config import Pi0Config
         from openpi.policies.policy_config import create_trained_policy
         from openpi.shared.normalize import load
         from openpi.training.config import TrainConfig
-        from strict_prompt import strict_aloha_config
-        cfg=TrainConfig(name='classify_two_variants_native100',
-            model=Pi0Config(pi05=True,action_horizon=50,action_dim=32,
-                           max_token_len=binding['training_identity']['max_token_len']),
-            data=strict_aloha_config(repo_id=None,adapt_to_pi=False,use_delta_joint_actions=True))
-        policy=create_trained_policy(cfg,Path(binding['export_path']),
-            norm_stats=load(Path(binding['norm_stats_path']).parent),sample_kwargs={'num_steps':10})
-        jax_module=jax
-    if jax_module is None:raise ValueError('Actual JAX RNG implementation required')
-    metadata={'schema':'classify_subtask_mainhist93_tok65536_runtime_v1','protocol_config_id':PROTOCOL_CONFIG_ID,
-        'source_export_binding_sha256':binding['binding_sha256'],'source_export_path':binding['export_path'],
-        'step':binding['step'],'inference_params':binding['inference_params'],
-        'planned_eval_ecot':online,'effective_eval_ecot':online,'source_training_eval_ecot':online,
-        'ablation_variant':variant,'parameter_item_tree_sha256':binding['parameter_item_tree_sha256'],
-        'runtime_condition':condition,'provider_process_count':0,'reasoner_process_count':0,
-        'provider_kind':spec['provider']+'_mainhist93_tok65536','provider_in_policy_process':online,
-        'generator_protocol':PROTOCOLS[protocol_mode],'protocol_mode':protocol_mode,
-        'catalog_episode':spec.get('catalog_episode'),'catalog_sha256':spec.get('catalog_sha256'),
-        'selector_first_empty_basket_planning_rule':True,'fixed_catalog_profile':'all_training_color_expanded288',
-        'isolated_multiview_probe':True,'generator_current3RGB':True,'generator_history':True,'generator_measured_state14':True,'history_max_total_images':96,'history_source_frame_rule':'floor(2.5*k)','history_views_per_point':1,'captured_history_views_per_point':3,'past_history_cameras':['cam_high'],
-        'max_tokens':65536,'selector_timeout_seconds':600,'selector_retry_budget_seconds':1850,'policy_rpc_timeout_seconds':2100,
-        'generator_actual_executed_subtask_history':True,'executed_history_max_past_records':137,
-        'generator_reference':False,'external_selector_relay':spec.get('relay_url')if spec['provider']=='codex'else None,'generator_full_training_video_reference':False,
-        'policy_history':False,'policy_image_history':False,
-        'policy_uses_only_current3RGB_state14_and_composed_prompt':True,
-        'predict_steps':50,'execute_steps':8,'flow_steps':10,'noise_seed':42,
-        'raw_camera_resolution':[640,480],'state_dim':14,'history':False,'image_history':False,
-        'task':'classify_objects','instruction':INSTRUCTION,'cadence_execution_frames':8,'category_basket_rule_explicit':True,'context_injected':online,
-        'context_fields':['subtask']if online else[]}
+        from strict_prompt import strict_aloha_config, compose_training_prompt
+        training_prompt_formatter = compose_training_prompt
+        cfg = TrainConfig(name='stack_bowls100_subtask_ema10000_random_online',
+                          model=Pi0Config(pi05=True, action_horizon=50, action_dim=32,
+                                         max_token_len=binding['training_identity']['max_token_len']),
+                          data=strict_aloha_config(repo_id=None, adapt_to_pi=False,
+                                                   use_delta_joint_actions=True))
+        policy = create_trained_policy(cfg, Path(binding['export_path']),
+                                       norm_stats=load(Path(binding['norm_stats_path']).parent),
+                                       sample_kwargs={'num_steps': 10})
+        jax_module = jax
+    else:
+        if training_prompt_formatter is None:
+            raise ValueError('An injected CPU fixture must provide its explicit training formatter')
+        imports = {'scope': 'Explicit injected CPU fixture; not production source acceptance'}
+    if jax_module is None:
+        raise ValueError('Actual JAX RNG implementation required')
+    metadata = {
+        'schema': 'ecot.stack_bowls_random.online_subtask.runtime.v1',
+        'protocol_config_id': PROTOCOL_CONFIG_ID, 'task': TASK, 'training_task': TRAIN_TASK,
+        'instruction': INSTRUCTION, 'variant': VARIANT,
+        'source_export_binding_sha256': binding['binding_sha256'],
+        'source_export_path': binding['export_path'], 'step': CHECKPOINT_STEP,
+        'inference_params': 'EMA', 'source_training_eval_ecot': False,
+        'planned_eval_ecot': True, 'effective_eval_ecot': True,
+        'parameter_item_tree_sha256': binding['parameter_item_tree_sha256'],
+        'runtime_condition': condition, 'provider_kind': 'deepseek_mainhist93_tok65536',
+        'generator_protocol': PROTOCOLS[protocol_mode], 'catalog_sha256': spec['catalog_sha256'],
+        'context_fields': ['subtask'], 'context_injected': True,
+        'generator_current3RGB': True, 'generator_measured_state14': True,
+        'generator_actual_executed_subtask_history': True, 'generator_reference': False,
+        'generator_full_training_video_reference': False,
+        'policy_history': False, 'policy_image_history': False,
+        'policy_uses_only_current3RGB_state14_and_composed_prompt': True,
+        'predict_steps': 50, 'execute_steps': 8, 'flow_steps': 10, 'noise_seed': 42,
+        'state_dim': 14, 'raw_camera_resolution': [640, 480], 'cadence_execution_frames': 8,
+        'SDK_action_limit': 800, 'max_tokens': 65536,
+        'runtime_import_validation': imports,
+        'policy_environment_sha256': canonical_sha(spec.get('policy_environment', {})),
+    }
 
     class RuntimeModel(NativeModel):
         def __init__(self):
@@ -171,7 +192,7 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
                     raise
                 validate_context(context)
                 prompt=compose_prompt(INSTRUCTION,context['subtask'],True)
-                if prompt!=INSTRUCTION+' Current subtask: '+context['subtask']:
+                if prompt!=training_prompt_formatter(INSTRUCTION,canonical(context).decode()):
                     raise ValueError('Actual training/inference Subtask composition differs')
             actual={**self.current,'prompt':prompt}
             _,sample_rng=self._jax.random.split(self.policy._rng)
@@ -209,7 +230,7 @@ def create_model(spec,policy=None,jax_module=None,provider=None):
 def main():
     p=argparse.ArgumentParser();p.add_argument('--config',type=Path,required=True)
     p.add_argument('--port',type=int,required=True);p.add_argument('--ready-output',type=Path,required=True)
-    args=p.parse_args();spec=read(args.config);initialize_paths(spec['parent_root']);model=create_model(spec)
+    args=p.parse_args();spec=read(args.config);model=create_model(spec)
     from client_server.ws.model_server import PolicyServer,PolicyServerConfig
     server=PolicyServer(model,PolicyServerConfig(host='127.0.0.1',port=args.port,ws_ping_interval_s=20,ws_ping_timeout_s=2100))
     async def run():

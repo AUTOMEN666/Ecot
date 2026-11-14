@@ -4,6 +4,7 @@ import json,os,time,urllib.error,urllib.request
 from pathlib import Path
 from uuid import uuid4
 from executed_history import ExecutedSubtaskHistory,digest
+from task_contract import INSTRUCTION
 from multiview_protocol import (CAMERAS,CATALOG_SHA,PROTOCOLS,build_request,canonical,load_catalog,resolve,sha,strict_json,make_history_point,history_source_frame,HTTP_TIMEOUT_SECONDS,RETRY_BUDGET_SECONDS)
 
 DEEPSEEK_MODEL='deepseek-v4-1-flash-261017'
@@ -38,7 +39,7 @@ class MultiviewHistoryProvider:
     def capture_history(self,pngs,instruction,*,state14,episode_id,frame):
         if episode_id!=self.episode_id:raise ValueError('History RPC needs same actual episode reset')
         if frame!=history_source_frame(len(self.frames)):raise ValueError('History must capture every actual floor(2.5*k) boundary once')
-        if instruction!='Sort the objects by category into the three baskets.':raise ValueError('Original Instruction required')
+        if instruction!=INSTRUCTION:raise ValueError('Original Instruction required')
         point=make_history_point(episode_id,frame,state14,pngs)
         folder=self.output_dir/'history_captures'/episode_id;folder.mkdir(parents=True,exist_ok=True)
         views={}

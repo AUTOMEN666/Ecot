@@ -1,83 +1,26 @@
-# Verification scope
+# 验证范围
 
-## Packaged checkout
+CPU套件保留源分支7模块并按叠碗更新，加入任务、实际导入来源、布局、证据与视频检查。
+最新46项全部通过，0失败、0错误、0跳过，见../provenance/cpu_validation.json。
+测试中的合成fixture不是实际API/GPU/native接入证据。
 
-The release owner ran the complete suite from a copied checkout outside the
-original experiment workspace, using `python3 -E -B` with Python3.9.6 and
-NumPy2.0.2. All31 checks passed, including3 loopback HTTP tests, with0 failures,
-0 errors and0 skips. The original workspace was absent from the test import
-path. This is separate from the observed deployed policy environment
-(Python3.11.17/NumPy1.26.4) and makes no GPU-environment equivalence claim.
+覆盖因果图片/State匹配、93+3均匀历史、792帧99条执行历史、ACK后入记忆、
+失败重试隔离、reset、RNG不变、私有RPC等待参数、回环HTTP超时/子进程回收、
+真实训练formatter调用与不一致拒绝、实际模块来源/缓存外来模块拒绝、
+原训练身份/EMA/step限制、Random30/source SHA/私有SDK、全场景冻结、800与拒绝128、
+实际文本边界、完整视频解码、缺失/伪造ACK与中断拒绝、30回合统计准入。
 
-| Check | Packaged-checkout result |
-|---|---|
-| Preserved-source map verification |48 mapped sources passed;47 retain original bytes, one test-only fixture path adaptation |
-| CPU behavior suite, including3 loopback HTTP checks |31 passed;0 failures/errors/skips in the separate copied checkout |
-| No implicit original workspace/history dependency | Original workspace absent from the successful test import path; old prompt is an explicit package fixture |
-| Public file list and secret/data exclusions | Independently reviewed; no blocking findings, credential literals or excluded data found by the documented scan |
-| Complete file inventory / clean committed clone / extracted ZIP checks | Passed on the preserved source candidate; every tracked file matched, and the extracted ZIP passed all31 CPU tests |
-| External software/version provenance | Observed versions and selected source hashes recorded; unknown upstream commits remain unpinned |
-| New API/GPU/native execution from this archive | Not performed by the documentation/packaging checks |
+H20-6已只读核对真实EMA10000、训练源码/norm/manifest/seal和49文件清单。
+源eval_ecot=false保持不变；这不是正式checkpoint全tensor恢复验收。
+实际SDK的Random30私有CPU准备亦已通过；早期收据见REMOTE_CPU_VALIDATION.json。
 
-The [source map](../provenance/SOURCE_MAP.json) records each original/destination
-hash and the sole test adaptation. Recheck it with:
+用户随后授权环境检查与H20修复。A800两节点有限seed42 JAX HIGHEST/Torch CUDA核函数通过；
+HIGHEST只用于数值核验，没有改变策略精度。H20修复显式策略库路径后核函数通过，
+私有SDK改正旧support导入后，实际scene1/layout0原生reset、300步稳定性、
+零物理推进的三路640×480 RGB采集均通过，图像已收回目视检查。
+共享SDK/环境、物理/奖励规则和已有任务未修改。原失败与新通过收据分别保留。
 
-```sh
-python -B tools/verify_archive.py
-```
-
-The [delivery validation](../provenance/delivery_validation.json) identifies the
-candidate commit used for the clean-clone, extracted-ZIP and deterministic
-rebuild checks. Runtime, tests, configurations and archive utilities remain the
-same bytes as that tested candidate; the later changes finalize documentation
-and evidence only. Final delivery commit/ZIP identities are recorded separately
-in the PR and the ZIP's adjacent checksum/manifest, avoiding a self-referential
-archive checksum. The copied-checkout result and delivery checks are distinct.
-
-## CPU commands and meaning
-
-From the repository root, with NumPy installed:
-
-```sh
-python -B -m unittest discover -s online_subtask/runtime -p 'test_*.py' -v
-python -E -B online_subtask/tests/run_cpu_tests.py
-```
-
-`-E` ignores inherited Python environment settings, including `PYTHONPATH`.
-`-I` may replace `-E` when NumPy is installed in the interpreter's regular
-site-packages; it hides user-site packages. A fresh virtual environment avoids
-that ambiguity. Isolation verification must also use a copied checkout outside
-the original experiment workspace.
-
-The full existing suite has31 checks. Three local HTTP transport tests require
-permission to bind a temporary loopback port. The runner's `--exclude-http`
-option is a deliberately partial28-check diagnostic, not a substitute for the
-full suite. A loopback permission error is an environment restriction, not a
-passing HTTP test. No test requires a real API key or external model call.
-
-The tests cover strict ID/JSON behavior, causal image sampling, prompt
-compatibility, bounded local HTTP behavior and actual-execution-history
-contracts, including runtime integration with mocked policy/JAX/transport/parent
-dependencies. These mocks do not load the real EMA checkpoint or simulate a
-real native episode. `native_cpu_smoke.py` is a separate asset-dependent tool
-that imports actual model dependencies; it is not part of the minimal NumPy
-test promise.
-
-## Historical source and deployment evidence
-
-Before packaging, the original frozen source manifest's77 entries were
-independently checked. Existing workspace CPU coverage comprised28 direct
-checks plus3 HTTP checks rerun where local loopback binding was permitted.
-Those are source/workspace facts, not packaged-checkout test results.
-
-Historical deployment receipts recorded generation before inference on selected
-frame0/8 inputs, real first8-action ACKs with next-request executed history, and
-actual acceptance of the maximum96-image request. Sanitized provenance may
-summarize that evidence. Reading a receipt is not a fresh API/GPU execution, a
-complete50-case result, a semantic-quality pass or validation of every external
-asset on a new machine.
-
-A complete reproduction claim additionally requires the genuine checkpoint,
-normalizer, training/data-audit bindings, exact software/SDK sources, same layout
-data, actual execution/ACK evidence and original SDK outcomes. Real rollout
-quality and synchronized videos are distinct from CPU/source verification.
+上述GPU/原生初始化不包含策略权重加载、DeepSeek调用或完整在线ECoT回合，不能作为正式30回合准入。
+两台A800本次采样未见运行中的64路GPU进程；没有完成64并发容量验收。
+真实策略加载、完整在线单回合工程验收及正式30回合仍需分别执行与审核。
+Prompt连续性不能保证LLM识别、跟踪或动作遵循正确。

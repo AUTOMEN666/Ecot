@@ -16,7 +16,7 @@ import unittest
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--exclude-http', action='store_true',
-                        help='Run28 tests without the3 loopback HTTP transport tests.')
+                        help='Exclude loopback HTTP transport fixtures.')
     parser.add_argument('--report', type=Path, help='Optional JSON receipt path; no env/credentials captured.')
     args = parser.parse_args()
     runtime = Path(__file__).resolve().parents[1] / 'runtime'
@@ -24,8 +24,8 @@ def main():
     sys.path.insert(0, str(runtime))
     modules = [path.stem for path in sorted(runtime.glob('test_*.py'))
                if not (args.exclude_http and path.stem == 'test_http_transport')]
-    if len(modules) != (6 if args.exclude_http else 7):
-        raise ValueError('Expected exact preserved7-module CPU suite')
+    if len(modules) < (6 if args.exclude_http else 7):
+        raise ValueError('Missing inherited CPU suite modules')
     suite = unittest.TestLoader().loadTestsFromNames(modules)
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     receipt = dict(schema='ecot.online_subtask.archive.cpu_test_run.v1',

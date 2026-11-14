@@ -1,70 +1,82 @@
-Select exactly one macro-level Subtask ID from the supplied 288-candidate
-catalogue for the complete Instruction: sort the objects by category into
-the three baskets.
+Select exactly one object-centered Subtask ID from the supplied Stack Bowls
+training-text catalogue for the complete Instruction:
+Stack the three bowls together.
 
 INPUT EVIDENCE
 You receive current main, left-wrist and right-wrist RGB views with measured
 State14, plus up to93 uniformly sampled strictly past MAIN-camera RGB views
-and their State14 (at most96 images total). Past wrist-camera images are not
-included; left-wrist and right-wrist views are provided only for the current
-observation.
+and their State14 (at most96 images total). Only the current observation has
+wrist views. All images are current or strictly past within this episode.
+There are no future images, expert actions, test labels or completion truth.
 
-You also receive the complete chronological history of Subtasks actually
-injected and followed by executed actions in THIS episode. Each record
-contains its observation frame, exact ID, exact candidate text and executed
-action range. The latest executed record is identified explicitly. The first
-request has empty history. Failed requests, retries and unexecuted proposals
-are excluded. These records describe past instructions, not verified object
-identities, successful placements or completed goals.
+The chronological executed Subtask history contains exact IDs, original texts,
+observation frames and actual executed action ranges, committed only after
+execution acknowledgement. Failed requests and unexecuted proposals are absent.
+An earlier instruction is NOT evidence that its goal was achieved. State14
+contains measured robot joints and grippers, not object identity, contact truth
+or Cartesian motion directions. Do not infer gripper sign conventions.
 
-DECISION PRIORITIES
-1. Ground the current goal in the actual observations. Use wrist views to
-   identify objects in the grippers and the main view for scene context and
-   baskets. Do not replace a held object with a nearby table object merely
-   because the arm passes near it. Robot parts are not task objects.
+STACKING TASK
+Identify the three task bowls from the observations. Random-setting bowl models
+may differ in appearance from training, and there are distracting objects.
+Do not manipulate a distractor or substitute a robot part for a bowl. Use main
+view for bowl/stack relationships and wrists for grasp, support and release
+evidence. Use an unchanged catalogue sentence appropriate to this actual scene;
+do not invent a color or geometric relation just to fit a sentence.
 
-2. Compare current observations with the latest executed goal and the earlier
-   history. A goal concerns the same PHYSICAL OBJECT INSTANCE and destination
-   basket. If that goal continues and observations do not contradict it,
-   return EXACTLY its previous ID. Preserve that ID through approach, grasp,
-   lift, carry, alignment and release. Do not alternate between equivalent
-   descriptions merely to rephrase it. Temporary occlusion or a changed
-   viewpoint is insufficient reason to switch. Earlier text is a fallible
-   continuity cue; clear visual evidence takes priority over repeated text.
+Keep one physical bowl instance, intended support bowl or existing stack, and
+the selected ID/text while that Subtask remains unfinished. Temporary occlusion,
+viewpoint changes, arm motion or eight elapsed actions do not justify switching
+goals or rephrasing. A left/right/center description anchors the instance when
+selected; if that bowl is subsequently moved, do not silently transfer the goal
+to another bowl now occupying that position. In particular, do not keep selecting
+the other currently rightmost bowl after the selected rightmost bowl is grasped.
 
-3. If clear observations contradict an earlier object identification or
-   destination, correct the ID. Do not retain a known error for consistency.
-   A correction or a switch does not prove the preceding goal was completed.
-   A dropped object or failed placement remains unfinished and may need
-   recovery; do not silently count it as sorted.
+COMPLETION IS SPECIFIC TO THE ORIGINAL SUBTASK TEXT
+- A pickup-only instruction such as 'Pick up the rightmost bowl.' finishes when
+  that SAME bowl is visibly secured and lifted clear of its support. Approaching,
+  closing the gripper, contact or an ambiguous hidden grasp alone is insufficient.
+  After a supported pickup, select a compatible placement/stacking instruction
+  for the held bowl. Do not wait for the entire three-bowl task to finish before
+  leaving a pickup-only Subtask.
+- A placement/stacking instruction finishes when that SAME bowl is aligned with
+  the intended support bowl/stack, visibly supported or nested there, and the
+  gripper has released/disengaged without the bowl falling away. Hovering above
+  a bowl, carrying it or opening away from the intended support is insufficient.
+- A combined pickup-and-stack sentence requires both phases; a successful pickup
+  alone does not complete it. A retreat/reset sentence concerns withdrawal from
+  the completed manipulation, not a new grasp.
 
-4. Infer completion for the PARTICULAR object from visible placement/release,
-   or consistent before-and-after evidence that it remains inside the intended
-   basket after the gripper disengages. An old instruction, elapsed actions,
-   an ID change, a grasp, or hovering over a basket is not completion. Another
-   similar object already inside the basket does not complete the currently
-   manipulated instance. If evidence is insufficient, leave completion
-   unconfirmed rather than inventing it.
+During an unfinished Subtask, preserve its physical goal through approach,
+grasping, lifting, carrying, alignment and release as applicable to that text.
+Do not generate a new micro-motion instruction every replan. Maintain the
+existing support stack when placing the next bowl; do not break a visibly valid
+stack merely to change ordering. A two-bowl stack does not complete a three-bowl
+task. Use actual visible support/release and consistent before-and-after evidence,
+not elapsed time or text history, to decide whether to advance.
 
-5. After supported completion, select a visible unfinished object and a
-   compatible destination. Candidate IDs identify wording, not unique object
-   instances: another identical-looking object can legitimately use the SAME
-   ID. Completing one does not complete every matching object. Initial freedom
-   to choose an empty compatible basket applies to selecting a new goal; it
-   does not authorize choosing a different basket at each update of that goal.
+Once all three bowls are visibly stacked, preserve that stack and select the
+supported release-and-retract instruction while withdrawing the arms. Do not
+restart a pickup or disturb the completed stack merely because the simulator
+has not terminated yet. Native success also requires the robot to return to
+its original posture; keep any already released gripper clear of the stack.
+Use only visible evidence and measured past/current robot state, not hidden
+scene labels, to guide withdrawal. The simulator alone decides final success.
 
-CATEGORY AND BASKET CONSISTENCY
-All objects of the same category belong in the same basket; different
-categories must not share a basket. Object color does not change category.
-Use observed, non-conflicting placements to maintain category-to-basket
-assignments. Intended destinations in textual history do not establish an
-assignment. A past placement may itself be mistaken; do not treat conflicting
-or mixed contents as proof that the original sorting goal has been satisfied.
-State14 supplies measured robot state, not object identity or placement truth.
+If a bowl slips, is dropped or a placement fails, do not count it as completed.
+Continue or select a supported recovery instruction for that same goal. Clear
+visual evidence may correct a previously mistaken instance/support identification;
+consistency never requires preserving a known error. A correction or ID switch
+does not retroactively mark the preceding goal complete. Identical-looking bowls
+remain distinct physical instances and may legitimately share catalogue wording.
+
+The catalogue is a vocabulary of original training Subtasks, not a test plan or
+test ground truth. Do not output Summary, Reasoning, coordinates, future actions,
+hidden scene labels or a success/termination decision. Episode success and
+termination are exclusively the native simulator's responsibility.
 
 OUTPUT CONTRACT
 Return ONLY JSON {"subtask_id":"one listed ID"}.
-Return exactly one valid catalogue ID. No extra fields, new text, Summary,
-Reasoning, completion list, null or NO_MATCH. If no candidate fits perfectly,
-select the closest supported candidate. The program copies that candidate's
-text unchanged. Never output an ID that is absent from the supplied catalogue.
+Select one supported listed ID and copy no new text into the response. No extra
+keys, null, NO_MATCH, Markdown or unlisted IDs. The host resolves the ID to its
+exact original training sentence without rewriting, semantic retries or fallback.
