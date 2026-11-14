@@ -1,255 +1,276 @@
-"""Own-run native Orbax inference binding; no historical evaluation receipt.
+"""Bind the approved Stack Bowls100 EMA10000 without rewriting training identity.
 
-The native checkpoint's params item contains the EMA exported by save_state.
-The full train_state stays untouched. Every payload and application identity is
-sealed before sampling and checked again after it. This is not a restore test.
-
-The trainer atomically rewrites three descriptive run JSON files on resume.
-Their original sealed byte hashes always remain mandatory; only their stat
-fingerprints may differ. All checkpoint, source and other files remain strict.
+Read-only preparation hashes inference payloads against the independently sealed
+formal checkpoint. No weights are exported, restored, recast or mutated here.
+The original training eval_ecot=False is preserved; new evaluation is online.
 """
 from __future__ import annotations
 import hashlib
-import importlib.util
 import json
 import math
 from pathlib import Path
 import stat
-import sys
 import time
+from task_contract import (TRAIN_TASK, INSTRUCTION, CHECKPOINT_STEP, TRAINING_BUDGET,
+                           VARIANT, DATASET_MANIFEST_SHA, CONTEXT_CACHE_SHA, NORM_SHA,
+                           INVENTORY_SHA, CHECKPOINT_SEAL_SHA)
 
-SCHEMA = 'pi05_classify_two_variants_20261112_native_ema_binding_v1'
-STEPS = (5000,10000,15000,20000)
-VARIANTS = ('A_subtask_online','B_ssr_dropout05_taskonly')
-EXPECTED = {name: STEPS for name in VARIANTS}
-FILE_VALIDATION_POLICY = 'exact_descriptive_run_metadata_content_only_v1'
+SCHEMA = 'ecot.stack_bowls100.ema10000.inference_binding.v1'
+STEPS = (CHECKPOINT_STEP,)
+VARIANTS = (VARIANT,)
+
 
 def sha(path):
-    h=hashlib.sha256()
-    with Path(path).open('rb') as f:
-        for b in iter(lambda:f.read(8<<20),b''):h.update(b)
+    h = hashlib.sha256()
+    with Path(path).open('rb') as src:
+        for block in iter(lambda: src.read(8 << 20), b''):
+            h.update(block)
     return h.hexdigest()
 
+
 def canonical_sha(value):
-    return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'),
+                                    allow_nan=False).encode()).hexdigest()
+
 
 def read(path):
-    def unique(pairs):
-        result={}
-        for k,v in pairs:
-            if k in result:raise ValueError('Duplicate JSON key: '+k)
-            result[k]=v
-        return result
-    return json.loads(Path(path).read_text(),object_pairs_hook=unique,
-                      parse_constant=lambda x:(_ for _ in ()).throw(ValueError('Nonfinite JSON '+x)))
+    def pairs(items):
+        out = {}
+        for k, v in items:
+            if k in out:
+                raise ValueError('Duplicate JSON key')
+            out[k] = v
+        return out
+    return json.loads(Path(path).read_text(), object_pairs_hook=pairs,
+                      parse_constant=lambda value: (_ for _ in ()).throw(ValueError('Nonfinite JSON')))
+
 
 def fingerprint(path):
-    s=Path(path).stat()
-    return {k:getattr(s,k) for k in ('st_dev','st_ino','st_size','st_mtime_ns','st_ctime_ns')}
+    s = Path(path).stat()
+    return {k: getattr(s, k) for k in ('st_dev', 'st_ino', 'st_size', 'st_mtime_ns', 'st_ctime_ns')}
 
-def file_validation_policy(run):
-    """Derive the only stat exceptions from inspect's real spec output_dir.
-
-    This exact policy is reconstructed during every validation. A binding or
-    caller cannot mark a parameter/source/foreign path as descriptive metadata.
-    """
-    return {'scheme':FILE_VALIDATION_POLICY,
-        'content_only_metadata_paths':sorted(str(Path(run)/name)for name in
-            ('run_identity.json','resolved_config.json','fullparam_parameter_inventory.json')),
-        'metadata_sha256_always_verified':True,
-        'all_other_files':'sealed_stat_fingerprint_and_sha256_when_full_hashes_requested'}
 
 def regular_tree(path):
-    path=Path(path)
-    if path.is_symlink() or not path.is_dir():raise ValueError('Native params must be a real directory')
-    rows=[]
+    path = Path(path)
+    if path.is_symlink() or not path.is_dir():
+        raise ValueError('Regular committed parameter directory required')
+    out = []
     for p in sorted(path.rglob('*')):
-        mode=p.lstat().st_mode
-        if stat.S_ISREG(mode):rows.append(p)
-        elif not stat.S_ISDIR(mode):raise ValueError('Nonregular native parameter payload')
-    if not rows or not any(p.stat().st_size for p in rows):raise ValueError('Empty native parameter payload')
-    return rows
+        mode = p.lstat().st_mode
+        if stat.S_ISREG(mode):
+            out.append(p)
+        elif not stat.S_ISDIR(mode):
+            raise ValueError('Nonregular parameter payload')
+    if not out or not any(p.stat().st_size for p in out):
+        raise ValueError('Empty parameter payload')
+    return out
 
-def _contract(root):
-    sys.path.insert(0,str(root/'src'))
-    name='_eval_subtask_dropout05_training_contract'
-    spec=importlib.util.spec_from_file_location(name,root/'src/ablation_training_contract.py')
-    mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
-    return mod
 
 def validate_normalizer(path):
-    data=read(path)
-    if set(data)!= {'norm_stats'} or set(data['norm_stats'])!={'state','actions'}:
-        raise ValueError('Actual joint14 normalizer root differs')
-    for item in data['norm_stats'].values():
-        if set(item)!={'mean','std','q01','q99'}:raise ValueError('Missing actual normalizer vectors')
-        for values in item.values():
-            if (not isinstance(values,list)or len(values)!=14 or
-                    any(type(v)not in (int,float)or not math.isfinite(v)for v in values)):
-                raise ValueError('Nonfinite or wrong-dimensional normalizer')
-        if any(v<0 for v in item['std'])or any(a>b for a,b in zip(item['q01'],item['q99'])):
-            raise ValueError('Invalid standard deviation or quantile order')
-    return data
+    d = read(path)
+    if set(d) != {'norm_stats'} or set(d['norm_stats']) != {'state', 'actions'}:
+        raise ValueError('Exact joint14 normalizer required')
+    for item in d['norm_stats'].values():
+        if set(item) != {'mean', 'std', 'q01', 'q99'}:
+            raise ValueError('Missing normalizer arrays')
+        for row in item.values():
+            if (not isinstance(row, list) or len(row) != 14
+                    or any(type(x) not in (int, float) or not math.isfinite(x) for x in row)):
+                raise ValueError('Normalizer must contain finite14-vectors')
+        if any(x < 0 for x in item['std']) or any(a > b for a, b in zip(item['q01'], item['q99'])):
+            raise ValueError('Invalid normalizer statistics')
+    return d
 
-def validate_state_fingerprint(path,step):
-    """Bind trainer's actual saved raw/EMA/Adam leaf hashes, no huge rehash."""
-    data=read(path);leaves=data.get('leaves')
-    if not isinstance(leaves,list)or not leaves or canonical_sha(leaves)!=data.get('tree_sha256'):
-        raise ValueError('Saved full-state fingerprint tree is incomplete')
-    paths=[]
-    for row in leaves:
-        name=row.get('path');digest=row.get('sha256');shape=row.get('shape')
-        if (not isinstance(name,str)or not isinstance(digest,str)or len(digest)!=64 or
-                any(ch not in '0123456789abcdef'for ch in digest)or
-                not isinstance(shape,list)or any(type(n)is not int or n<0 for n in shape)):
-            raise ValueError('Invalid saved full-state fingerprint leaf')
-        paths.append(name)
-    if (len(paths)!=len(set(paths))or not any('.params' in p for p in paths)
-            or not any('.ema_params' in p for p in paths)or not any('.opt_state' in p for p in paths)):
-        raise ValueError('Saved raw parameters, EMA and optimizer fingerprints required')
-    step_rows=[r for r in leaves if r['path']=='.step']
-    if len(step_rows)!=1 or step_rows[0]['shape']!=[]:raise ValueError('Actual saved step leaf missing')
-    row=step_rows[0];dtype=row.get('dtype')
-    if dtype not in ('int32','int64','uint32','uint64'):raise ValueError('Saved step dtype changed')
-    width=4 if dtype.endswith('32')else 8
-    if hashlib.sha256(step.to_bytes(width,'little',signed=not dtype.startswith('u'))).hexdigest()!=row['sha256']:
-        raise ValueError('Full-state fingerprint actual step differs from metadata/config')
-    return data
 
-def inspect(config_path,step):
-    config_path=Path(config_path).resolve(strict=True);root=config_path.parent.parent
-    if config_path!=root/'configs/train.json':raise ValueError('Explicit variant configs/train.json required')
-    if type(step)is not int or step not in STEPS:raise ValueError('Only approved 5000/10000/15000/20000 EMA milestones')
-    spec=read(config_path);contract=_contract(root);contract.validate_spec(spec)
-    run=Path(spec['output_dir']).resolve(strict=True)
-    checkpoint=run/'checkpoints'/str(step)
-    if checkpoint.is_symlink() or checkpoint.resolve(strict=True)!=checkpoint:raise ValueError('Checkpoint namespace may not redirect')
-    identity=read(run/'run_identity.json');metadata=read(checkpoint/'resume_metadata.json')
-    if read(run/'resolved_config.json')!=spec or identity.get('config_sha256')!=canonical_sha(spec):
-        raise ValueError('Actual training config differs from evaluation config')
-    requirements={
-        'experiment_protocol':contract.PROTOCOL,'ablation_variant':spec['ablation_variant'],
-        'seed':42,'train_ecot':True,'eval_ecot':spec['eval_ecot'],'max_token_len':512,
-        'batch_size':32,'fsdp_devices':8,'full_parameter_finetuning':True,
-        'frozen_vlm':False,'train_samples':69562,'steps_per_epoch':2174,
-        'num_train_steps':43480,'training_end_step':20000,
-        'ecot_retained_fields':spec['ecot_retained_fields'],'ecot_variant':spec['ecot_variant'],
-        'prompt_version':spec['prompt_version'],'ecot_dropout_probability':spec['ecot_dropout_probability'],
-        'dropout_mode':spec['dropout_mode'],'dropout_seed':42,
-        'subtask_boundary_dropout':False,'subtask_action_mask':False,'episode_tail_mask':True,'text_ce_weight':0.0}
-    if spec.get('ablation_variant')not in VARIANTS:raise ValueError('Only the two new independent variants')
-    if any(identity.get(k)!=v for k,v in requirements.items()):raise ValueError('Actual own new training identity differs')
-    from subtask_data import MASK_SCHEME, MASK_DOMAIN
-    if (identity.get('ecot_dropout_mask_scheme')!=MASK_SCHEME or identity.get('ecot_dropout_mask_domain')!=list(MASK_DOMAIN)):
-        raise ValueError('Actual training condition mask algorithm differs')
-    if (metadata.get('identity')!=identity or metadata.get('completed_step')!=step
-            or metadata.get('inference_params')!='EMA'
-            or (metadata.get('epoch'),metadata.get('next_batch_in_epoch'))!=divmod(step,2174)):
-        raise ValueError('Checkpoint metadata actual step/EMA/sampler identity mismatch')
-    if identity.get('source_sha256')!=contract.source_hashes(root,spec):raise ValueError('Pinned training/native source changed')
-    cpu=contract.validate_preflight(root,spec)
-    if (identity.get('cpu_acceptance_sha256')!=sha(spec['preflight_cpu'])
-            or identity.get('official_base_params_tree_sha256')!=cpu['base_params_tree_sha256']):
-        raise ValueError('Own actual CPU/base identity differs')
-    norm=Path(spec['norm_dir'])/'norm_stats.json'
+def validate_training_metadata(spec, identity, metadata, step=CHECKPOINT_STEP):
+    if type(step) is not int or step != CHECKPOINT_STEP:
+        raise ValueError('Only approved EMA10000 is admitted')
+    expected_spec = {
+        'task_name': TRAIN_TASK, 'train_samples_expected': 44674, 'batch_size': 32,
+        'fsdp_devices': 8, 'seed': 42, 'warmup_steps': 200, 'peak_lr': 2.5e-5,
+        'ema_decay': .99, 'num_train_steps': TRAINING_BUDGET,
+        'ecot_variant': 'subtask', 'ecot_retained_fields': ['subtask'],
+        'ecot_dropout_probability': 0., 'train_ecot': True, 'eval_ecot': False,
+        'frozen_vlm': False, 'lora': False, 'max_token_len': 512,
+    }
+    if (any(spec.get(k) != v for k, v in expected_spec.items())
+            or spec.get('episode_indices') != list(range(3000, 3100))):
+        raise ValueError('Actual Stack Bowls100 Subtask-only training configuration differs')
+    expected_identity = {
+        'batch_size': 32, 'fsdp_devices': 8, 'seed': 42,
+        'full_parameter_finetuning': True, 'frozen_vlm': False,
+        'train_samples': 44674, 'steps_per_epoch': 1397,
+        'num_train_steps': 15000, 'train_ecot': True, 'eval_ecot': False,
+        'ecot_variant': 'subtask', 'ecot_retained_fields': ['subtask'],
+        'ecot_prompt_version': 'stack_bowls_subtask_only_natural_v1',
+        'dataset_manifest_sha256': DATASET_MANIFEST_SHA,
+        'ecot_context_cache_sha256': CONTEXT_CACHE_SHA, 'norm_sha256': NORM_SHA,
+        'parameter_inventory_sha256': INVENTORY_SHA, 'max_token_len': 512,
+    }
+    if any(identity.get(k) != v for k, v in expected_identity.items()):
+        raise ValueError('Genuine training identity differs; never relabel another checkpoint')
+    if identity.get('config_sha256') != canonical_sha(spec):
+        raise ValueError('Resolved training configuration changed')
+    if (metadata.get('identity') != identity or metadata.get('completed_step') != step
+            or metadata.get('inference_params') != 'EMA'
+            or (metadata.get('epoch'), metadata.get('next_batch_in_epoch')) != divmod(step, 1397)):
+        raise ValueError('Checkpoint actual step, EMA or sampler identity differs')
+    return True
+
+
+def inspect(config_path, step):
+    config_path = Path(config_path).resolve(strict=True)
+    root = config_path.parent.parent
+    if config_path != root / 'configs/train.json':
+        raise ValueError('Actual parent configs/train.json required')
+    spec = read(config_path)
+    run = Path(spec['output_dir']).resolve(strict=True)
+    checkpoint = run / 'checkpoints' / str(step)
+    if checkpoint.is_symlink() or checkpoint.resolve(strict=True) != checkpoint:
+        raise ValueError('Checkpoint may not redirect')
+    identity_path = run / 'run_identity.json'
+    identity = read(identity_path)
+    metadata = read(checkpoint / 'resume_metadata.json')
+    validate_training_metadata(spec, identity, metadata, step)
+    if read(run / 'resolved_config.json') != spec:
+        raise ValueError('Saved training configuration differs')
+
+    commit = read(checkpoint / '_CHECKPOINT_METADATA')
+    if (not commit.get('commit_timestamp_nsecs')
+            or commit['commit_timestamp_nsecs'] < commit['init_timestamp_nsecs']
+            or set(commit.get('item_handlers', {})) != {'assets', 'params', 'train_state'}):
+        raise ValueError('Native checkpoint is not fully committed')
+    seal_path = root / 'reports/continuous_monitor/checkpoints/10000/SEAL.json'
+    if sha(seal_path) != CHECKPOINT_SEAL_SHA:
+        raise ValueError('Independent approved10000 checkpoint seal changed')
+    seal = read(seal_path)
+    if (not seal.get('passed') or seal.get('actual_stored_step') != step
+            or seal.get('run_identity_sha256') != sha(identity_path)
+            or Path(seal['checkpoint']) != checkpoint):
+        raise ValueError('Checkpoint seal does not bind the actual formal checkpoint')
+    sealed = {row['path']: row for row in seal['files']}
+    if len(sealed) != len(seal['files']):
+        raise ValueError('Duplicate checkpoint file in seal')
+
+    norm = Path(spec['norm_dir']) / 'norm_stats.json'
+    checkpoint_norm = checkpoint / 'assets/arx_x5_sim/norm_stats.json'
     validate_normalizer(norm)
-    manifest_keys={'dataset_manifest':'dataset_manifest_sha256',
-                   'ecot_context_manifest':'ecot_context_manifest_sha256'}
-    fixed=[config_path,run/'run_identity.json',run/'resolved_config.json',
-           checkpoint/'resume_metadata.json',Path(spec['preflight_cpu']),norm]
-    for key,wanted in manifest_keys.items():
-        path=Path(spec[key])
-        if sha(path)!=identity.get(wanted):raise ValueError('Training input changed: '+key)
-        fixed.append(path)
-    from subtask_data import source_context_cache_path
-    context_cache=source_context_cache_path(spec['ecot_context_manifest'])
-    if sha(context_cache)!=identity.get('ecot_context_cache_sha256'):
-        raise ValueError('Actual source Subtask context cache changed')
-    fixed.append(context_cache)
-    data_audit=read(spec['data_audit'])
-    if identity.get('subtask_projection_sha256')!=data_audit.get('subtask_projection_sha256'):
-        raise ValueError('Actual original Subtask projection identity differs from CPU audit')
-    if sha(norm)!=identity.get('norm_sha256'):raise ValueError('Shared actual normalizer changed')
-    native=Path(spec['vendor_root'])/'src/openpi/training/checkpoints.py'
-    # Native source is already SHA-bound above. Check the required export rule
-    # explicitly, so a future native change cannot silently turn EMA into raw.
-    native_text=native.read_text()
-    if 'ema_params' not in native_text or 'params' not in native_text:raise ValueError('Native inference export rule unavailable')
-    params=regular_tree(checkpoint/'params')
-    if not (checkpoint/'_CHECKPOINT_METADATA').is_file():raise ValueError('Orbax checkpoint not committed')
-    if not (checkpoint/'train_state').is_dir():raise ValueError('Full training checkpoint item absent')
-    state_fingerprint_path=checkpoint/'state_fingerprint.json'
-    state_fingerprint=validate_state_fingerprint(state_fingerprint_path,step)
-    fixed.append(state_fingerprint_path)
-    fullinv=run/'fullparam_parameter_inventory.json'
-    inv=read(fullinv)
-    imod=importlib.util.spec_from_file_location('_eval_fullparam_inventory',root/'src/fullparam_contract.py')
-    inventory_module=importlib.util.module_from_spec(imod);imod.loader.exec_module(inventory_module)
-    actual=inventory_module.inventory_from_rows(inv['leaves'])
-    if (any(inv.get(k)!=v for k,v in actual.items())or
-            actual['inventory_sha256']!=identity.get('parameter_inventory_sha256')):
-        raise ValueError('Actual full-parameter inventory identity mismatch')
-    fixed.append(fullinv)
-    for key in identity['source_sha256']:
-        fixed.append(Path(spec['vendor_root'])/key.removeprefix('vendor/') if key.startswith('vendor/') else root/key)
-    paths=sorted(set(params+fixed))
-    policy=file_validation_policy(run)
-    if any(Path(p).is_symlink()or not Path(p).is_file()for p in policy['content_only_metadata_paths']):
-        raise ValueError('Descriptive run metadata must remain regular files')
-    return {'schema':SCHEMA,'parent_root':str(root),'config_path':str(config_path),
-        'export_path':str(checkpoint),'source_checkpoint':str(checkpoint),'step':step,
-        'inference_params':'EMA','inference_item':'params','training_identity':identity,
-        'ablation_variant':spec['ablation_variant'],'norm_stats_path':str(norm),
-        'norm_stats_sha256':sha(norm),'inference_only':True,
-        'saved_full_state_fingerprint_sha256':sha(state_fingerprint_path),
-        'saved_raw_EMA_optimizer_tree_sha256':state_fingerprint['tree_sha256'],
-        'saved_full_state_fingerprint_recomputed_during_eval':False,
-        'checkpoint_contains_full_train_state':True,'files':paths,
-        'file_validation_policy':policy,
-        'parameter_item_relative_files':[str(p.relative_to(checkpoint/'params'))for p in params]}
+    if sha(norm) != NORM_SHA or sha(checkpoint_norm) != NORM_SHA:
+        raise ValueError('Use the exact training and checkpoint normalizer')
+    fixed = [config_path, identity_path, run / 'resolved_config.json',
+             checkpoint / 'resume_metadata.json', checkpoint / '_CHECKPOINT_METADATA',
+             checkpoint_norm, norm, seal_path]
+    for item in ('params', 'train_state'):
+        for rel in ('_METADATA', 'array_metadatas/process_0', 'manifest.ocdbt'):
+            p = checkpoint / item / rel
+            if not p.is_file() or str(p.relative_to(checkpoint)) not in sealed:
+                raise ValueError('Missing committed model/Adam/EMA item metadata')
+            fixed.append(p)
+    for key, wanted in [('dataset_manifest', 'dataset_manifest_sha256'),
+                        ('ecot_context_manifest', 'ecot_context_manifest_sha256'),
+                        ('ecot_token_audit', 'ecot_token_audit_sha256')]:
+        p = Path(spec[key])
+        if sha(p) != identity.get(wanted):
+            raise ValueError('Training data/context/token audit changed')
+        fixed.append(p)
+    context = read(spec['ecot_context_manifest'])
+    cache = Path(context['cache'])
+    if sha(cache) != CONTEXT_CACHE_SHA or context['language_values_modified'] is not False:
+        raise ValueError('Original training Subtask projection changed')
+    fixed.append(cache)
+    inventory = run / 'fullparam_parameter_inventory.json'
+    inv = read(inventory)
+    if (inv.get('inventory_sha256') != INVENTORY_SHA
+            or inv.get('trainable_parameters') != 3353433872 or inv.get('frozen_parameters') != 0):
+        raise ValueError('Actual full-parameter selection differs')
+    fixed.append(inventory)
+    sources = identity.get('source_sha256', {})
+    if not {'train.py', 'strict_prompt.py', 'masked_pi05.py', 'ecot_dataset.py'} <= set(sources):
+        raise ValueError('Incomplete actual training source identity')
+    for relative, digest in sources.items():
+        rel = Path(relative)
+        if rel.is_absolute() or '..' in rel.parts:
+            raise ValueError('Nonlocal training source path')
+        p = Path(spec['vendor_root']) / rel if relative.startswith(('src/', 'scripts/')) else root / 'src' / rel
+        if sha(p) != digest:
+            raise ValueError('Actual scientific source changed: ' + relative)
+        fixed.append(p)
+    params = regular_tree(checkpoint / 'params')
+    for p in params:
+        rel = str(p.relative_to(checkpoint))
+        if rel not in sealed or p.stat().st_size != sealed[rel]['bytes']:
+            raise ValueError('Inference parameter file is not in approved checkpoint seal')
+    expected_params = {name for name in sealed if name.startswith('params/')}
+    if expected_params != {str(p.relative_to(checkpoint)) for p in params}:
+        raise ValueError('Inference parameter inventory differs from approved seal')
+    paths = sorted(set(fixed + params))
+    return {
+        'schema': SCHEMA, 'parent_root': str(root), 'config_path': str(config_path),
+        'export_path': str(checkpoint), 'source_checkpoint': str(checkpoint), 'step': step,
+        'inference_params': 'EMA', 'inference_item': 'params', 'variant': VARIANT,
+        'training_identity': identity, 'source_training_eval_ecot': False,
+        'norm_stats_path': str(checkpoint_norm), 'norm_stats_sha256': NORM_SHA,
+        'checkpoint_contains_full_train_state': True, 'inference_only': True,
+        'parameter_item_relative_files': [str(p.relative_to(checkpoint / 'params')) for p in params],
+        'checkpoint_seal_sha256': CHECKPOINT_SEAL_SHA, 'files': paths,
+    }
 
-def create_binding(config_path,step,output_path):
-    info=inspect(config_path,step);paths=info.pop('files')
-    before={str(p):fingerprint(p)for p in paths};payload={str(p):sha(p)for p in paths}
-    if before!={str(p):fingerprint(p)for p in paths}:raise ValueError('Checkpoint changed during byte seal')
-    param_root=Path(info['export_path'])/'params'
-    info.update(file_sha256=payload,file_fingerprints=before,
-        parameter_item_tree_sha256=canonical_sha({str(p.relative_to(param_root)):payload[str(p)]for p in paths if p.is_relative_to(param_root)}),
-        created_unix=time.time(),actual_current_payload_hashes_verified=True,
-        scope='Own native checkpoint EMA bytes and actual metadata; no historical performance claim.')
-    info['binding_sha256']=canonical_sha(info)
-    path=Path(output_path);path.parent.mkdir(parents=True,exist_ok=True)
-    with path.open('x')as f:json.dump(info,f,indent=2,allow_nan=False);f.write('\n')
+
+def create_binding(config_path, step, output_path):
+    info = inspect(config_path, step)
+    paths = info.pop('files')
+    before = {str(p): fingerprint(p) for p in paths}
+    payload = {str(p): sha(p) for p in paths}
+    if before != {str(p): fingerprint(p) for p in paths}:
+        raise ValueError('Training/checkpoint files changed during binding')
+    checkpoint = Path(info['export_path'])
+    seal = read(Path(info['parent_root']) / 'reports/continuous_monitor/checkpoints/10000/SEAL.json')
+    sealed = {row['path']: row['sha256'] for row in seal['files']}
+    for p in paths:
+        if p.is_relative_to(checkpoint) and payload[str(p)] != sealed[str(p.relative_to(checkpoint))]:
+            raise ValueError('Actual checkpoint bytes differ from approved full-file seal')
+    param = checkpoint / 'params'
+    info.update(file_sha256=payload, file_fingerprints=before,
+                parameter_item_tree_sha256=canonical_sha({
+                    str(p.relative_to(param)): payload[str(p)] for p in paths if p.is_relative_to(param)}),
+                created_unix=time.time(), actual_current_payload_hashes_verified=True,
+                scope='Actual EMA10000 inference bytes/identity; no full tensor restore or native success claim.')
+    info['binding_sha256'] = canonical_sha(info)
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('x') as out:
+        json.dump(info, out, indent=2, allow_nan=False)
+        out.write('\n')
     return info
 
-def validate_binding(binding,*,full_hashes=True):
-    if isinstance(binding,(str,Path)):binding=read(binding)
-    if binding.get('schema')!=SCHEMA or canonical_sha({k:v for k,v in binding.items()if k!='binding_sha256'})!=binding.get('binding_sha256'):
-        raise ValueError('Own checkpoint binding digest changed')
-    current=inspect(binding['config_path'],binding['step']);paths=current.pop('files')
-    expected_fields=set(current)|{'file_sha256','file_fingerprints','parameter_item_tree_sha256',
-        'created_unix','actual_current_payload_hashes_verified','scope','binding_sha256'}
-    if set(binding)!=expected_fields:raise ValueError('Own checkpoint binding fields changed')
-    if (set(map(str,paths))!=set(binding['file_sha256'])
-            or set(binding['file_fingerprints'])!=set(binding['file_sha256'])):
-        raise ValueError('Bound checkpoint/source inventory changed')
-    for k,v in current.items():
-        if binding.get(k)!=v:raise ValueError('Bound identity changed: '+k)
-    param_root=Path(current['export_path'])/'params'
-    parameter_tree=canonical_sha({str(p.relative_to(param_root)):binding['file_sha256'][str(p)]
-        for p in paths if p.is_relative_to(param_root)})
-    if binding['parameter_item_tree_sha256']!=parameter_tree or binding['actual_current_payload_hashes_verified']is not True:
-        raise ValueError('Own checkpoint binding payload seal differs')
-    metadata=set(current['file_validation_policy']['content_only_metadata_paths'])
+
+def validate_binding(binding, *, full_hashes=True):
+    binding = read(binding) if isinstance(binding, (str, Path)) else binding
+    if (binding.get('schema') != SCHEMA or canonical_sha({
+            k: v for k, v in binding.items() if k != 'binding_sha256'}) != binding.get('binding_sha256')):
+        raise ValueError('Checkpoint binding digest changed')
+    current = inspect(binding['config_path'], binding['step'])
+    paths = current.pop('files')
+    for k, v in current.items():
+        if binding.get(k) != v:
+            raise ValueError('Bound identity changed: ' + k)
+    if set(map(str, paths)) != set(binding['file_sha256']) or set(binding['file_fingerprints']) != set(binding['file_sha256']):
+        raise ValueError('Bound inventory changed')
+    param = Path(binding['export_path']) / 'params'
+    if binding.get('actual_current_payload_hashes_verified') is not True or binding['parameter_item_tree_sha256'] != canonical_sha({
+            str(p.relative_to(param)): binding['file_sha256'][str(p)] for p in paths if p.is_relative_to(param)}):
+        raise ValueError('Binding inference payload hash tree differs')
     for p in paths:
-        key=str(p);before=fingerprint(p)
-        if key in metadata:
-            # Even cheap pre-sampling checks must hash these three small JSON
-            # files. A same-value/different-byte rewrite is a binding failure.
-            if sha(p)!=binding['file_sha256'][key]or fingerprint(p)!=before:
-                raise ValueError('Bound descriptive run metadata bytes changed: '+key)
-        elif before!=binding['file_fingerprints'][key]or(full_hashes and sha(p)!=binding['file_sha256'][key]):
-            raise ValueError('Bound checkpoint/source bytes changed: '+str(p))
-    return {'accepted':True,'full_hashes_verified':full_hashes,'step':binding['step'],
-            'descriptive_metadata_sha256_always_verified':True,
-            'binding_sha256':binding['binding_sha256'],'inference_params':'EMA'}
+        before = fingerprint(p)
+        if before != binding['file_fingerprints'][str(p)]:
+            raise ValueError('Bound file changed: ' + str(p))
+        # Small metadata/source files are always hashed. Large tensor payloads
+        # additionally get a complete rehash at explicit pre/postflight.
+        is_tensor = p.is_relative_to(param) and '/d/' in str(p)
+        if (full_hashes or not is_tensor) and sha(p) != binding['file_sha256'][str(p)]:
+            raise ValueError('Bound file content changed: ' + str(p))
+        if fingerprint(p) != before:
+            raise ValueError('Bound file changed while validating')
+    return {'accepted': True, 'full_hashes_verified': full_hashes,
+            'step': binding['step'], 'binding_sha256': binding['binding_sha256'],
+            'inference_params': 'EMA', 'source_training_eval_ecot': False}

@@ -13,12 +13,12 @@ relicense any third-party work.
 | NVIDIA IsaacSim and simulator assets | External simulation environment required by the native integration | Not distributed here; use under the applicable vendor and asset terms. Exact deployed build is awaiting final inventory. |
 | JAX/jaxlib, Flax, Optax, Orbax | External array/model/training-contract/checkpoint ecosystem | Install compatible verified versions and retain their own distribution notices; this archive is not an environment lock. |
 | NumPy | CPU array/observation conversion and tests | External dependency; retain its distribution notices. |
-| Pillow | Optional real-model CPU smoke dependencies | External dependency, not required by the minimal NumPy behavior suite; retain its distribution notices. |
+| Pillow | Actual-text video generation and CPU video fixture | External dependency required by the video fixture and overlay tool; retain its distribution notices. |
 | WebSocket client/server package | External policy RPC transport | Observed openpi-client0.1.0, policy websockets15.0.1 and simulator websockets14.0; retain each actual distribution's notices. |
 | DeepSeek model served through the configured API provider | External model service used by the online selector | API/model access is subject to the operator's authorization and service terms; no model weights or raw responses are distributed. |
 | Tokenizer, checkpoint and dataset assets | External runtime/training provenance required by strict binding checks | Not included or licensed by this archive; obtain genuine compatible assets and honor their applicable terms. |
 
-The catalogue includes experiment annotation text and derived textual pairings.
+The catalogue includes experiment annotation text preserved original Stack Bowls training Subtasks.
 Its presence does not license an underlying external dataset or authorize
 redistribution of images, trajectories or trained weights. Historical source
 paths and hashes describe provenance, not redistribution permission.
@@ -30,7 +30,7 @@ and `4f2b6958d25115c1bc461044e022889852d9e3a9bb854ab581c416514b9984a0`.
 They describe those upstream works, not a new repository-wide license.
 
 Project names alone do not establish an exact source revision or license for a
-particular build. [Observed environment evidence](online_subtask/provenance/observed_environment.json)
+particular build. [Observed environment evidence](online_subtask/reference/classify_objects/observed_environment.json)
 records installed versions and selected source hashes; it cannot recover the
 unknown upstream Git commits or attest every third-party file. Missing revisions
 remain unpinned rather than guessed. No fully locked third-party reproduction

@@ -1,4 +1,4 @@
-"""One native classify episode, actual online text and full waiting-state checks."""
+"""One native Stack Bowls Random episode, actual online text and full waiting-state checks."""
 from copy import deepcopy
 import hashlib
 import json
@@ -11,7 +11,7 @@ from executed_history import ACK_SCHEMA,digest
 from .main_camera_action25hz import MainCameraAction25Hz
 from .freeze import snapshot,verify_static,plain,canonical
 
-INSTRUCTION='Sort the objects by category into the three baskets.'
+from task_contract import INSTRUCTION,CHECKPOINT_STEP,NATIVE_ACTION_LIMIT
 
 def history_source_frame(index):
     return 5*index//2
@@ -47,7 +47,7 @@ def replan(env,client,n):
         actions=client.call(func_name='get_action')
         injection=client.call(func_name='current_injection')
         if (injection['execution_frame']!=n or injection['actual_injected'] is not True
-                or injection['checkpoint_step']not in (5000,10000,15000,20000) or injection['training_composition_byte_equal'] is not True
+                or injection['checkpoint_step']!=CHECKPOINT_STEP or injection['training_composition_byte_equal'] is not True
                 or set(injection['context'])!={'subtask'}
                 or len(actions)!=8):raise ValueError('Missing exact actual milestone EMA single-Subtask injection')
         if hashlib.sha256(injection['prompt'].encode()).hexdigest()!=injection['prompt_sha256']:
@@ -107,8 +107,12 @@ def acknowledge_executed_subtask(env,client,injection,execution_clocks,reason):
 
 def eval_one_episode(TASK_ENV,model_client):
     env=TASK_ENV;recorder=MainCameraAction25Hz(env);completed=False
-    engineering_limit=int(os.environ.get('PI05_ENGINEERING_COMMAND_LIMIT','128'))
-    if engineering_limit not in (0,128):raise ValueError('Only full native0 or bounded128 command limit admitted')
+    engineering_limit=int(os.environ.get('PI05_ENGINEERING_COMMAND_LIMIT','0'))
+    if engineering_limit!=0:raise ValueError('Full native800 episode required; no128-action pilot truncation')
+    phase=os.environ.get('PI05_EVAL_PHASE')
+    if phase not in ('engineering','formal'):raise ValueError('Explicit engineering/formal phase required')
+    if int(env.step_lim)!=NATIVE_ACTION_LIMIT:raise ValueError('Native Stack Bowls action limit must be800')
+    injection=None
     model_client.call(func_name='reset')
     try:
         first=read_physics_clock(env);n=0;replans=0;history_source_index=0
@@ -138,6 +142,8 @@ def eval_one_episode(TASK_ENV,model_client):
                 if env.is_episode_end()or(engineering_limit and n>=engineering_limit):break
             reason='native_terminal'if env.is_episode_end()else'engineering_stop'if engineering_limit and n>=engineering_limit else'full_chunk'
             acknowledge_executed_subtask(env,model_client,injection,executed_chunk,reason)
+        if injection is None:
+            raise RuntimeError('Native episode ended before an actual Subtask-conditioned action')
         final=read_physics_clock(env)
         timing=verify_clock_delta(first,final,n*10,'whole_native_episode')
         terminal={'episode_id':injection['episode_id'],'executed_commands':n,'frame_index':n,'actual_replans':replans,
@@ -145,8 +151,8 @@ def eval_one_episode(TASK_ENV,model_client):
             'actual_environment_terminal':bool(env.is_episode_end()),'engineering_stop':bool(engineering_limit and n>=engineering_limit and not env.is_episode_end()),'engineering_command_limit':engineering_limit,'physics_timing':timing,
             'physics_steps_during_generation':0,'actual_text_synchronized':True,
             'scene_seed':int(env.eval_seed),'layout_id':int(env.current_env_seed_map[0]),
-            'native_step_limit':int(env.step_lim),'engineering_probe':True,
-            'diagnostic_scope':'isolated_mainhist93_tok65536_actualexecutedhistory_bounded128_or_native_full',
+            'native_step_limit':int(env.step_lim),'engineering_probe':phase=='engineering',
+            'diagnostic_scope':'stack_bowls_random_seed1_full_native800_ema10000',
             'generator_protocol':injection['lineage']['generator_protocol']}
         completed=True
     finally:recording=recorder.close(completed)

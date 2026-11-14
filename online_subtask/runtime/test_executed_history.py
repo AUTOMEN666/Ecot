@@ -21,7 +21,7 @@ def injection(frame,episode='fixture',selected='U0001',lineage=None):
     return {'episode_id':episode,'execution_frame':frame,'context':context,'context_json':canonical(context),
         'prompt':prompt,'prompt_sha256':hashlib.sha256(prompt.encode()).hexdigest(),
         'lineage':lineage or {'selected_id':selected,'resolution':{'selected_id':selected},'generator_protocol':PROTOCOLS['expanded_catalog_id']},
-        'actual_injected':True,'checkpoint_step':5000,'training_composition_byte_equal':True}
+        'actual_injected':True,'checkpoint_step':10000,'training_composition_byte_equal':True}
 def ack(frame,episode='fixture',count=8,reason='full_chunk',actual_injection=None):
     commands=actions()
     return {'schema':ACK_SCHEMA,'injection':actual_injection or injection(frame,episode),
@@ -74,15 +74,15 @@ class ExecutedHistoryContracts(unittest.TestCase):
         commit(self.memory,0)
         with self.assertRaises(ValueError):commit(self.memory,0)
         self.assertEqual(len(self.memory.records),1)
-    def test_real_terminal_partial1100_max137_before_last_replan(self):
-        for frame in range(0,1096,8):commit(self.memory,frame)
-        proof=self.memory.for_request('fixture',1096)
-        self.assertEqual(proof['executed_subtask_history_count'],137)
-        self.assertEqual(proof['latest_executed_subtask_record']['executed_action_end'],1096)
-        terminal=commit(self.memory,1096,count=4,reason='native_terminal')
-        self.assertEqual(terminal['history_count'],138);self.assertEqual(terminal['last_executed_frame'],1100)
-        self.assertEqual(terminal['record']['executed_action_start'],1097)
-        with self.assertRaises(ValueError):self.memory.for_request('fixture',1104)
+    def test_native800_terminal_and_no_future_query(self):
+        for frame in range(0,792,8):commit(self.memory,frame)
+        proof=self.memory.for_request('fixture',792)
+        self.assertEqual(proof['executed_subtask_history_count'],99)
+        terminal=commit(self.memory,792,count=8,reason='native_terminal')
+        self.assertEqual(terminal['history_count'],100)
+        self.assertEqual(terminal['last_executed_frame'],800)
+        with self.assertRaises(ValueError):self.memory.for_request('fixture',800)
+        with self.assertRaises(ValueError):commit(self.memory,800)
     def test_reset_clears_actual_records_and_clock(self):
         commit(self.memory,0);self.memory.reset('new')
         self.assertEqual(self.memory.for_request('new',0)['executed_subtask_history'],[])

@@ -80,7 +80,7 @@ class NativeLoopACKOrdering(unittest.TestCase):
         from pi05_policy import deploy
         memory=ExecutedSubtaskHistory(CATALOG);log=[];rows={}
         class Env:
-            n=0;eval_seed=1;current_env_seed_map=[1];step_lim=1100
+            n=0;eval_seed=1;current_env_seed_map=[1];step_lim=800
             @property
             def take_action_cnt(self):return [self.n]
             def get_obs(self):return {'fixture':self.n}
@@ -105,7 +105,7 @@ class NativeLoopACKOrdering(unittest.TestCase):
         def snapshot(env,obs):return {'physics_clock':clock(env.n),'fixture_frame':env.n}
         def static(before,after):self.assertEqual(before,after)
         def append(name,row):rows.setdefault(name,[]).append(deepcopy(row))
-        with patch.dict(os.environ,{'PI05_ENGINEERING_COMMAND_LIMIT':'0'}),\
+        with patch.dict(os.environ,{'PI05_ENGINEERING_COMMAND_LIMIT':'0','PI05_EVAL_PHASE':'engineering'}),\
                 patch.object(deploy,'MainCameraAction25Hz',Recorder),patch.object(deploy,'read_physics_clock',lambda e:clock(e.n)),\
                 patch.object(deploy,'snapshot',snapshot),patch.object(deploy,'verify_static',static),patch.object(deploy,'append',append),\
                 patch.object(deploy,'capture_history',lambda *a,**k:None),\

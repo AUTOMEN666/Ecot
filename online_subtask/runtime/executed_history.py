@@ -6,7 +6,7 @@ from pi05_policy.physics_clock import verify_clock_delta
 
 SCHEMA='ecot.actual_executed_subtask_history.v1'
 ACK_SCHEMA='ecot.actual_executed_subtask_ack.v1'
-INSTRUCTION='Sort the objects by category into the three baskets.'
+from task_contract import INSTRUCTION,CHECKPOINT_STEP,LAST_REPLAN_FRAME,MAX_PAST_RECORDS,NATIVE_ACTION_LIMIT
 RECORD_FIELDS={'observation_frame','subtask_id','subtask','executed_action_start','executed_action_end'}
 
 def canonical(value):
@@ -16,8 +16,8 @@ def digest(value):return hashlib.sha256(canonical(value).encode()).hexdigest()
 
 def validate_records(records,episode_id,frame,catalog):
     if not isinstance(episode_id,str)or not episode_id:raise ValueError('Actual episode required')
-    if type(frame)is not int or not 0<=frame<=1096 or frame%8:raise ValueError('Native replan frame required')
-    if type(records)is not list or len(records)!=frame//8 or len(records)>137:
+    if type(frame)is not int or not 0<=frame<=LAST_REPLAN_FRAME or frame%8:raise ValueError('Native replan frame required')
+    if type(records)is not list or len(records)!=frame//8 or len(records)>MAX_PAST_RECORDS:
         raise ValueError('Complete actual executed history required before every replan')
     by_id={item['id']:item['text'] for item in catalog['candidates']}
     for index,row in enumerate(records):
@@ -51,7 +51,7 @@ class ExecutedSubtaskHistory:
             raise ValueError('ACK must match exact current actual policy injection')
         f=injection.get('execution_frame')
         if (injection.get('episode_id')!=self.episode_id or type(f)is not int or f!=8*len(self.records)
-                or f>1096 or injection.get('actual_injected')is not True or injection.get('checkpoint_step')!=5000
+                or f>LAST_REPLAN_FRAME or injection.get('actual_injected')is not True or injection.get('checkpoint_step')!=CHECKPOINT_STEP
                 or injection.get('training_composition_byte_equal')is not True):
             raise ValueError('ACK episode/frame/actual injection differs or was already committed')
         context=injection.get('context');lineage=injection.get('lineage',{})
@@ -65,7 +65,7 @@ class ExecutedSubtaskHistory:
             raise ValueError('ACK exact ID/text/prompt binding differs')
         rows=ack['execution_clocks'];reason=ack['chunk_end_reason']
         if (type(rows)is not list or not 1<=len(rows)<=8 or len(expected_actions)!=8
-                or f+len(rows)>1100 or reason not in ('full_chunk','native_terminal','engineering_stop')
+                or f+len(rows)>NATIVE_ACTION_LIMIT or reason not in ('full_chunk','native_terminal','engineering_stop')
                 or len(rows)<8 and reason=='full_chunk'):
             raise ValueError('ACK needs actual full8 or terminal/engineering partial execution')
         previous=expected_clock

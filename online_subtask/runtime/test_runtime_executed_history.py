@@ -30,19 +30,20 @@ class RuntimeExecutedHistory(unittest.TestCase):
                 return {'actions':np.zeros((50,14),dtype=np.float32)}
         def obs(frame):return {'state':state(frame),'images':{c:np.zeros((480,640,3),np.uint8)for c in CAMERAS},
             'instruction':INSTRUCTION,'frame_index':frame,'physics_clock':clock(frame)}
-        binding={'step':5000,'ablation_variant':'A_subtask_online','training_identity':{'eval_ecot':True,'train_ecot':True},
+        binding={'step':10000,'variant':'stack_bowls_subtask_online','parent_root':'FIXTURE_PARENT','training_identity':{'eval_ecot':False,'train_ecot':True},
             'binding_sha256':'fixture-only','export_path':'fixture-only','inference_params':{},'parameter_item_tree_sha256':'fixture-only'}
         with tempfile.TemporaryDirectory()as tmp,patch.dict(sys.modules,{'support':support,'support.task_contract':task,
                 'support.weights_contract':weights,'subtask_data':data}):
             import model_server,subtask_client
             policy=Policy();provider=MultiviewHistoryProvider(Path(tmp)/'requests',selector_kind='deepseek',transport=lambda r,p:response())
-            audit=Path(tmp)/'online96_10hz_20261112/seed1_native50_mainhistory93_65536_20261113_v1/audit.jsonl'
-            spec={'parent_root':tmp,'ablation_variant':'A_subtask_online','isolated_multiview_probe':True,
+            binding['parent_root']=str(Path(tmp).resolve())
+            audit=Path(tmp)/'stack_bowls_random_seed1_online30_ema10000_v1/audit.jsonl'
+            spec={'parent_root':tmp,'variant':'stack_bowls_subtask_online','task':'stack_bowls_random','training_task':'stack_bowls','source_training_eval_ecot':False,'cadence_execution_frames':8,
                 'protocol_mode':'expanded_catalog_id','catalog_sha256':CATALOG_SHA,'generator_protocol':PROTOCOLS['expanded_catalog_id'],
-                'audit_path':str(audit),'step':5000,'condition':'online_subtask','effective_eval_ecot':True,'noise_seed':42,
+                'audit_path':str(audit),'step':10000,'condition':'online_subtask','effective_eval_ecot':True,'noise_seed':42,
                 'instruction':INSTRUCTION,'export_binding':'fixture-only','provider':'deepseek',
                 'executed_subtask_history_enabled':True,'executed_history_protocol':'ecot.actual_executed_subtask_history.v1',
-                'config_id':'mainhist93_tok65536_v1','protocol_config_id':'mainhist93_tok65536_v1','maximum_past_timepoints':93,'max_tokens':65536,'past_history_cameras':['cam_high'],'maximum_total_images':96,
+                'config_id':'stack_bowls_random_mainhist93_tok65536_ema10000_v1','protocol_config_id':'stack_bowls_random_mainhist93_tok65536_ema10000_v1','maximum_past_timepoints':93,'max_tokens':65536,'past_history_cameras':['cam_high'],'maximum_total_images':96,
                 'selector_timeout_seconds':600,'selector_retry_budget_seconds':1850,'policy_rpc_timeout_seconds':2100}
             with patch.object(model_server,'read',lambda path:binding),patch.object(model_server,'validate_binding',lambda *a,**k:None),\
                     patch.object(subtask_client,'png_current_rgb',lambda image:triplet(0)[CAMERAS[0]]):

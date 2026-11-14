@@ -1,0 +1,10 @@
+{
+  "source": "actual approved training projection; CPU-only read on H20-6",
+  "builder_sha256": "84f2202e9dbb334bb258356d1bbed8b63c7c86186b374618d0259de145db0997",
+  "catalog_sha256": "5a651a940cc1359832a23ad7414cf154a36a3efff76e02b35422c558d1ac94aa",
+  "candidate_count": 297,
+  "training_starts": 44674,
+  "all_original_strings_preserved": true,
+  "DeepSeek_called": false,
+  "GPU_or_simulator_started": false
+}

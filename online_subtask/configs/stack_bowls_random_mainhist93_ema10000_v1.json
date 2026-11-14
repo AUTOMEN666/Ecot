@@ -1,0 +1,138 @@
+{
+  "schema": "ecot.stack_bowls_random.scientific_config.v1",
+  "usage": "Declarative protocol. Generate an actual verified model.json with prepare_policy; this file alone does not launch anything.",
+  "config_id": "stack_bowls_random_mainhist93_tok65536_ema10000_v1",
+  "protocol_config_id": "stack_bowls_random_mainhist93_tok65536_ema10000_v1",
+  "selector": {
+    "entry": "runtime/multiview_provider.py:MultiviewHistoryProvider (runtime directory on Python import path)",
+    "provider": "deepseek",
+    "model": "deepseek-v4-1-flash-261017",
+    "temperature": 0,
+    "thinking": {
+      "type": "enabled"
+    },
+    "reasoning_effort": "high",
+    "max_tokens": 65536,
+    "response_format": {
+      "type": "json_object"
+    },
+    "output_keys": [
+      "subtask_id"
+    ],
+    "catalog_count": 297,
+    "catalog_relative_to_online_subtask": "runtime/ACTIVE_EXPANDED_CATALOG.json",
+    "catalog_sha256": "5a651a940cc1359832a23ad7414cf154a36a3efff76e02b35422c558d1ac94aa",
+    "prompt_relative_to_online_subtask": "runtime/selector_prompt.md",
+    "prompt_sha256": "55c15e6a645edee1ca8797f5ed1b76ebd92da34c344d7b3b004426d2a1f0a666",
+    "semantic_retry": false,
+    "ID_repair": false,
+    "fallback": false
+  },
+  "observations": {
+    "current_cameras": [
+      "cam_high",
+      "cam_left_wrist",
+      "cam_right_wrist"
+    ],
+    "current_state_dimension": 14,
+    "instruction": "Stack the three bowls together.",
+    "history_source_frame_rule": "floor(2.5*k), k=0,1,... on the25Hz action clock",
+    "past_cameras": [
+      "cam_high"
+    ],
+    "maximum_past_timepoints": 93,
+    "maximum_total_images": 96,
+    "past_frames": "Strictly before the current frame, same episode, uniformly selected from every captured source point over the complete prefix; preserve first/last when subsampling.",
+    "subsample_index_when_more_than93": "i*(N-1)//92, i=0..92",
+    "image_order": "Selected past MAIN images in time order, then current MAIN/left-wrist/right-wrist.",
+    "past_wrist_images_sent": false
+  },
+  "executed_history": {
+    "schema": "ecot.actual_executed_subtask_history.v1",
+    "commit": "Only after validated actual-execution ACK, including episode, exact ID/text/prompt/commands, action range and physics clock.",
+    "maximum_past_records": 99,
+    "fields": [
+      "subtask_id",
+      "subtask",
+      "observation_frame",
+      "executed_action_start",
+      "executed_action_end"
+    ],
+    "failed_requests_or_unexecuted_proposals_committed": false,
+    "same_instance_goal_ID_continuity": true,
+    "visual_evidence_correction_allowed": true
+  },
+  "timeouts": {
+    "HTTP_absolute_seconds": 600,
+    "whole_generation_retry_budget_seconds": 1850,
+    "maximum_identical_request_total_attempts": 3,
+    "policy_RPC_seconds": 2100,
+    "RPC_ping_seconds": 2100,
+    "timed_out_HTTP_child": "Kill and reap the exact request child before returning or retrying; key enters only private stdin.",
+    "retry_scope": "Only preserved transport/transient429/5xx and empty public-content length errors; body remains identical."
+  },
+  "policy": {
+    "EMA_step": 10000,
+    "predict_steps": 50,
+    "execute_steps": 8,
+    "flow_steps": 10,
+    "noise_seed": 42,
+    "action_hz": 25,
+    "SDK_action_limit": 800,
+    "prompt_composition": "Instruction + ' Current subtask: ' + exact_catalog_text",
+    "inputs": "Current3RGB, State14 and composed prompt only; selector history is not sent to pi0.5.",
+    "waiting_simulation_frozen": true,
+    "success_and_termination": "Original SDK rules, including partial final execution ACK when native termination occurs.",
+    "variant": "stack_bowls_subtask_online",
+    "source_training_eval_ecot": false,
+    "effective_eval_ecot": true
+  },
+  "deployment_limits": [
+    "External checkpoint, original training source, SDK/assets, compatible policy/simulator environments and authorized API access are required.",
+    "Actual full-file checkpoint binding and private SDK/source/layout checks are mandatory.",
+    "GPU ownership and native renderer/environment admission are external prerequisites; this code does not reserve resources.",
+    "CPU fixtures do not establish actual API/GPU/native acceptance or policy success.",
+    "No actual evaluation has been launched by this implementation PR."
+  ],
+  "evaluation": {
+    "task": "stack_bowls_random",
+    "scene_seed": 1,
+    "noise_seed": 42,
+    "layout_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29
+    ],
+    "episodes": 30,
+    "independent_engineering_case_first": true,
+    "engineering_in_denominator": false,
+    "original_layouts_only": true
+  }
+}

@@ -51,7 +51,7 @@ class MainPayloadContracts(unittest.TestCase):
             self.assertEqual(obs['state14'],state(obs['frame']))
             self.assertEqual(obs['state_sha256'],hashlib.sha256(canonical(state(obs['frame'])).encode()).hexdigest())
             if not obs['is_current']:self.assertEqual(obs['camera'],'cam_high')
-        self.assertEqual(request['max_tokens'],65536);self.assertEqual(proof['protocol_config_id'],'mainhist93_tok65536_v1')
+        self.assertEqual(request['max_tokens'],65536);self.assertEqual(proof['protocol_config_id'],'stack_bowls_random_mainhist93_tok65536_ema10000_v1')
     def test_uniform_source_capacity_boundaries92_93_94(self):
         for count in(92,93,94):
             with self.subTest(strictpast_source_count=count):
@@ -73,25 +73,27 @@ class MainPayloadContracts(unittest.TestCase):
                 self.assertEqual(proof['total_image_count'],min(source_count,93)+3)
                 self.assertEqual([o['camera']for o in proof['observations'][-3:]],list(CAMERAS))
                 self.assertTrue(all(o['camera']=='cam_high'and o['frame']<frame for o in proof['observations'][:-3]))
-    def test_last_replan_keeps137_full_executed_records_with_only96_images(self):
-        frame=1096;memory=memory_at(frame)
+    def test_last_replan_keeps99_full_executed_records_with_only96_images(self):
+        frame=792;memory=memory_at(frame)
         request,proof,_=build_request(episode_id='fixture',frame=frame,state14=state(0),pngs=triplet(0),instruction=INSTRUCTION,
             past_frames=source_points(frame),executed_subtask_history=memory.records)
         sent=json.loads(request['messages'][-1]['content'][0]['text'])
         self.assertEqual(sent['executed_subtask_history'],memory.records)
-        self.assertEqual(proof['executed_subtask_history_count'],137)
-        self.assertEqual(sent['latest_executed_subtask_record']['executed_action_end'],1096)
+        self.assertEqual(proof['executed_subtask_history_count'],99)
+        self.assertEqual(sent['latest_executed_subtask_record']['executed_action_end'],792)
         self.assertEqual(proof['total_image_count'],96)
-        self.assertTrue(all(f<1096 for f in proof['history_frames']))
+        self.assertTrue(all(f<792 for f in proof['history_frames']))
         strict=[p for p in source_points(frame)if p.frame<frame]
         self.assertEqual(proof['history_frames'],[strict[i*(len(strict)-1)//92].frame for i in range(93)])
-        self.assertEqual(proof['history_frames'][0],0);self.assertEqual(proof['history_frames'][-1],1095)
-    def test_prompt_diff_is_only_visual_context_description(self):
-        old=Path(__file__).resolve().parent.parent/'tests/fixtures/mainhistory31_selector_prompt.md'
-        expected=old.read_text().replace('up to31 uniformly sampled strictly past MAIN-camera RGB views',
-            'up to93 uniformly sampled strictly past MAIN-camera RGB views').replace('at most34 images total','at most96 images total')
+        self.assertEqual(proof['history_frames'][0],0);self.assertEqual(proof['history_frames'][-1],790)
+    def test_stack_bowls_prompt_goal_completion_and_identity(self):
         actual=(Path(__file__).parent/'selector_prompt.md').read_text()
-        self.assertEqual(actual,expected);self.assertIn('Return ONLY JSON {"subtask_id":"one listed ID"}.',actual)
+        self.assertIn('pickup-only',actual.lower())
+        self.assertIn('placement',actual.lower())
+        self.assertIn('released',actual.lower())
+        self.assertIn('physical bowl instance',actual.lower())
+        self.assertNotIn('basket',actual.lower())
+        self.assertIn('Return ONLY JSON',actual)
 
 class BoundedRequestContracts(unittest.TestCase):
     def run_empty_attempts(self,attempt_cost):

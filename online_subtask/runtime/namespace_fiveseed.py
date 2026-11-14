@@ -4,9 +4,6 @@ import ast
 import importlib.util
 from pathlib import Path
 
-SOURCE = Path('/mnt/xzt/robodojo/src/RoboDojo')
-
-
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
@@ -21,7 +18,7 @@ def links(source, destination, exclude=()):
 def patch_seed_source(text, rows):
     ids = [row['layout_id'] for row in rows]
     if not ids or len(set(ids)) != len(ids) or not all(type(i) is int and i >= 0 for i in ids):
-        raise ValueError('Distinct nonnegative official seed1 classify_objects layout IDs required')
+        raise ValueError('Distinct nonnegative official seed1 stack_bowls_random layout IDs required')
     needle = '        all_layout_ids = list(range(len(matching_files)))'
     if text.count(needle) != 1:
         raise ValueError('Native seed declaration changed')
@@ -66,19 +63,19 @@ def build(folder, ids, adapter, alias, *, seed, manifest):
     source = folder / 'src/RoboDojo'
     source.parent.mkdir(parents=True, exist_ok=True)
     rows=rows_for(manifest,seed,ids)
-    pool=rows_for(manifest,seed,list(range(50)))
+    pool=rows_for(manifest,seed,list(range(30)))
     for row in rows:
         if sha(row['path'])!=row['sha256']:raise ValueError('Frozen scene/layout changed before namespace construction')
     links(source_root, source, {'Assets','env', 'src', 'XPolicyLab', 'eval_result', '.git'})
     # Only this private SDK sees the frozen overlay. Original shared Assets
-    # remain untouched; all20 filenames retain native loader ID semantics.
+    # remain untouched; all30 filenames retain native loader ID semantics.
     relative=Path('Assets')
     for next_name in ('Eval_Layout','RoboDojo','arx_x5',str(seed)):
         links(source_root/relative,source/relative,{next_name})
         relative=relative/next_name
     (source/relative).mkdir()
     for row in pool:
-        (source/relative/f"classify_objects_{row['layout_id']}.json").symlink_to(Path(row['path']).resolve(strict=True))
+        (source/relative/f"stack_bowls_random_{row['layout_id']}.json").symlink_to(Path(row['path']).resolve(strict=True))
     links(source_root / 'env', source / 'env', {'seed_manager', '__pycache__'})
     links(source_root / 'env/seed_manager', source / 'env/seed_manager', {'seed_manager.py', '__pycache__'})
     (source / 'env/seed_manager/seed_manager.py').write_text(

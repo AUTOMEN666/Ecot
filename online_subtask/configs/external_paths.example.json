@@ -1,35 +1,16 @@
 {
-  "schema": "ecot.online_subtask.archive.external_paths_example.v1",
-  "usage": "Documentation placeholders only. Replace with independently verified external assets and valid original identity evidence. Moving files or copying archived contracts does not make an old binding valid.",
-  "runtime_model_spec_path_fields": {
-    "parent_root": "/path/to/verified/A_subtask_online",
-    "export_binding": "/path/to/verified/A_subtask_online_EMA5000.export_binding.json",
-    "audit_path": "/path/to/fresh/seed1_native50_mainhistory93_65536_20261113_v1/case/audit.jsonl"
-  },
-  "external_environment_paths": {
-    "policy_python": "/path/to/existing/verified-policy-environment/bin/python",
-    "sim_python": "/path/to/existing/verified-native-environment/bin/python",
-    "sdk_root": "/path/to/verified/native-SDK",
-    "openpi_source": "/path/to/verified/OpenPI-with-required-local-transform",
-    "export_path": "/path/to/verified/A_subtask_online_EMA5000/export",
-    "normalizer_path": "/path/to/verified/normalizer/norm_stats.json",
-    "tokenizer_assets": "/path/to/verified/tokenizer-assets",
-    "original_layout_manifest": "/path/to/verified/seed1_layout0_to49_manifest.json",
-    "data_audit_and_context_cache": "/path/to/verified/original-training-audit-assets"
-  },
-  "archived_local_contract_sources_relative_to_online_subtask": "integration/experiment_contract",
-  "archived_contract_scope": "Eleven original local parent source files retain src/evaluation_native/support layout. This is a static source closure only, not a substitute for a full verified parent runtime or its assets.",
-  "credential_configuration": {
-    "API_key_environment_variable_name_only": "ECOT_AUTHORIZED_API_KEY",
-    "API_key_value_included": false,
-    "host43585_receipt_environment_variable_names_only": ["PI05_HOST_RECEIPT_PATH", "PI05_HOST_RECEIPT_SHA256"],
-    "host_receipts_portable_to_new_hosts": false
-  },
-  "startup_notes": [
-    "Use documented current model_server/MultiviewHistoryProvider integration; examples do not execute services.",
-    "Provider output directory must be fresh; use reset per episode and serial calls within each episode.",
-    "Do not bypass namespace, catalog, binding, clock, SDK, layout or actual-execution ACK validation.",
-    "Do not use historical seed0/layout0/128-action pilot prepare_native_sim.py as a quickstart.",
-    "Machine-specific prepare50/controller/recovery tools are not included as a generic launcher."
-  ]
+  "schema": "ecot.stack_bowls.external_paths_example.v1",
+  "usage": "Placeholders only; use real compatible assets verified by binding and manifest tools.",
+  "parent_root": "/path/to/pi05_stack_bowls100_subtask_fullparam_h20_8_20261113",
+  "train_config": "/path/to/parent/configs/train.json",
+  "checkpoint": "/path/to/parent/runs/seed42/checkpoints/10000",
+  "export_binding": "/path/to/readonly_verified_EMA10000.binding.json",
+  "sdk_root": "/path/to/current_native_SDK",
+  "sim_python": "/path/to/verified_native_environment/bin/python",
+  "policy_python": "/path/to/verified_pi05_environment/bin/python",
+  "layout_manifest": "/path/to/frozen_random_seed1_layout0_to29.json",
+  "output_namespace": "stack_bowls_random_seed1_online30_ema10000_v1",
+  "API_key_environment_variable_name_only": "ECOT_AUTHORIZED_API_KEY",
+  "credentials_bundled": false,
+  "weights_bundled": false
 }

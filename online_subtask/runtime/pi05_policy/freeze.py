@@ -5,7 +5,7 @@ import json
 import numpy as np
 from .physics_clock import read_physics_clock
 
-SCHEMA='classify_current_layout_freeze_v2'
+SCHEMA='stack_bowls_random_current_layout_freeze_v1'
 # Exact LayoutManager OBJECT_CONFIG_TYPES and its separately registered fixtures.
 # Enumerate every current record, including non-task objects such as camera_stand.
 OBJECT_TYPES=('Rigid','Dynamic','Geometry','Articulation','Garment','Fluid')
@@ -66,11 +66,9 @@ def validate_inventory(inventory):
             raise ValueError('Invalid actual current object identity')
         names.append(row['instance_name'])
     if len(set(names))!=len(names):raise ValueError('Duplicate actual current object instance')
-    for label in ('basket0','basket1','basket2'):
-        if label not in inventory or inventory[label]['object_type']!='geometry':
-            raise ValueError('All three actual geometry baskets must be measured')
-    for prefix in ('cat0_','cat1_','cat2_'):
-        if not any(label.startswith(prefix)for label in inventory):raise ValueError('Missing actual sorting category objects')
+    for label in ('bowl0','bowl1','bowl2'):
+        if label not in inventory or inventory[label]['object_type']!='rigid':
+            raise ValueError('All three actual task bowls must be measured')
 
 
 def validate_pose(pose):

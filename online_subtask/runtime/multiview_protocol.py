@@ -5,11 +5,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from history_client import STATE_SCHEMA,canonical,sha,make_frame
 from executed_history import validate_records,digest
+from task_contract import INSTRUCTION,PROTOCOL_CONFIG_ID
 
 HERE=Path(__file__).resolve().parent
 CAMERAS=('cam_high','cam_left_wrist','cam_right_wrist')
 PAST_CAMERAS=('cam_high',)
-PROTOCOL_CONFIG_ID='mainhist93_tok65536_v1'
 MAX_PAST_TIMEPOINTS=93
 MAX_TOTAL_IMAGES=96
 MAX_TOKENS=65536
@@ -18,8 +18,7 @@ RETRY_BUDGET_SECONDS=1850
 PRIVATE_RPC_TIMEOUT_SECONDS=2100
 MODES=('expanded_catalog_id',)
 PROTOCOLS={'expanded_catalog_id':PROTOCOL_CONFIG_ID}
-CATALOG_SHA='97734cb3db4e92fcf62beec96d635896d09d8f23c99c646170bf7736f8b48600'
-INSTRUCTION='Sort the objects by category into the three baskets.'
+CATALOG_SHA='5a651a940cc1359832a23ad7414cf154a36a3efff76e02b35422c558d1ac94aa'
 
 class SubtaskAbstention(RuntimeError):
     """Compatibility exception only; no NO_MATCH output is admitted here."""
@@ -37,9 +36,13 @@ def strict_json(raw):
 
 def load_catalog():
     raw=(HERE/'ACTIVE_EXPANDED_CATALOG.json').read_bytes()
-    if sha(raw)!=CATALOG_SHA:raise ValueError('Frozen 288 catalog changed')
+    if sha(raw)!=CATALOG_SHA:raise ValueError('Frozen 297 catalog changed')
     catalog=strict_json(raw);items=catalog['candidates']
-    if len(items)!=288 or len({item['id'] for item in items})!=288:raise ValueError('Require all288 unique IDs')
+    if (catalog.get('training_task')!='stack_bowls' or catalog.get('instruction')!=INSTRUCTION
+            or catalog.get('source_cache_sha256')!='70658dfcd24eed1548f7ff71511486a93377dad0fe7540d0228fb7ead1936c5f'
+            or catalog.get('language_values_modified')is not False or catalog.get('test_observations_used')is not False):
+        raise ValueError('Original Stack Bowls training catalogue required')
+    if len(items)!=297 or len({item['id'] for item in items})!=297:raise ValueError('Require all297 unique IDs')
     return catalog
 
 def resolve(raw, catalog=None):
@@ -50,7 +53,7 @@ def resolve(raw, catalog=None):
     if len(matches)!=1:raise ValueError('Unknown/null/NO_MATCH ID forbidden; no substitute')
     item=matches[0];context={'subtask':item['text']}
     return context,{'selected_id':item['id'],'catalog_sha256':CATALOG_SHA,'exact_text_utf8_sha256':sha(item['text'].encode()),
-        'raw_selection':selected,'resolution_kind':'exact_expanded288_catalog_lookup','host_fallback_used':False,
+        'raw_selection':selected,'resolution_kind':'exact_expanded297_catalog_lookup','host_fallback_used':False,
         'semantic_correctness_guaranteed':False}
 
 def history_source_frame(index):
@@ -126,10 +129,10 @@ def build_request(*,episode_id,frame,state14,pngs,instruction,past_frames,execut
         content.extend([{'type':'text','text':canonical(metadata)},{'type':'image_url','image_url':{'url':'data:image/png;base64,'+base64.b64encode(f.image_png).decode()}}])
         observations.append({**metadata,'image_sha256':f.image_sha256,'original_camera_chw_sha256':f.camera_chw_sha256,'state_sha256':f.state_sha256})
     messages=[{'role':'system','content':prompt},{'role':'user','content':[{'type':'text','text':canonical({'candidates':items,
-        'candidate_source':'All100training episodes color-explicit known descriptions paired with white/blue/red; derived pairs are not test labels.',
+        'candidate_source':'All100 Stack Bowls training episodes; exact original Subtask strings, no test observations or derived color/target pairs.',
         'selection_rule':'Exactly one listed ID; NO_MATCH/null forbidden.'})}]},{'role':'user','content':content}]
     request={'model':'__PROVIDER__','messages':messages,'temperature':0,'max_tokens':MAX_TOKENS,'thinking':{'type':'enabled'},'reasoning_effort':'high','response_format':{'type':'json_object'}}
-    proof={'schema':'ecot.mainhist93_tok65536.request.v1','protocol_config_id':PROTOCOL_CONFIG_ID,'episode_id':episode_id,'current_frame':frame,'fps':25,'cadence_execution_frames':8,
+    proof={'schema':'ecot.stack_bowls.mainhist93_tok65536.request.v1','protocol_config_id':PROTOCOL_CONFIG_ID,'episode_id':episode_id,'current_frame':frame,'fps':25,'cadence_execution_frames':8,
         'catalog_sha256':CATALOG_SHA,'prompt_sha256':sha(prompt.encode()),'messages_sha256':sha(canonical(messages).encode()),
         'observations':observations,'history_frames':[p.frame for p in past],'context_fields':['subtask'],
         'total_image_count':len(observations),'past_image_count':len(past),'current_image_count':3,
