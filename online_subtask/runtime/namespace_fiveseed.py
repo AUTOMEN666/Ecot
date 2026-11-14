@@ -56,6 +56,25 @@ def verify_private_assets(source):
     return {'global_configs_sha256':sha(path),'actual_private_ASSETS_PATH':str(actual)}
 
 
+def patch_readback_source(text):
+    needle = '            self.reward_manager.init_state()'
+    if text.count(needle) != 1:
+        raise ValueError('Native reward initialize site changed')
+    legacy = ('            from support.probe_readback import install_private_reward_readback\n'
+              '            if not hasattr(self, "_ervla_readback_audit"):\n'
+              '                self._ervla_readback_audit = install_private_reward_readback(self)\n')
+    own = ('            from pi05_policy.probe_readback import install_private_reward_readback\n'
+           '            if not hasattr(self, "_pi05_reward_readback_audit"):\n'
+           '                self._pi05_reward_readback_audit = install_private_reward_readback(self)\n')
+    if legacy in text:
+        if text.count(legacy) != 1 or text.count('support.') != 1:
+            raise ValueError('Unreviewed legacy project dependencies in native SDK')
+        return text.replace(legacy, own)
+    if 'support.' in text or 'install_private_reward_readback' in text:
+        raise ValueError('Unreviewed reward readback adapter; do not duplicate it')
+    return text.replace(needle, own + needle)
+
+
 def build(folder, ids, adapter, alias, *, seed, manifest):
     from layout_manifest import rows_for
     source_root=Path(manifest['sdk_source'])
@@ -86,13 +105,7 @@ def build(folder, ids, adapter, alias, *, seed, manifest):
     # Existing SDK's reward parser mixes CUDA tensors with NumPy. This bridge
     # only converts pose/point readbacks to NumPy; no rule/threshold is changed.
     text = (source_root / 'src/eval_client/eval_env.py').read_text()
-    needle = '            self.reward_manager.init_state()'
-    if text.count(needle) != 1:
-        raise ValueError('Native reward initialize site changed')
-    text = text.replace(needle,
-        '            from pi05_policy.probe_readback import install_private_reward_readback\n'
-        '            if not hasattr(self, "_pi05_reward_readback_audit"):\n'
-        '                self._pi05_reward_readback_audit = install_private_reward_readback(self)\n' + needle)
+    text = patch_readback_source(text)
     (source / 'src/eval_client/eval_env.py').write_text(text)
     links(source_root / 'XPolicyLab', source / 'XPolicyLab', {'policy', '__pycache__'})
     (source / 'XPolicyLab/policy').mkdir()

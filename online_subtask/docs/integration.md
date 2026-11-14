@@ -25,10 +25,11 @@ python "$RUNTIME/layout_manifest.py" --sdk-root "$SDK_ROOT" --output "$OUT/layou
 
 ~~~sh
 MANIFEST_SHA=实际输出的SHA256
-python "$RUNTIME/prepare_policy.py" prepare --parent-root "$TRAIN_ROOT" --export-binding "$OUT/EMA10000.binding.json" --output "$OUT/policies/engineering" --policy-python "$POLICY_PY" --port 19071
+python "$RUNTIME/prepare_policy.py" prepare --parent-root "$TRAIN_ROOT" --export-binding "$OUT/EMA10000.binding.json" --output "$OUT/policies/engineering" --policy-python "$POLICY_PY" --sdk-root "$SDK_ROOT" --port 19071
 python "$RUNTIME/prepare_native_sim.py" --layout-manifest "$OUT/layouts.json" --manifest-sha256 "$MANIFEST_SHA" --output "$OUT/engineering" --sim-python "$SIM_PY" --port 19071 --layout 0 --phase engineering
 ~~~
-只生成policy_launch.json/model.json及sim_launch.json/私有SDK，不启动GPU/API。
+准备流程先用指定策略解释器完成CPU模块来源检查，再生成policy_launch.json/model.json及sim_launch.json/私有SDK；不启动GPU/API。
+原生入口同时固定--device_id 3与AppLauncher的--device cuda:3，并显式关闭多卡渲染；不会只设置环境侧device_id。
 默认native物理设备3只是候选，须实际环境/renderer验收支持，不能直接推断可用。
 prepare命令只写新私有目录，不改共享SDK和reward规则。
 
@@ -86,3 +87,23 @@ python tools/summarize_random30.py --receipts 30个正式验收文件路径 --ou
 
 验收收据是可复核的文件/时钟合约，不是加密硬件证明，不能抵抗伪造整套原始证据；
 需要操作者保留原始日志和真实进程来源并作语义质检。
+
+## 复查修复后的环境约束
+
+prepare_policy现在强制从训练项目vendor/openpi及该SDK的XPolicyLab导入，并校验实际module.__file__和文件SHA。
+指定--sdk-root是必填；不依赖环境中恰好安装的另一份OpenPI/RPC。CPU_IMPORT_CHECK.json必须exit0。
+解释器必须在当前主机存在且可执行；不能把H20-8的断开Python符号链接照搬到H20-6。
+
+若主机需要显式CUDA动态库/编译器路径，可给prepare_policy追加--policy-env-json /path/to/accepted/POLICY_ENV.json。
+仅允许LD_LIBRARY_PATH、PATH和单一--xla_gpu_cuda_data_dir的XLA_FLAGS，禁止改GPU选择、凭据、Python导入路径或模型精度。
+该文件绑定进model.json的SHA。只用于策略进程，禁止全局export后污染原生进程。
+H20-6本次已验证的文件位于本次专用环境目录POLICY_ENV.json；不要修改或覆盖其它项目的环境文件。
+policy_launch.json中的required_environment_overrides仅应用于该策略子进程；GPU归属仍由外部owner负责。
+
+原生子进程明确将当前runtime、私有SDK、私有XPolicyLab、curobo及SDK携带的IsaacLab源加入PYTHONPATH。
+record_native_exit在Popen前重新检查代码/Prompt/候选库、SDK、布局、策略alias及工程验收SHA。
+准备完成后若任何这些来源改变，必须停止并重新准备，不能继续使用旧计划。
+逐次生成等待/10Hz历史/执行回执与视频帧账本均要求完整，缺少其中一次也不能验收。
+
+GPU核函数或原生初始化通过不能替代完整在线ECoT单回合接入验收。
+原生独立初始化只做reset/稳定性/三图检查，不能生成正式30回合准入的ACCEPTANCE.json。

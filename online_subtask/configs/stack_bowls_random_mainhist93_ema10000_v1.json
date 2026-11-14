@@ -23,7 +23,7 @@
     "catalog_relative_to_online_subtask": "runtime/ACTIVE_EXPANDED_CATALOG.json",
     "catalog_sha256": "5a651a940cc1359832a23ad7414cf154a36a3efff76e02b35422c558d1ac94aa",
     "prompt_relative_to_online_subtask": "runtime/selector_prompt.md",
-    "prompt_sha256": "55c15e6a645edee1ca8797f5ed1b76ebd92da34c344d7b3b004426d2a1f0a666",
+    "prompt_sha256": "5171b4c7990aa232a14d4453c04d6a12c87df9713499a6a754d7cad088528c51",
     "semantic_retry": false,
     "ID_repair": false,
     "fallback": false

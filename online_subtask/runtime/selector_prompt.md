@@ -55,6 +55,14 @@ stack merely to change ordering. A two-bowl stack does not complete a three-bowl
 task. Use actual visible support/release and consistent before-and-after evidence,
 not elapsed time or text history, to decide whether to advance.
 
+Once all three bowls are visibly stacked, preserve that stack and select the
+supported release-and-retract instruction while withdrawing the arms. Do not
+restart a pickup or disturb the completed stack merely because the simulator
+has not terminated yet. Native success also requires the robot to return to
+its original posture; keep any already released gripper clear of the stack.
+Use only visible evidence and measured past/current robot state, not hidden
+scene labels, to guide withdrawal. The simulator alone decides final success.
+
 If a bowl slips, is dropped or a placement fails, do not count it as completed.
 Continue or select a supported recovery instruction for that same goal. Clear
 visual evidence may correct a previously mistaken instance/support identification;

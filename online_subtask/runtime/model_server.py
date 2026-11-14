@@ -5,18 +5,14 @@ import asyncio
 from copy import deepcopy
 import hashlib
 import json
+import os
 from pathlib import Path
 import sys
 import time
 import numpy as np
-from export_binding import read, validate_binding
+from export_binding import read, validate_binding, canonical_sha
 from task_contract import (TASK, TRAIN_TASK, INSTRUCTION, CHECKPOINT_STEP, VARIANT,
                            PROTOCOL_CONFIG_ID, OUTPUT_NAMESPACE, compose_prompt)
-
-
-def initialize_paths(parent):
-    parent = Path(parent)
-    sys.path[:0] = [str(Path(__file__).resolve().parent), str(parent / 'src')]
 
 
 def validate_protocol_spec(spec):
@@ -40,12 +36,15 @@ def validate_protocol_spec(spec):
         raise ValueError('Exact Stack Bowls Random/EMA10000 online protocol required')
     if OUTPUT_NAMESPACE not in Path(spec['audit_path']).parts:
         raise ValueError('New isolated Stack Bowls output namespace required')
+    from import_contract import validate_policy_environment
+    environment = validate_policy_environment(spec.get('policy_environment', {}))
+    if spec.get('policy_environment_sha256', canonical_sha({})) != canonical_sha(environment):
+        raise ValueError('Policy process library/compiler environment differs')
     return {'config_id': PROTOCOL_CONFIG_ID, 'maximum_past_timepoints': 93,
             'maximum_total_images': 96}
 
 
-def create_model(spec, policy=None, jax_module=None, provider=None):
-    initialize_paths(spec['parent_root'])
+def create_model(spec, policy=None, jax_module=None, provider=None, training_prompt_formatter=None):
     from pi05_policy.native_model import Model as NativeModel, to_commands, encode_obs
     from multiview_protocol import PROTOCOLS, CAMERAS, SubtaskAbstention
     validate_protocol_spec(spec)
@@ -64,12 +63,24 @@ def create_model(spec, policy=None, jax_module=None, provider=None):
                                             selector_kind='deepseek',
                                             timeout_seconds=spec['selector_timeout_seconds'])
     if policy is None:
+        if training_prompt_formatter is not None:
+            raise ValueError('Production formatting must come from the bound training source')
+        from import_contract import validate_policy_environment
+        if spec.get('runtime_import_contract', {}).get('parent_root') != binding['parent_root']:
+            raise ValueError('Source-bound training imports required; prepare the policy on this host')
+        os.environ.update(validate_policy_environment(spec.get('policy_environment', {})))
+        os.environ['OPENPI_DATA_HOME'] = str(Path(binding['parent_root']) / 'cache/openpi')
+        os.environ['JAX_COMPILATION_CACHE_DIR'] = str(Path(spec['audit_path']).parent / 'cache/jax')
+        os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
+        from import_contract import activate
+        imports = activate(spec['runtime_import_contract'])
         import jax
         from openpi.models.pi0_config import Pi0Config
         from openpi.policies.policy_config import create_trained_policy
         from openpi.shared.normalize import load
         from openpi.training.config import TrainConfig
-        from strict_prompt import strict_aloha_config
+        from strict_prompt import strict_aloha_config, compose_training_prompt
+        training_prompt_formatter = compose_training_prompt
         cfg = TrainConfig(name='stack_bowls100_subtask_ema10000_random_online',
                           model=Pi0Config(pi05=True, action_horizon=50, action_dim=32,
                                          max_token_len=binding['training_identity']['max_token_len']),
@@ -79,6 +90,10 @@ def create_model(spec, policy=None, jax_module=None, provider=None):
                                        norm_stats=load(Path(binding['norm_stats_path']).parent),
                                        sample_kwargs={'num_steps': 10})
         jax_module = jax
+    else:
+        if training_prompt_formatter is None:
+            raise ValueError('An injected CPU fixture must provide its explicit training formatter')
+        imports = {'scope': 'Explicit injected CPU fixture; not production source acceptance'}
     if jax_module is None:
         raise ValueError('Actual JAX RNG implementation required')
     metadata = {
@@ -101,6 +116,8 @@ def create_model(spec, policy=None, jax_module=None, provider=None):
         'predict_steps': 50, 'execute_steps': 8, 'flow_steps': 10, 'noise_seed': 42,
         'state_dim': 14, 'raw_camera_resolution': [640, 480], 'cadence_execution_frames': 8,
         'SDK_action_limit': 800, 'max_tokens': 65536,
+        'runtime_import_validation': imports,
+        'policy_environment_sha256': canonical_sha(spec.get('policy_environment', {})),
     }
 
     class RuntimeModel(NativeModel):
@@ -175,7 +192,7 @@ def create_model(spec, policy=None, jax_module=None, provider=None):
                     raise
                 validate_context(context)
                 prompt=compose_prompt(INSTRUCTION,context['subtask'],True)
-                if prompt!=INSTRUCTION+' Current subtask: '+context['subtask']:
+                if prompt!=training_prompt_formatter(INSTRUCTION,canonical(context).decode()):
                     raise ValueError('Actual training/inference Subtask composition differs')
             actual={**self.current,'prompt':prompt}
             _,sample_rng=self._jax.random.split(self.policy._rng)
@@ -213,7 +230,7 @@ def create_model(spec, policy=None, jax_module=None, provider=None):
 def main():
     p=argparse.ArgumentParser();p.add_argument('--config',type=Path,required=True)
     p.add_argument('--port',type=int,required=True);p.add_argument('--ready-output',type=Path,required=True)
-    args=p.parse_args();spec=read(args.config);initialize_paths(spec['parent_root']);model=create_model(spec)
+    args=p.parse_args();spec=read(args.config);model=create_model(spec)
     from client_server.ws.model_server import PolicyServer,PolicyServerConfig
     server=PolicyServer(model,PolicyServerConfig(host='127.0.0.1',port=args.port,ws_ping_interval_s=20,ws_ping_timeout_s=2100))
     async def run():

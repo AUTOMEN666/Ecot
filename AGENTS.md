@@ -18,8 +18,12 @@ measured states and acknowledged execution history. Preserve frozen waits,
 physics-clock witnesses and exact text/command ACKs. Private SDK scene data is
 for freeze auditing only, never generator or policy input.
 
-No real API/model/GPU/native execution is authorized by the current code/PR
-request. CPU fixtures are explicitly fixtures, not runtime acceptance. Never
+The original request covered code/PR only. The user subsequently authorized
+finite A800/H20 environment checks and H20 repair on2026-11-14; source inspection
+across projects is read-only. Preserve existing workloads. Environment kernels
+and standalone native initialization are separate from full online acceptance;
+no formal30/64-concurrency rollout is launched by this branch preparation.
+CPU fixtures are explicitly fixtures, not runtime acceptance. Never
 resume paused ERVLA, create synthetic parking, change shared SDK/environments,
 read another project's secrets, or publish weights/credentials/raw requests.
 

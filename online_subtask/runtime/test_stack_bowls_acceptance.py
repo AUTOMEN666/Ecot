@@ -40,7 +40,8 @@ def fixture(root):
             observed_outcome_frame=1, injection_execution_frame=0, episode_id='fixture', context=p['context'],
             prompt=p['prompt'], prompt_sha256=p['prompt_sha256']))+'\n')
     freeze = dict(before=frozen(), after=frozen())
-    write(output/'freeze.jsonl', freeze); write(output/'history_capture_freeze.jsonl', freeze)
+    write(output/'freeze.jsonl', dict(**freeze, execution_frame=0, episode_id='fixture', request_returned=True))
+    write(output/'history_capture_freeze.jsonl', dict(**freeze, history_frame=0, episode_id='fixture', history_RPC_returned=True))
     write(output/'executed_subtask_ack.jsonl', dict(**freeze, ACK_RPC_returned=True, ack_source=source, receipt=receipt))
     policy = root/'policy.jsonl'
     commands14 = [a['left_arm_joint_state']+a['left_ee_joint_state']+a['right_arm_joint_state']+a['right_ee_joint_state'] for a in actions()]
@@ -63,7 +64,9 @@ def fixture(root):
         details={'0':dict(layout_id=0, success=False, score=0.)}))
     video = root/'fixture-video'; video.write_bytes(b'explicit synthetic fixture; NOT an MP4')
     encoded = root/'fixture-overlay'; encoded.write_bytes(b'not an actual encoded movie')
-    frames = write(root/'frames.jsonl', {'fixture_only':True})
+    frames = root/'frames.jsonl'
+    frames.write_text(''.join(json.dumps(dict(frame_index=i, executed_action_step=i,
+        **{key:clock(i)[key] for key in ('context_physics_step_index','SDK_physics_step_counter','simulation_time_seconds')}))+'\n' for i in range(2)))
     decoded = write(root/'decode.json', dict(fully_decoded=True, encoded_video_fully_decoded=True,
         frame_count=2, fps=25, actual_text_timeline_verified=True,
         injection_log_sha256=sha(output/'injected_text.jsonl'), source_video_sha256=sha(video),
@@ -88,7 +91,7 @@ class CaseArtifactContracts(unittest.TestCase):
             with self.assertRaises(ValueError): verify_engineering(path, args['manifest_sha256'])
 
     def test_interruptions_missing_actions_and_forged_ACK_are_rejected(self):
-        for failure in ('exit', 'clock', 'ack', 'text', 'video'):
+        for failure in ('exit', 'clock', 'ack', 'text', 'video', 'freeze', 'ledger'):
             with tempfile.TemporaryDirectory() as tmp:
                 args = fixture(Path(tmp)); out = args['output']
                 if failure == 'exit':
@@ -100,9 +103,14 @@ class CaseArtifactContracts(unittest.TestCase):
                 elif failure == 'text':
                     p = out/'injected_text.jsonl'; rows = [json.loads(s) for s in p.read_text().splitlines()]
                     rows[-1]['prompt'] = 'unexecuted text'; p.write_text(''.join(json.dumps(r)+'\n' for r in rows))
-                else:
+                elif failure == 'video':
                     d = json.loads(args['decode_receipt'].read_text()); d['encoded_video_fully_decoded'] = False
                     write(args['decode_receipt'], d)
+                elif failure == 'freeze':
+                    (out/'freeze.jsonl').write_text('')
+                else:
+                    d = json.loads((out/'terminal.jsonl').read_text())
+                    Path(d['main_camera_action25hz']['frames_path']).write_text('{}\n')
                 with self.subTest(failure=failure), self.assertRaises((ValueError, RuntimeError)):
                     audit_case(**args)
 

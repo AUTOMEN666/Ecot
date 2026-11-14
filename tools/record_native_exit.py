@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import signal
 import subprocess
+import sys
 import time
 
 
@@ -30,6 +31,10 @@ def main():
     folder = a.plan.parent
     if (folder / 'NATIVE_EXIT.json').exists():
         raise ValueError('Do not overwrite or silently retry an actual case')
+    runtime = Path(__file__).resolve().parents[1] / 'online_subtask/runtime'
+    sys.path.insert(0, str(runtime))
+    from preflight import validate_native_plan
+    preflight = validate_native_plan(plan, a.plan)
     env = dict(os.environ)
     for key in plan['environment_must_be_unset']:
         env.pop(key, None)
@@ -64,6 +69,7 @@ def main():
                'timed_out': timed_out, 'phase': plan['phase'], 'layout_id': plan['layout_id'],
                'plan_path': str(a.plan.resolve()), 'plan_sha256': a.plan_sha256,
                'SDK_success_claimed': False, 'acceptance_claimed': False}
+    receipt['launch_preflight'] = preflight
     with (folder / 'NATIVE_EXIT.json').open('x') as out:
         json.dump(receipt, out, indent=2); out.write('\n')
     print(json.dumps(receipt))

@@ -108,6 +108,18 @@ def audit_case(output, policy_audit, layout_manifest, manifest_sha256, native_ex
         for row in records:
             verify_static(row['before'], row['after'])
             verify_clock_delta(row['before']['physics_clock'], row['after']['physics_clock'], 0, name)
+        if name == 'freeze.jsonl':
+            if ([r.get('execution_frame') for r in records] != list(range(0, commands, 8))
+                    or any(r.get('episode_id') != episode or r.get('request_returned') is not True for r in records)):
+                raise ValueError('Missing one or more real generation/policy freeze witnesses')
+        if name == 'history_capture_freeze.jsonl':
+            from multiview_protocol import history_source_frame
+            frames = []; i = 0
+            while history_source_frame(i) <= commands:
+                frames.append(history_source_frame(i)); i += 1
+            if ([r.get('history_frame') for r in records] != frames
+                    or any(r.get('episode_id') != episode or r.get('history_RPC_returned') is not True for r in records)):
+                raise ValueError('Missing one or more actual10Hz history captures')
     acks = lines(output / 'executed_subtask_ack.jsonl')
     if len(acks) != len(plans) or any(row.get('ACK_RPC_returned') is not True for row in acks):
         raise ValueError('One successful actual-execution ACK per plan required')
@@ -135,6 +147,9 @@ def audit_case(output, policy_audit, layout_manifest, manifest_sha256, native_ex
         if canonical(executed8.tolist()) != canonical(row['executed_first8_absolute_joint14']):
             raise ValueError('Model first8 commands differ from the recorded full50 prediction')
         actual_clocks = clocks[f:min(f + 8, commands)]
+        expected_reason = 'native_terminal' if f + len(actual_clocks) == commands else 'full_chunk'
+        if ack['ack_source'].get('chunk_end_reason') != expected_reason:
+            raise ValueError('Only the actual final native chunk may terminate')
         if canonical(ack['ack_source']['execution_clocks']) != canonical(actual_clocks):
             raise ValueError('ACK does not describe actual native actions')
         receipt = history.commit(ack['ack_source'], expected_injection=expected_injection,
@@ -142,6 +157,15 @@ def audit_case(output, policy_audit, layout_manifest, manifest_sha256, native_ex
         if canonical(receipt) != canonical(ack['receipt']):
             raise ValueError('Executed history receipt differs from reconstructed ACK')
     recording = terminal['main_camera_action25hz']
+    frame_rows = lines(recording['frames_path'])
+    if ([r.get('frame_index') for r in frame_rows] != list(range(commands + 1))
+            or [r.get('executed_action_step') for r in frame_rows] != list(range(commands + 1))):
+        raise ValueError('Incomplete actual video capture ledger')
+    boundary_clocks = [clocks[0]['before']] + [row['after'] for row in clocks]
+    for frame, actual_clock in zip(frame_rows, boundary_clocks):
+        if any(frame.get(key) != actual_clock[key] for key in (
+                'context_physics_step_index', 'SDK_physics_step_counter', 'simulation_time_seconds')):
+            raise ValueError('Video capture is not aligned to the actual action clock')
     decoded = read(decode_receipt)
     if (recording.get('status') != 'complete' or recording.get('frame_count') != commands + 1
             or decoded.get('fully_decoded') is not True or decoded.get('encoded_video_fully_decoded') is not True

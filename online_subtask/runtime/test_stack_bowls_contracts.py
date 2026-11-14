@@ -38,6 +38,7 @@ def fixture_sdk(root):
     for index in range(30):
         (layouts / f'{TASK}_{index}.json').write_text(json.dumps({'offline_fixture_layout': index}))
     (root / 'XPolicyLab/policy').mkdir(parents=True)
+    (root / 'third_party/curobo').mkdir(parents=True)
     (root / 'env/global_configs.py').write_text(
         "import os\nBENCHMARK='RoboDojo'\n"
         "ASSETS_PATH=os.path.abspath(os.path.join(os.path.dirname(__file__),'..','Assets'))\n")
@@ -60,6 +61,19 @@ def frozen(frame=0):
 
 
 class StackBowlsContracts(unittest.TestCase):
+    def test_existing_H20_readback_hook_is_rehomed_once_without_foreign_support(self):
+        from namespace_fiveseed import patch_readback_source
+        original = ('class Eval:\n    def reset(self):\n'
+            '            from support.probe_readback import install_private_reward_readback\n'
+            '            if not hasattr(self, "_ervla_readback_audit"):\n'
+            '                self._ervla_readback_audit = install_private_reward_readback(self)\n'
+            '            self.reward_manager.init_state()\n')
+        patched = patch_readback_source(original)
+        self.assertNotIn('support.', patched)
+        self.assertEqual(patched.count('install_private_reward_readback(self)'), 1)
+        self.assertEqual(patched.count('self.reward_manager.init_state()'), 1)
+        with self.assertRaises(ValueError):patch_readback_source(patched)
+        with self.assertRaises(ValueError):patch_readback_source(original.replace('support.probe_readback','support.unreviewed'))
     def test_actual_catalogue_source_counts_and_original_words(self):
         c = load_catalog()
         self.assertEqual(len(c['candidates']), 297)
@@ -132,7 +146,7 @@ class StackBowlsContracts(unittest.TestCase):
             self.assertEqual(validate_manifest(mp, expected_sha256=digest)['episodes'], 30)
             a = types.SimpleNamespace(layout=29, phase='engineering', layout_manifest=mp,
                 manifest_sha256=digest, engineering_acceptance=None,
-                output=root / OUTPUT_NAMESPACE / 'engineering', sim_python=Path('/fixture/python'),
+                output=root / OUTPUT_NAMESPACE / 'engineering', sim_python=Path(sys.executable),
                 port=19071, native_gpu_index=3, experience=None)
             source_bytes = {name: (sdk / name).read_bytes() for name in SOURCE_FILES}
             plan = prepare(a)
@@ -142,12 +156,24 @@ class StackBowlsContracts(unittest.TestCase):
             self.assertEqual(len(plan['namespace']['layout_pool']), 30)
             self.assertIn(TASK, plan['argv']); self.assertNotIn('CUDA_VISIBLE_DEVICES', plan['required_environment_overrides'])
             self.assertEqual(plan['original_SDK_action_limit'], 800)
+            self.assertEqual(plan['argv'][plan['argv'].index('--device')+1], 'cuda:3')
+            import argparse
+            parser = argparse.ArgumentParser(allow_abbrev=False)
+            parser.add_argument('--kit_args'); parser.add_argument('--device')
+            parsed, _ = parser.parse_known_args(plan['argv'][2:])
+            self.assertEqual(parsed.kit_args, '--/renderer/multiGpu/enabled=false')
+            self.assertEqual(parsed.device, 'cuda:3')
+            from preflight import validate_native_plan
+            self.assertTrue(validate_native_plan(plan, a.output/'sim_launch.json')['passed'])
+            changed = deepcopy(plan); changed['runtime_PYTHONPATH_prefix'] = [changed['runtime_PYTHONPATH_prefix'][0]]
+            with self.assertRaises(ValueError): validate_native_plan(changed, a.output/'sim_launch.json')
             for field, value in [('phase', 'formal'), ('layout', 30)]:
                 bad = deepcopy(a); setattr(bad, field, value)
                 with self.assertRaises(ValueError): prepare(bad)
             scene = sdk / f'Assets/Eval_Layout/RoboDojo/arx_x5/1/{TASK}_0.json'
             scene.write_text('{}')
             with self.assertRaises(ValueError): validate_manifest(mp, expected_sha256=digest)
+            with self.assertRaises(ValueError): validate_native_plan(plan, a.output/'sim_launch.json')
             scene.write_text(json.dumps({'offline_fixture_layout': 0}))
             task = sdk / SOURCE_FILES[-2]; task.write_text('# changed native task\n')
             with self.assertRaises(ValueError): validate_manifest(mp, expected_sha256=digest)

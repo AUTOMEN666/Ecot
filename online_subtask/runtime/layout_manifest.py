@@ -12,6 +12,8 @@ SOURCE_FILES = (
     'src/eval_client/main.py', 'src/eval_client/eval_env.py',
     'task/RoboDojo/task_registry.py', 'task/RoboDojo/tasks/stack_bowls_random.py',
     'task/RoboDojo/config/stack_bowls_random.yml',
+    'XPolicyLab/client_server/ws/model_server.py', 'XPolicyLab/client_server/ws/model_client.py',
+    'third_party/IsaacLab/source/isaaclab/isaaclab/app/app_launcher.py',
 )
 
 

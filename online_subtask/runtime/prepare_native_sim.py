@@ -2,6 +2,7 @@
 from __future__ import annotations
 import argparse
 import json
+import os
 from pathlib import Path
 from export_binding import sha
 from layout_manifest import validate_manifest
@@ -10,12 +11,16 @@ from seed_namespace_validation import validate_namespace
 from rpc_contract import patch_private_namespace, validate_rpc_namespace
 from acceptance import verify_engineering
 from task_contract import TASK, OUTPUT_NAMESPACE, LAYOUT_IDS, PROTOCOL_CONFIG_ID
+from preflight import runtime_sources, native_import_roots
 HERE = Path(__file__).resolve().parent
 
 
 def prepare(a):
     if a.layout not in LAYOUT_IDS or a.phase not in ('engineering', 'formal'):
         raise ValueError('Exact existing Random30 layout and phase required')
+    python = a.sim_python.resolve(strict=True)
+    if not python.is_file() or not os.access(python, os.X_OK):
+        raise ValueError('Usable native Python on this host required')
     manifest = validate_manifest(a.layout_manifest, expected_sha256=a.manifest_sha256)
     if a.phase == 'formal':
         if a.engineering_acceptance is None:
@@ -41,7 +46,8 @@ def prepare(a):
             '--task_name', TASK, '--num_envs', '1', '--env_cfg_type', 'arx_x5',
             '--policy_name', alias, '--port', str(a.port), '--host', '127.0.0.1',
             '--seed', '1', '--additional_info', out.name, '--headless', '--enable_cameras',
-            '--device_id', str(a.native_gpu_index)]
+            '--device_id', str(a.native_gpu_index), '--device', 'cuda:' + str(a.native_gpu_index),
+            '--kit_args=--/renderer/multiGpu/enabled=false']
     if a.experience:
         argv += ['--experience', str(a.experience)]
     plan = {'schema': 'ecot.stack_bowls_random.native_case_plan.v1',
@@ -49,10 +55,12 @@ def prepare(a):
             'scene_seed': 1, 'layout_id': a.layout, 'noise_seed': 42,
             'manifest_path': str(a.layout_manifest.resolve()), 'manifest_sha256': a.manifest_sha256,
             'argv': argv, 'cwd': str(sdk), 'required_environment_overrides': env,
-            'runtime_PYTHONPATH_prefix': [str(HERE)],
+            'runtime_PYTHONPATH_prefix': native_import_roots(sdk),
+            'runtime_source_sha256': runtime_sources(),
             'credential_not_required_by_native_child': True,
             'environment_must_be_unset': ['CUDA_VISIBLE_DEVICES', 'ECOT_AUTHORIZED_API_KEY'],
             'native_physical_gpu_index': a.native_gpu_index,
+            'native_single_GPU_rendering': True,
             'required_resource_scope': 'All8 public UUID locks and fresh owner/renderer admission; no synthetic parking',
             'namespace': ns, 'engineering_command_limit': 0, 'original_SDK_action_limit': 800,
             'engineering_acceptance': str(a.engineering_acceptance.resolve()) if a.engineering_acceptance else None,

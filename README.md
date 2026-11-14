@@ -4,7 +4,7 @@
 ecot_online_generation_subtask_classify_objects 的 commit
 95188146ce7191aa15d8a23a545707712e267d81 独立适配。
 DeepSeek生成当前Subtask，π0.5接收文本并预测动作。
-**此PR交付代码与CPU验证，未执行真实DeepSeek、GPU推理或仿真，没有成功率结果。**
+**此PR交付代码与验证。尚未执行DeepSeek在线策略闭环或正式30回合，没有成功率结果。环境核函数和独立初始化检查与测评结果分开记录。**
 
 | 项目 | 固定设置 |
 |---|---|

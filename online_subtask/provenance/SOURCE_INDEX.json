@@ -11,13 +11,13 @@
     },
     {
       "path": "AGENTS.md",
-      "bytes": 1575,
-      "sha256": "f3b33ced9476abb7480a71bc550a9b70ea16a0a50f906d9409dee27cf9ee826f"
+      "bytes": 1881,
+      "sha256": "9d9bd4a64b6cb29bc7ff761b74ad1967c88d2b44fcd62602f06c8385df195a43"
     },
     {
       "path": "README.md",
-      "bytes": 2833,
-      "sha256": "758d8353209c6c0b7494f3c529e58a27e2cdac2df72b55ec8a330f1699625e85"
+      "bytes": 2910,
+      "sha256": "7fd17e80b12c733e620b5ba3dd7f4151190856c4c0d55b777901bc9843da8c3b"
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -26,13 +26,13 @@
     },
     {
       "path": "experiment/evaluation.md",
-      "bytes": 1344,
-      "sha256": "426fc1054d889d3a571a2b2a1aae94690ee0fb58b747f00e38ccc76a3574828e"
+      "bytes": 1491,
+      "sha256": "740157a247c226fbb1f1330b203a505629b3159d183cc224548f3a85ea548d9a"
     },
     {
       "path": "handoff.md",
-      "bytes": 1025,
-      "sha256": "50eea13006f36eaf39af64cc8cbdd7b181253e607b4b98457ac9d7a3fc394bc7"
+      "bytes": 2277,
+      "sha256": "6a024d416606765fc298317f1305286dc3af7036421dcf451606e1e34f01b024"
     },
     {
       "path": "online_subtask/configs/external_paths.example.json",
@@ -42,7 +42,7 @@
     {
       "path": "online_subtask/configs/stack_bowls_random_mainhist93_ema10000_v1.json",
       "bytes": 4835,
-      "sha256": "b7875d3d9979739452bcbc60db415349fc1efe603bab3abf2f1c5a1ee30f757f"
+      "sha256": "7aedec956d586a08b66a78d948ccb204d340103e435ec3e43088d2d550fecf5b"
     },
     {
       "path": "online_subtask/docs/branches.md",
@@ -51,13 +51,13 @@
     },
     {
       "path": "online_subtask/docs/integration.md",
-      "bytes": 5714,
-      "sha256": "117482e00071a0ee7888817eab5864210c72b6f7aeb352e52de3261cc590db41"
+      "bytes": 7639,
+      "sha256": "a7cd778e25fb889c97563c5556cebc15e77ae0e31637891429e6226e21fdfe3d"
     },
     {
       "path": "online_subtask/docs/protocol.md",
-      "bytes": 3204,
-      "sha256": "df6376ac56e2fbb22970861afe2e44404a560029a7dfd68c47f980c7d52e3a3c"
+      "bytes": 3367,
+      "sha256": "d70a9427a0afe76d8c4afaefb2a9d8d7bee06db2bcae483b31f8804350646f65"
     },
     {
       "path": "online_subtask/docs/provenance.md",
@@ -66,13 +66,18 @@
     },
     {
       "path": "online_subtask/docs/validation.md",
-      "bytes": 1307,
-      "sha256": "82d6e6836dfee11802f4650f3040a6a19297c6327d53b7bc932e215922b0e8ca"
+      "bytes": 1970,
+      "sha256": "fd57129b82598c26e778554ad157fb6ce2c73591d11591e83393cd3e636f043c"
     },
     {
       "path": "online_subtask/provenance/REMOTE_CPU_VALIDATION.json",
       "bytes": 902,
       "sha256": "5a2e471987909af215bb60480bea637f61fe7dc7e93c29ad3c901b01f3908e9d"
+    },
+    {
+      "path": "online_subtask/provenance/REVIEW_FINDINGS.md",
+      "bytes": 1935,
+      "sha256": "1f58a81e51047dbf7f9ea87b23a3aef69c0d6bcc7da66e4180b8e9f669727df4"
     },
     {
       "path": "online_subtask/provenance/STACK_BOWLS_CATALOG_GENERATION.json",
@@ -81,8 +86,8 @@
     },
     {
       "path": "online_subtask/provenance/cpu_validation.json",
-      "bytes": 923,
-      "sha256": "10089a9b75e0016c36330360f4bb7ad1a6485365f5f73f60297b115fc00a90ec"
+      "bytes": 983,
+      "sha256": "4feba392aff8351ee976369a6321b9b3952b8a99a5670d732b00d8c48ed9b958"
     },
     {
       "path": "online_subtask/provenance/licenses/openpi_vendor/LICENSE",
@@ -226,8 +231,8 @@
     },
     {
       "path": "online_subtask/runtime/acceptance.py",
-      "bytes": 13076,
-      "sha256": "b1d1f3621714a1c4792216d29d1dfb1dc866032f4a577c56aeff8f99706f2f0b"
+      "bytes": 14903,
+      "sha256": "c75ae365325d0cd51fa7a3b8d2711c27a14eaf315f182e346b2a124352ef6c4d"
     },
     {
       "path": "online_subtask/runtime/executed_history.py",
@@ -250,14 +255,19 @@
       "sha256": "3dae444076c323fb0074811a823f7a03342481dc5ae364e48d3e2ef279e32232"
     },
     {
+      "path": "online_subtask/runtime/import_contract.py",
+      "bytes": 4223,
+      "sha256": "7c07ec86be22941a18a56fbb61950d75359d7850e141de72c9bdb57bc00de66d"
+    },
+    {
       "path": "online_subtask/runtime/layout_manifest.py",
-      "bytes": 4987,
-      "sha256": "bccbc20cd70e503c6f571b7db53e7ded7166d6fd653113cdf779085874468dfc"
+      "bytes": 5158,
+      "sha256": "79aac049a8d32aef49b36516e0ea694eaa35748a6b2b83dfe4b4eaf24e7e3902"
     },
     {
       "path": "online_subtask/runtime/model_server.py",
-      "bytes": 15343,
-      "sha256": "c8ea6ce6469ab804366679e7f6c0c424a9837b862731d6d03ffed8dd01d0ad5e"
+      "bytes": 16847,
+      "sha256": "eb8b25770257409f95f19bcc5869fcca7f567637dcee7a34a22e1d3883940ea9"
     },
     {
       "path": "online_subtask/runtime/multiview_protocol.py",
@@ -271,8 +281,8 @@
     },
     {
       "path": "online_subtask/runtime/namespace_fiveseed.py",
-      "bytes": 6752,
-      "sha256": "f5706a97605b69036dd36ffca904f49a2da3403f9de54de621e3d3187fdb2a64"
+      "bytes": 7488,
+      "sha256": "6c51c9cbdbdf7d91b7891a7e29f6306a06cbd9fdc6f2485ef0449211e5cbae09"
     },
     {
       "path": "online_subtask/runtime/native_cpu_smoke.py",
@@ -315,19 +325,24 @@
       "sha256": "79a98fb9dcbf025fdfa757efb792e28104b456d135fe984d1320ccf88007427e"
     },
     {
+      "path": "online_subtask/runtime/preflight.py",
+      "bytes": 5161,
+      "sha256": "854d73ec82856ddd2c0a02830f903df79d7a8d0f8e77a6bab5f570516209f7fb"
+    },
+    {
       "path": "online_subtask/runtime/prepare_cohort.py",
       "bytes": 1981,
       "sha256": "3a3ab2728899c77af412706ed6a050f92cace0a1017fa933016760d65ffe510b"
     },
     {
       "path": "online_subtask/runtime/prepare_native_sim.py",
-      "bytes": 5005,
-      "sha256": "4a18c1925127b3506a3b22299102602b8928b18d642d8ac30f2dc7efd94064a5"
+      "bytes": 5481,
+      "sha256": "12c4670adf5a8cd81c599870461cb88e5ee5878aaa5e9bdddf256afe7c60a7e5"
     },
     {
       "path": "online_subtask/runtime/prepare_policy.py",
-      "bytes": 4040,
-      "sha256": "fd4feb32f4be58d847375994efdd646417a4072040e4d7834fac1431dce6c8a5"
+      "bytes": 6368,
+      "sha256": "75071d2ca8fa949da50108baee02c85eb252bf865bd41fd26a04218c88fffbed"
     },
     {
       "path": "online_subtask/runtime/rpc_contract.py",
@@ -341,8 +356,8 @@
     },
     {
       "path": "online_subtask/runtime/selector_prompt.md",
-      "bytes": 4706,
-      "sha256": "55c15e6a645edee1ca8797f5ed1b76ebd92da34c344d7b3b004426d2a1f0a666"
+      "bytes": 5244,
+      "sha256": "5171b4c7990aa232a14d4453c04d6a12c87df9713499a6a754d7cad088528c51"
     },
     {
       "path": "online_subtask/runtime/subtask_client.py",
@@ -375,6 +390,11 @@
       "sha256": "610e0bd0b3cf4a3ffd27dd42983da569b771dc95ae5b0ebae963d7652eef6586"
     },
     {
+      "path": "online_subtask/runtime/test_import_contract.py",
+      "bytes": 3525,
+      "sha256": "bd19d3880799b7cf47e4df3491c891b2a2c37f963dd9963098267fc565dffd8f"
+    },
+    {
       "path": "online_subtask/runtime/test_json_object_prompt_compatibility.py",
       "bytes": 4135,
       "sha256": "8caee13e0eb97b3e650e60589fc1b987d156a7694dd3bc88fcd76bd14d7cd55b"
@@ -386,18 +406,18 @@
     },
     {
       "path": "online_subtask/runtime/test_runtime_executed_history.py",
-      "bytes": 6268,
-      "sha256": "5f76945be03ac894a204e67a02c2860a31d35c341bb2ba3a24c8a68a8337b84f"
+      "bytes": 6591,
+      "sha256": "32bbe983cdda62d675830868a77c364c4dd5e072cdb0238202d232a842cd90c9"
     },
     {
       "path": "online_subtask/runtime/test_stack_bowls_acceptance.py",
-      "bytes": 8301,
-      "sha256": "ec9eae865f71eadbaeacba24315a247d1d767b3678d8ca07e3b6d3a8f36c75a0"
+      "bytes": 8975,
+      "sha256": "891b603798001b0d91a1ab9ff7584e6701a761aaa6dd58a1ba48a2a61dc2cf79"
     },
     {
       "path": "online_subtask/runtime/test_stack_bowls_contracts.py",
-      "bytes": 12114,
-      "sha256": "3f3507d276d33116deb8d9d56a4ffa5e1335cd9a0a76c7f687cae100cdad9d70"
+      "bytes": 14105,
+      "sha256": "198219efe8fa5156c326f4d9949352fb7dcf9bbf4d470e9847bbdeb25e41e19a"
     },
     {
       "path": "online_subtask/tests/run_cpu_tests.py",
@@ -416,8 +436,8 @@
     },
     {
       "path": "tools/record_native_exit.py",
-      "bytes": 3240,
-      "sha256": "d00dc36f2c1637107492ea9329b6db6a43baf7e22fbc3cc9ad07f7531284dc54"
+      "bytes": 3507,
+      "sha256": "3d15673cbfe2545cf8d377c96d3208da6324bec5d0975579768a781a0d09a64f"
     },
     {
       "path": "tools/render_subtask_video.py",
